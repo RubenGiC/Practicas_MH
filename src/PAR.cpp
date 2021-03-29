@@ -95,6 +95,7 @@ void PAR::lectura(string fichero_set, string fichero_set_const){
 	--size;//le decremento 1 porque cuenta el salto de linea del vacio
 	//cout << size << endl;
 	matriz.set_size(size,size);//redimensiono la matriz
+	size_mat = size;
 
 	read.open(fichero_set_const);//abro el archivo que contiene la matriz
 
@@ -182,15 +183,23 @@ void PAR::print_RSI(){
 vector<vector<int>> PAR::algoritmo_greedy(){
 
 	vector<vector<int>> cop_clusters;//vector de clusters copia para comparar con el cluster modificado
+	int pos=-1;
+
 	do{//mientras los vectores sean distintos
 		if(clusters.size()>0)//si el vector de clusters no esta vacio
 			cop_clusters = clusters;//copio el vector de clusters antes de que sea modificado
 		for(vector<int>::iterator it=RSI.begin(); it != RSI.end(); ++it){
 			if(it != RSI.begin()){
-				clusters[min_restrictions(atributos[*it])].push_back(*it);
+				pos = min_restrictions(*it);
+				clusters[pos].push_back(*it);
+				if(find(clusters_not_null.begin(),clusters_not_null.end(),pos) != clusters_not_null.end())
+					clusters_not_null.push_back(pos);
 			}else{
-				clusters[min_distance(atributos[*it])].push_back(*it);
+				pos = min_distance(*it);
+				clusters[pos].push_back(*it);
+				clusters_not_null.push_back(pos);
 			}
+			pos = -1;
 		}
 
 	}while(clusters!=cop_clusters);
@@ -199,29 +208,36 @@ vector<vector<int>> PAR::algoritmo_greedy(){
 }
 
 //calculate the closest and least restriction to cluster
-int PAR::min_restrictions(vector <float> actual){
+int PAR::min_restrictions(int actual){
 	int cluster=-1;
 	float min_distance=999;//save the minimum distance and less restriction
 	int less_restriction=999;
 	float actual_distance=0;//save the actual distance
+	int actual_restriction=0;//save the actual number of restrictions
 	//go through all clusters
 	for(unsigned int i=0; i < centroides.size(); ++i){
 		//calculate the Euclidea distance with the current cluster
-		actual_distance = distancia_euclidea(actual,centroides[i]);
-		cout << " distancia euclidea " << actual_distance << endl;
+		actual_distance = distancia_euclidea(atributos[actual],centroides[i]);
 
+		actual_restriction = infeasibility(i, actual);
+
+		//cout << "if( " << actual_restriction << " <= " << less_restriction << " and " << actual_distance << " <= " << min_distance << endl;
 		//if the current cluster is less than the minimum saved, update the cluster and distance
-		if(actual_distance < min_distance){
-			min_distance = actual_distance;
-			cluster = i;
+		if(actual_restriction <=less_restriction){
+			if((actual_restriction <less_restriction) || (actual_distance < min_distance && actual_restriction <=less_restriction)){
+				min_distance = actual_distance;
+				less_restriction = actual_restriction;
+				cluster = i;
+				//cout << "YES " << min_distance << ", " << less_restriction << endl;
+			}
 		}
 	}
-
+	//cout << min_distance << " <-> " << less_restriction << " <-> " << endl;
 	return cluster;
 }
 
 //calculate the cluster with minimum distance, only first iteration
-int PAR::min_distance(vector<float> actual){
+int PAR::min_distance(int actual){
 	int cluster=-1;//save the cluster with minimum distance
 	float min_distance=999;//save the minimum distance
 	float actual_distance=0;//save the actual distance
@@ -229,8 +245,8 @@ int PAR::min_distance(vector<float> actual){
 	//go through all clusters
 	for(unsigned int i=0; i < centroides.size(); ++i){
 		//calculate the Euclidea distance with the current cluster
-		actual_distance = distancia_euclidea(actual,centroides[i]);
-		cout << " distancia euclidea " << actual_distance << endl;
+		actual_distance = distancia_euclidea(atributos[actual],centroides[i]);
+		//cout << " distancia euclidea " << actual_distance << endl;
 
 		//if the current cluster is less than the minimum saved, update the cluster and distance
 		if(actual_distance < min_distance){
@@ -239,20 +255,74 @@ int PAR::min_distance(vector<float> actual){
 		}
 	}
 
-	cout << " minima distancia euclidea " << min_distance << " con cluster: " << cluster << endl;
+	//cout << " minima distancia euclidea " << min_distance << " con cluster: " << cluster << endl;
 
 	return cluster;//return the cluster with minimum distance
 }
 
 //calculate infeasibility when assigning an atribute to each cluster and return the minimum
-/*int PAR::infeasibility(int actual){
-	vector<int> restrictions;
+int PAR::infeasibility(int clust, int actual){
+	// number of restrictions, matrix column and row and not empty cluster indexes
+	int rest=0, col=-1, row=-1, pos=-1;
 
-	for(vector<float>::iterator it=centroides.begin(); it != centroides.end(); ++it){
+	//vector that save the node and constraint
+	vector<pair<int,int>> restriction_clust;
 
+	//-1 CL (Cannot-Link) y 1 ML (Must-Link)
+
+	//traverses the row of the constraint matrix of the current node
+	for(int i =0; i<size_mat; ++i){
+
+		//Is a triangular matrix
+		if(i<actual){
+			col = i;
+			row = actual;
+		}else{
+			col = actual;
+			row = i;
+		}
+
+		//if it isn't the diagonal and has a constraint
+		if(col != row && matriz(i,actual)!=0){
+			//walk through non-empty clusters
+			for(unsigned int e=0; e<clusters_not_null.size(); ++e){
+				//saves the current position of the non-emplty cluster
+				pos = clusters_not_null[e];
+
+				//if found by the node in current cluster
+				if(find(clusters[pos].begin(),clusters[pos].end(),i)!=clusters[pos].end()){
+					//saves node and constraint
+					restriction_clust.push_back(make_pair(i,matriz(col,row)));
+				}
+			}
+		}
 	}
-	return 0;
-}*/
+	//if the cluster is non-empty
+	if(clusters[clust].size()>0){
+
+		//walk through the vector with the constraints
+		for(unsigned int i=0; i< restriction_clust.size(); ++i){
+
+			//if the node is in the current cluster
+			if(find(clusters[clust].begin(),clusters[clust].end(),restriction_clust[i].first) != clusters[clust].end()){
+				//and the constraint is CL
+				if(restriction_clust[i].second == -1)
+					++rest;//increased constraint
+			}else{//in case it isn't and the constraint is ML
+				if(restriction_clust[i].second == 1)
+					++rest;//increased constraint
+			}
+		}
+	}else{//if the cluster is empty
+		//walk through the vector with the constraints
+		for(unsigned int i=0; i< restriction_clust.size(); ++i){
+			//and increase the number of constraints if the constraint is ML
+			if(restriction_clust[i].second == 1)
+				++rest;
+		}
+	}
+	return rest;// return the number of restriction
+}
 
 //calcula la distancia euclidea entre 2 nodos
 float PAR::distancia_euclidea(vector<float> nod1, vector<float> nod2){

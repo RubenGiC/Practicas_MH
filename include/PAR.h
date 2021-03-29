@@ -25,6 +25,8 @@ public:
 	vector<vector<float>> centroides;//vector de centroides
 	vector<vector<int>> clusters;//es la asignación de cada elementoa cada cluster
 	vector<int> RSI; //attribute index vector
+	int size_mat;
+	vector<int> clusters_not_null;//vector of non-empty cluster indices
 
 
 	PAR(string fichero_set, string fichero_set_const);//constructor que inicializa los valores
@@ -34,13 +36,13 @@ public:
 	void print_RSI();
 	vector<vector<int>> algoritmo_greedy();//algoritmo greedy
 	//calculate the closest and least restriction cluster
-	int min_restrictions(vector<float> actual);
+	int min_restrictions(int actual);
 	//calculate the cluster with minimum distance, only in the first iteration
-	int min_distance(vector<float> actual);
+	int min_distance(int actual);
 
 
-	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL CLUSTER QUE INCUMPLE MENOS RESTRICCIONES
-	int infeasibility(int actual);
+	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL NUMERO DE RESTRICCIONES QUE INCUMPLE DEL CLUSTER QUE RECIBE
+	int infeasibility(int cluster, int actual);;
 
 
 	//CALCULO QUE NODO TIENE LA DISTANCIA EUCLIDEA MINIMA

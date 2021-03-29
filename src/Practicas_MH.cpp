@@ -11,6 +11,7 @@
 #include <fstream> //lectura de ficheros
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "../include/PAR.h"
 using namespace std;
@@ -29,19 +30,16 @@ int main() {
 	//cout << par->min_distancia() << endl;
 	//par->print_centroides();
 	//par->print_RSI();
-	int p = par->min_distance(par->atributos[0]);
+	//int p = par->min_distance(par->atributos[0]);
 
-	vector<int> a = {1,2,3};
-	/*vector<int> b = {1,5,3};*/
-	vector<vector<int>> c;
-	vector<vector<int>> d;
-	c.push_back(a);
-	/*d.push_back(b);*/
-	cout << c.size() << endl;
-	if(c != d)
-		cout << "son iguales" << endl;
-	else
-		cout << "son distintos" << endl;
+	vector<vector<int>> clusters;
+
+	clock_t start = clock();
+	clusters = par->algoritmo_greedy();
+	clock_t end = clock();
+	float elapsed = float(end - start)/CLOCKS_PER_SEC;
+	cout << "Elapsed (Greedy): " << elapsed << "(seconds)" << endl;
+
 
 	return 0;
 }
