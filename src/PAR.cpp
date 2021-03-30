@@ -188,21 +188,34 @@ vector<vector<int>> PAR::algoritmo_greedy(){
 	do{//mientras los vectores sean distintos
 		if(clusters.size()>0)//si el vector de clusters no esta vacio
 			cop_clusters = clusters;//copio el vector de clusters antes de que sea modificado
+		//go through all nodes
 		for(vector<int>::iterator it=RSI.begin(); it != RSI.end(); ++it){
+			//if it isn't the first node
 			if(it != RSI.begin()){
+				//save the cluster that best fits that node
 				pos = min_restrictions(*it);
+				//access to the cluster and add actual node
 				clusters[pos].push_back(*it);
+				//if the actual cluster is not in the vector of not-null clusters
 				if(find(clusters_not_null.begin(),clusters_not_null.end(),pos) != clusters_not_null.end())
+					//add the cluster
 					clusters_not_null.push_back(pos);
-			}else{
+			}else{//if it's the first node
+				//save the node in the cluster with the smallest distance
 				pos = min_distance(*it);
 				clusters[pos].push_back(*it);
 				clusters_not_null.push_back(pos);
 			}
-			pos = -1;
+			pos = -1;//reset cluster
 		}
 
-	}while(clusters!=cop_clusters);
+		//update centroids
+		for(int i = 0; i<k; ++i){
+
+		}
+
+
+	}while(clusters!=cop_clusters and pos != -1);
 
 	return clusters;//devuelvo el vector de cluster definitivo
 }
@@ -214,6 +227,7 @@ int PAR::min_restrictions(int actual){
 	int less_restriction=999;
 	float actual_distance=0;//save the actual distance
 	int actual_restriction=0;//save the actual number of restrictions
+
 	//go through all clusters
 	for(unsigned int i=0; i < centroides.size(); ++i){
 		//calculate the Euclidea distance with the current cluster
@@ -282,7 +296,7 @@ int PAR::infeasibility(int clust, int actual){
 			row = i;
 		}
 
-		//if it isn't the diagonal and has a constraint
+		//if it isn't the identity and has a constraint
 		if(col != row && matriz(i,actual)!=0){
 			//walk through non-empty clusters
 			for(unsigned int e=0; e<clusters_not_null.size(); ++e){
@@ -321,7 +335,7 @@ int PAR::infeasibility(int clust, int actual){
 				++rest;
 		}
 	}
-	return rest;// return the number of restriction
+	return rest;// return the number of restrictions it violates
 }
 
 //calcula la distancia euclidea entre 2 nodos
