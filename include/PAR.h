@@ -31,14 +31,20 @@ public:
 
 	PAR(string fichero_set, string fichero_set_const);//constructor que inicializa los valores
 	void lectura(string fichero_set, string fichero_set_const);//lee los archivos
-	void print_distancias_euclideas();//imprime el vector de distancias euclideas
-	void print_centroides();//imprime el vector de centroides
-	void print_RSI();
-	vector<vector<int>> algoritmo_greedy();//algoritmo greedy
+	void printDistanciasEuclideas();//imprime el vector de distancias euclideas
+	void printCentroides();//imprime el vector de centroides
+	void printRSI();
+	vector<vector<int>> algoritmoGreedy();//algoritmo greedy
 	//calculate the closest and least restriction cluster
-	int min_restrictions(int actual);
+	int minRestrictionsDistance(int actual);
 	//calculate the cluster with minimum distance, only in the first iteration
-	int min_distance(int actual);
+	int minDistance(int actual);
+
+	//update the distance for each cluster
+	vector<float> updateDistance(vector<int> nodes);
+
+	//reset centroides
+	void resetCentroides();
 
 
 	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL NUMERO DE RESTRICCIONES QUE INCUMPLE DEL CLUSTER QUE RECIBE
@@ -46,9 +52,8 @@ public:
 
 
 	//CALCULO QUE NODO TIENE LA DISTANCIA EUCLIDEA MINIMA
-	float distancia_euclidea(vector<float> nod1, vector<float> nod2);//calcula la distancia de 2 puntos
-	float suma_total_distancias(int nodo);//suma todas las distancias de todos los nodos con la de un nodo concreto
-	int min_distancia();//calcula que nodo tiene menor distancia
+	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);//calcula la distancia de 2 puntos
+	float sumaTotalDistancias(int nodo);//suma todas las distancias de todos los nodos con la de un nodo concreto
 
 };
 #endif /* INCLUDE_PAR_H_ */

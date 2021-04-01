@@ -141,8 +141,18 @@ void PAR::lectura(string fichero_set, string fichero_set_const){
 	cout << matriz << endl;*/
 }
 
+//reset Centroides
+void PAR::resetCentroides(){
+	//vuelvo a generar aleatoriamente los centroides inicialmente distintos de dimensión n
+	for(int i=0; i<k; ++i){
+		centroides[i].clear();
+		for(unsigned int e=0; e <atributos[0].size(); ++e)
+			centroides[i].push_back(Rand());
+	}
+}
+
 //imprime los atributos de cada nodo
-void PAR::print_distancias_euclideas(){
+void PAR::printDistanciasEuclideas(){
 	for(vector<vector<float>>::iterator it=atributos.begin(); it != atributos.end(); ++it){
 		for(vector<float>::iterator it2=(*it).begin(); it2 != (*it).end(); ++it2){
 			if(it2+1 != (*it).end())
@@ -154,7 +164,7 @@ void PAR::print_distancias_euclideas(){
 	}
 }
 //imprime los centroides de cada cluster
-void PAR::print_centroides(){
+void PAR::printCentroides(){
 	int i=0;
 	for(vector<vector<float>>::iterator it=centroides.begin(); it != centroides.end(); ++it){
 		cout << i << " [ ";
@@ -170,7 +180,7 @@ void PAR::print_centroides(){
 }
 
 //print the indexes of the attributes
-void PAR::print_RSI(){
+void PAR::printRSI(){
 	for(vector<int>::iterator it=RSI.begin(); it != RSI.end(); ++it){
 		if(it+1 != RSI.end())
 			cout << (*it) << ", ";
@@ -180,20 +190,34 @@ void PAR::print_RSI(){
 }
 
 //algoritmo Greedy
-vector<vector<int>> PAR::algoritmo_greedy(){
+vector<vector<int>> PAR::algoritmoGreedy(){
 
-	vector<vector<int>> cop_clusters;//vector de clusters copia para comparar con el cluster modificado
-	int pos=-1;
+	vector<vector<int>> cop_clusters(k);//vector de clusters copia para comparar con el cluster modificado
+	//initialize the vector to 0
+	for(unsigned int i=0; i< cop_clusters.size(); ++i){
+		//clean vector copy
+		for(unsigned int i=0; i< cop_clusters.size(); ++i){cop_clusters[i].clear();}
+		cop_clusters.clear();
+		cop_clusters[i].push_back(0);
+	}
+	int pos=-1, iterations = 0, not_null=0;
+	bool end = false;
 
 	do{//mientras los vectores sean distintos
-		if(clusters.size()>0)//si el vector de clusters no esta vacio
+		if(clusters.size()>0){
 			cop_clusters = clusters;//copio el vector de clusters antes de que sea modificado
+
+			//clear vector of clusters
+			for(unsigned int i=0; i< clusters.size(); ++i){clusters[i].clear();}
+		}
+
 		//go through all nodes
 		for(vector<int>::iterator it=RSI.begin(); it != RSI.end(); ++it){
 			//if it isn't the first node
 			if(it != RSI.begin()){
+
 				//save the cluster that best fits that node
-				pos = min_restrictions(*it);
+				pos = minRestrictionsDistance(*it);
 				//access to the cluster and add actual node
 				clusters[pos].push_back(*it);
 				//if the actual cluster is not in the vector of not-null clusters
@@ -201,8 +225,9 @@ vector<vector<int>> PAR::algoritmo_greedy(){
 					//add the cluster
 					clusters_not_null.push_back(pos);
 			}else{//if it's the first node
+				//cout << "Cluster? " << minRestrictionsDistance(*it) << " --> " << *it << endl;
 				//save the node in the cluster with the smallest distance
-				pos = min_distance(*it);
+				pos = minDistance(*it);
 				clusters[pos].push_back(*it);
 				clusters_not_null.push_back(pos);
 			}
@@ -211,17 +236,68 @@ vector<vector<int>> PAR::algoritmo_greedy(){
 
 		//update centroids
 		for(int i = 0; i<k; ++i){
-
+			//cout << "cluster: " << i << " size: " << clusters[i].size() << endl;
+			if(clusters[i].size()>0){
+				centroides[i] = updateDistance(clusters[i]);
+			}
 		}
 
+		cout << "calculate... " << iterations << endl;
+		/*for(unsigned int i = 0; i< clusters.size(); ++i){
+			cout << "cluster: " << i << endl;
+			for(unsigned int e = 0; e < clusters[i].size(); ++e){
+				if(clusters[i].size()>0)
+					cout << clusters[i][e] << ", ";
+			}
+			cout << endl;
+		}*/
 
-	}while(clusters!=cop_clusters and pos != -1);
+		++iterations;
+		//if the clusters don't undergo changes
+		if(clusters==cop_clusters){
+
+			//check that no cluster is empty
+			for(int i =0; i < k; ++i){
+				if(clusters[i].size()>0) ++not_null;
+			}
+			//if all the clusters aren't empty, finish Greedy
+			if(not_null == k)
+				end = true;
+			//otherwise reset the centroids and clean clusters and cop_clusters
+			else{
+				resetCentroides();//reset the centroids
+				not_null = 0;
+				//clean clusters and cop_clusters
+				for(unsigned int i=0; i< clusters.size(); ++i){clusters[i].clear();}
+				for(unsigned int i=0; i< cop_clusters.size(); ++i){cop_clusters[i].clear();}
+			}
+		}
+
+	}while(not end);
 
 	return clusters;//devuelvo el vector de cluster definitivo
 }
 
+vector<float> PAR::updateDistance(vector<int> nodes){
+	//save the actual distance
+	vector<float> distance(atributos[nodes[0]].size(),0);
+	for(unsigned int e=0; e<nodes.size(); ++e){
+		//calculate average distance
+		for(unsigned int i=0; i < atributos[nodes[e]].size(); ++i){
+			//sumatorry
+			distance[i] += atributos[nodes[e]][i];
+		}
+	}
+	//average
+	for(unsigned int i = 0; i < distance.size(); ++i){
+		distance[i] = distance[i]/nodes.size();
+	}
+
+	return distance;
+}
+
 //calculate the closest and least restriction to cluster
-int PAR::min_restrictions(int actual){
+int PAR::minRestrictionsDistance(int actual){
 	int cluster=-1;
 	float min_distance=999;//save the minimum distance and less restriction
 	int less_restriction=999;
@@ -230,8 +306,11 @@ int PAR::min_restrictions(int actual){
 
 	//go through all clusters
 	for(unsigned int i=0; i < centroides.size(); ++i){
+
 		//calculate the Euclidea distance with the current cluster
-		actual_distance = distancia_euclidea(atributos[actual],centroides[i]);
+		actual_distance = distanciaEuclidea(atributos[actual],centroides[i]);
+
+
 
 		actual_restriction = infeasibility(i, actual);
 
@@ -246,12 +325,22 @@ int PAR::min_restrictions(int actual){
 			}
 		}
 	}
-	//cout << min_distance << " <-> " << less_restriction << " <-> " << endl;
+	/*if(actual == 75){
+		cout << min_distance << " <-> " << less_restriction << " <-> " << endl;
+		cout << 0 << " [ ";
+		for(vector<float>::iterator it2=centroides[0].begin(); it2 != centroides[0].end(); ++it2){
+			if(it2+1 != centroides[0].end())
+				cout << (*it2) << ", ";
+			else
+				cout << (*it2);
+		}
+		cout << " ]" << endl;
+	}*/
 	return cluster;
 }
 
 //calculate the cluster with minimum distance, only first iteration
-int PAR::min_distance(int actual){
+int PAR::minDistance(int actual){
 	int cluster=-1;//save the cluster with minimum distance
 	float min_distance=999;//save the minimum distance
 	float actual_distance=0;//save the actual distance
@@ -259,7 +348,7 @@ int PAR::min_distance(int actual){
 	//go through all clusters
 	for(unsigned int i=0; i < centroides.size(); ++i){
 		//calculate the Euclidea distance with the current cluster
-		actual_distance = distancia_euclidea(atributos[actual],centroides[i]);
+		actual_distance = distanciaEuclidea(atributos[actual],centroides[i]);
 		//cout << " distancia euclidea " << actual_distance << endl;
 
 		//if the current cluster is less than the minimum saved, update the cluster and distance
@@ -322,8 +411,7 @@ int PAR::infeasibility(int clust, int actual){
 				//and the constraint is CL
 				if(restriction_clust[i].second == -1)
 					++rest;//increased constraint
-			}else{//in case it isn't and the constraint is ML
-				if(restriction_clust[i].second == 1)
+			}else if(restriction_clust[i].second == 1){//in case it isn't and the constraint is ML
 					++rest;//increased constraint
 			}
 		}
@@ -339,7 +427,7 @@ int PAR::infeasibility(int clust, int actual){
 }
 
 //calcula la distancia euclidea entre 2 nodos
-float PAR::distancia_euclidea(vector<float> nod1, vector<float> nod2){
+float PAR::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
 	//la formula es: sqrt(sumatoria((a_i - b_i)²))
 	float suma=0;
 
@@ -352,34 +440,15 @@ float PAR::distancia_euclidea(vector<float> nod1, vector<float> nod2){
 }
 
 //suma todas las distancias euclideas de un nodo concreto
-float PAR::suma_total_distancias(int nodo){
+float PAR::sumaTotalDistancias(int nodo){
 	float suma_total=0;
 	//recorro todos los nodos menos si mismo
 	for(unsigned int i=0;i<atributos.size(); ++i){
 		if(i!=(unsigned int) nodo){
 			//calculo la distancia euclidea entre ellos y la sumo
-			suma_total += distancia_euclidea(atributos[nodo],atributos[i]);
+			suma_total += distanciaEuclidea(atributos[nodo],atributos[i]);
 		}
 	}
 	return suma_total;
 }
-//obtiene el nodo con menor distancia
-int PAR::min_distancia(){
-	int pos_nod=-1;//guardo el nodo con menor distancia
-	float dist=0, dist_min=999999;//guardo la distancia actual y la distancia minima
 
-	for(unsigned int i=0;i<atributos.size(); ++i){
-
-		//calcula la distancia euclidea de todos los nodos con respecto al nodo actual
-		dist = suma_total_distancias(i);
-		//cout << "nodo: " << i << ", distancia: " << dist << endl;
-		//si la distancia actual es mas pequeña que la minima encontrada
-		if(dist < dist_min){
-			//actualizo la distancia y el nodo
-			dist_min = dist;
-			pos_nod = i;
-		}
-	}
-	cout << "El nodo: " << pos_nod << " tiene la distancia minima de " << dist_min << endl;
-	return pos_nod;
-}

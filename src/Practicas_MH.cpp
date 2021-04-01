@@ -25,21 +25,20 @@ int main() {
 	//"datos/bupa_set.dat", "datos/bupa_set_const_10.const"
 	PAR *par = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const");
 	//par->lectura("datos/bupa_set.dat", "datos/bupa_set_const_10.const");
-	//par.print_distancias_euclideas();
+	//par.printDistanciasEuclideas();
 	//cout << par.matriz << endl;
-	//cout << par->min_distancia() << endl;
-	//par->print_centroides();
-	//par->print_RSI();
-	//int p = par->min_distance(par->atributos[0]);
+	//par->printCentroides();
+	//par->printRSI();
 
 	vector<vector<int>> clusters;
 
+	par->printCentroides();
+
 	clock_t start = clock();
-	clusters = par->algoritmo_greedy();
+	clusters = par->algoritmoGreedy();
 	clock_t end = clock();
 	float elapsed = float(end - start)/CLOCKS_PER_SEC;
 	cout << "Elapsed (Greedy): " << elapsed << "(seconds)" << endl;
-
 
 	return 0;
 }
