@@ -31,29 +31,36 @@ public:
 
 	PAR(string fichero_set, string fichero_set_const);//constructor que inicializa los valores
 	void lectura(string fichero_set, string fichero_set_const);//lee los archivos
+
+	//PRINT TO CONSOLE
 	void printDistanciasEuclideas();//imprime el vector de distancias euclideas
 	void printCentroides();//imprime el vector de centroides
 	void printRSI();
+
+	//ALGORITHMS
+	vector<vector<int>> algoritmoBL();//BL algorithm
 	vector<vector<int>> algoritmoGreedy();//algoritmo greedy
+
+	//MINIMIZATION FUNCTIONS
 	//calculate the closest and least restriction cluster
 	int minRestrictionsDistance(int actual);
 	//calculate the cluster with minimum distance, only in the first iteration
 	int minDistance(int actual);
 
-	//update the distance for each cluster
-	vector<float> updateDistance(vector<int> nodes);
-
-	//reset centroides
-	void resetCentroides();
-
+	//MAXIMIZATION FUNCTION
+	//calculate Landa
+	float landa();
 
 	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL NUMERO DE RESTRICCIONES QUE INCUMPLE DEL CLUSTER QUE RECIBE
 	int infeasibility(int cluster, int actual);;
 
-
 	//CALCULO QUE NODO TIENE LA DISTANCIA EUCLIDEA MINIMA
 	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);//calcula la distancia de 2 puntos
-	float sumaTotalDistancias(int nodo);//suma todas las distancias de todos los nodos con la de un nodo concreto
 
+	//OTHER FUNCTIONS
+	//update the distance for each cluster
+	vector<float> updateDistance(vector<int> nodes);
+	//reset centroides
+	void resetCentroides();
 };
 #endif /* INCLUDE_PAR_H_ */

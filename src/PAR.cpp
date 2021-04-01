@@ -278,6 +278,7 @@ vector<vector<int>> PAR::algoritmoGreedy(){
 	return clusters;//devuelvo el vector de cluster definitivo
 }
 
+//Update the distance
 vector<float> PAR::updateDistance(vector<int> nodes){
 	//save the actual distance
 	vector<float> distance(atributos[nodes[0]].size(),0);
@@ -325,17 +326,6 @@ int PAR::minRestrictionsDistance(int actual){
 			}
 		}
 	}
-	/*if(actual == 75){
-		cout << min_distance << " <-> " << less_restriction << " <-> " << endl;
-		cout << 0 << " [ ";
-		for(vector<float>::iterator it2=centroides[0].begin(); it2 != centroides[0].end(); ++it2){
-			if(it2+1 != centroides[0].end())
-				cout << (*it2) << ", ";
-			else
-				cout << (*it2);
-		}
-		cout << " ]" << endl;
-	}*/
 	return cluster;
 }
 
@@ -439,16 +429,26 @@ float PAR::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
 	return sqrt(suma);
 }
 
-//suma todas las distancias euclideas de un nodo concreto
-float PAR::sumaTotalDistancias(int nodo){
-	float suma_total=0;
-	//recorro todos los nodos menos si mismo
-	for(unsigned int i=0;i<atributos.size(); ++i){
-		if(i!=(unsigned int) nodo){
-			//calculo la distancia euclidea entre ellos y la sumo
-			suma_total += distanciaEuclidea(atributos[nodo],atributos[i]);
-		}
-	}
-	return suma_total;
+vector<vector<int>> PAR::algoritmoBL(){
+
+	return clusters;
 }
 
+//calculate Landa
+float PAR::landa(){
+	float lan = 0, actual_distance=0, node1=-1, node2=-1;
+	for(unsigned int i = 0; i < atributos.size(); ++i){
+		for(unsigned int e = i+1; e < atributos.size(); ++e){
+			actual_distance = distanciaEuclidea(atributos[i],atributos[e]);
+			if(actual_distance > lan){
+				lan = actual_distance;
+				node1 = i;
+				node2 = e;
+			}
+		}
+	}
+
+	//count number of restriction betwen node1 and node 2
+	cout << endl << node1 << " and " << node2 << ", distance: " << lan << endl;
+	return lan;
+}

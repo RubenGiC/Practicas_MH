@@ -32,13 +32,25 @@ int main() {
 
 	vector<vector<int>> clusters;
 
-	par->printCentroides();
-
 	clock_t start = clock();
 	clusters = par->algoritmoGreedy();
 	clock_t end = clock();
 	float elapsed = float(end - start)/CLOCKS_PER_SEC;
 	cout << "Elapsed (Greedy): " << elapsed << "(seconds)" << endl;
 
+	cout << "Solution clusters:" << endl;
+	int n = 0;
+	for(vector<vector<int>>::iterator it = clusters.begin(); it != clusters.end(); ++it){
+		cout << n << " [ ";
+		for(vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
+			if(it2+1 != (*it).end())
+				cout << (*it2) << ", ";
+			else
+				cout << (*it2);
+		}
+		cout << " ]" << endl;
+		++n;
+	}
+	par->landa();
 	return 0;
 }
