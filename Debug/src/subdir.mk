@@ -6,17 +6,20 @@
 CPP_SRCS += \
 ../src/PAR.cpp \
 ../src/Practicas_MH.cpp \
-../src/random.cpp 
+../src/random.cpp \
+../src/result_algorithms.cpp 
 
 OBJS += \
 ./src/PAR.o \
 ./src/Practicas_MH.o \
-./src/random.o 
+./src/random.o \
+./src/result_algorithms.o 
 
 CPP_DEPS += \
 ./src/PAR.d \
 ./src/Practicas_MH.d \
-./src/random.d 
+./src/random.d \
+./src/result_algorithms.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
