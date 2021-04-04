@@ -479,7 +479,7 @@ vector<vector<int>> PAR::algoritmoBL(){
 }
 
 //calculate Landa
-float PAR::landa(){
+void PAR::createLanda(){
 	float lan = 0, actual_distance=0, node1=-1, node2=-1;
 	//calculate the maximum distance
 	for(unsigned int i = 0; i < atributos.size(); ++i){
@@ -492,10 +492,13 @@ float PAR::landa(){
 			}
 		}
 	}
-
-
+	//count the number of restrictions total
+	uvec rest = (find(matriz == 1 or matriz == -1));
+	cout << rest.size() << endl;
 
 	//count number of restriction betwen node1 and node 2
 	cout << endl << node1 << " and " << node2 << ", distance: " << lan << endl;
-	return lan;
+	lan = lan/rest.size();
+	cout << "landa: " << lan << endl;
+	landa = lan;
 }

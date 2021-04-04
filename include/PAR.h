@@ -27,6 +27,7 @@ public:
 	vector<int> RSI; //attribute index vector
 	int size_mat;
 	vector<int> clusters_not_null;//vector of non-empty cluster indices
+	float landa;
 
 
 	PAR(string fichero_set, string fichero_set_const);//constructor que inicializa los valores
@@ -49,7 +50,7 @@ public:
 
 	//MAXIMIZATION FUNCTION
 	//calculate Landa
-	float landa();
+	void createLanda();
 
 	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL NUMERO DE RESTRICCIONES QUE INCUMPLE DEL CLUSTER QUE RECIBE
 	int infeasibility(int cluster, int actual);;
