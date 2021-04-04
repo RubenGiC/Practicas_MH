@@ -26,6 +26,10 @@ public:
 	vector<vector<int>> clusters;//es la asignación de cada elementoa cada cluster
 	vector<int> RSI; //attribute index vector
 	int size_mat;
+<<<<<<< HEAD
+=======
+	vector<int> clusters_not_null;//vector of non-empty cluster indices
+>>>>>>> b38ac7563d6ca67c0b1ea6e8c3c09b120e7b9e15
 	float landa;
 
 
