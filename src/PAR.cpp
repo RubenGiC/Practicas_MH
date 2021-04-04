@@ -12,6 +12,7 @@
 #include <math.h> // para calculos matematicos (sqrt, pow (x^y), ...)
 #include <algorithm>// para barajar el vector
 #include <ctime>// libreria de time para el shufle aleatorio de vectores
+#include <stack>// use stack
 
 #include "../include/PAR.h"
 #include "../include/random.h"
@@ -208,7 +209,7 @@ vector<vector<int>> PAR::algoritmoGreedy(){
 			cop_clusters = clusters;//copio el vector de clusters antes de que sea modificado
 
 			//clear vector of clusters
-			for(unsigned int i=0; i< clusters.size(); ++i){clusters[i].clear();}
+			clearClusters(false);
 		}
 
 		//go through all nodes
@@ -268,7 +269,7 @@ vector<vector<int>> PAR::algoritmoGreedy(){
 				resetCentroides();//reset the centroids
 				not_null = 0;
 				//clean clusters and cop_clusters
-				for(unsigned int i=0; i< clusters.size(); ++i){clusters[i].clear();}
+				clearClusters(false);
 				for(unsigned int i=0; i< cop_clusters.size(); ++i){cop_clusters[i].clear();}
 			}
 		}
@@ -429,6 +430,49 @@ float PAR::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
 	return sqrt(suma);
 }
 
+//random assignment of each node with a cluster
+void PAR::randomAssign(){
+	bool not_null = true;
+	stack<int> clusters_null;
+
+	//go through all nodes
+	for(unsigned int i = 0; i < RSI.size(); ++i){
+		//if it has traversed half the nodes
+		if(i == RSI.size()/2){
+			//check that no cluster is empty
+			for(unsigned int i = 0; i < clusters.size(); ++i){
+				//if the cluster is empty
+				if(clusters[i].size() == 0){//add the cluster to the stack
+					not_null = false;
+					clusters_null.push(i);
+				}
+			}
+		}
+
+
+		//if all clusters aren't empty or haven't yet traveled half of the nodes
+		if(not_null)
+			clusters[rand() % k + 0].push_back(RSI[i]);//randomly assign a cluster
+		else{//else it asigns to the cluster that is empty
+			clusters[clusters_null.top()].push_back(RSI[i]);
+			clusters_null.pop();
+		}
+		//if all the clusters aren't empty, assign the rest of the nodes randomly
+		if(clusters_null.size() == 0)
+			not_null = true;
+
+	}
+}
+
+void PAR::clearClusters(bool all){
+
+	for(unsigned int i = 0; i<clusters.size(); ++i){
+		clusters[i].clear();
+	}
+	if(all)
+		clusters.clear();
+}
+
 vector<vector<int>> PAR::algoritmoBL(){
 
 	return clusters;
@@ -437,6 +481,7 @@ vector<vector<int>> PAR::algoritmoBL(){
 //calculate Landa
 float PAR::landa(){
 	float lan = 0, actual_distance=0, node1=-1, node2=-1;
+	//calculate the maximum distance
 	for(unsigned int i = 0; i < atributos.size(); ++i){
 		for(unsigned int e = i+1; e < atributos.size(); ++e){
 			actual_distance = distanciaEuclidea(atributos[i],atributos[e]);
@@ -447,6 +492,8 @@ float PAR::landa(){
 			}
 		}
 	}
+
+
 
 	//count number of restriction betwen node1 and node 2
 	cout << endl << node1 << " and " << node2 << ", distance: " << lan << endl;

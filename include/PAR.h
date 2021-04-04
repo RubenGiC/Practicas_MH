@@ -62,5 +62,9 @@ public:
 	vector<float> updateDistance(vector<int> nodes);
 	//reset centroides
 	void resetCentroides();
+	//random assignment
+	void randomAssign();
+	//clear the clusters
+	void clearClusters(bool all=true);
 };
 #endif /* INCLUDE_PAR_H_ */

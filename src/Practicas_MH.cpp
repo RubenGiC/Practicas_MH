@@ -51,6 +51,24 @@ int main() {
 		cout << " ]" << endl;
 		++n;
 	}
+	//BL (LOCAL SEARCH)
+	par->clearClusters(false);//clear the clusters
+	par->resetCentroides();//randomly generate the centroids
+	par->randomAssign();//assign each node to a cluster randomly
+
+	/*cout << "Asign cluster randomly:" << endl;
+	n = 0;
+	for(vector<vector<int>>::iterator it = par->clusters.begin(); it != par->clusters.end(); ++it){
+		cout << n << " [ ";
+		for(vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
+			if(it2+1 != (*it).end())
+				cout << (*it2) << ", ";
+			else
+				cout << (*it2);
+		}
+		cout << " ]" << endl;
+		++n;
+	}*/
 	par->landa();
 	return 0;
 }
