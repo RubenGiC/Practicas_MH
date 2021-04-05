@@ -41,4 +41,31 @@ int ResultAlgorithms::Infeasable(vector<vector<int>> clusters, mat matriz){
 	}
 	return restrictions;
 }
+//calculate the general deviation
+float ResultAlgorithms::Distance(vector<vector<int>> clusters, vector<vector<float>> atributos,vector<vector<float>> centroides){
+	float distance = 0;
+	//walk through each cluster
+	for(unsigned int i = 0; i< clusters.size(); ++i){
+		//sumatorry(euclidean distance of all nodes in the cluster)
+		for(vector<int>::iterator it = clusters[i].begin(); it != clusters[i].end(); ++it){
+			distance += distanciaEuclidea(atributos[(*it)],centroides[i]);
+		}
+		//mean intra-cluster distance
+		distance = distance / clusters[i].size();
+	}
 
+	return distance/clusters.size();
+}
+
+//calcula la distancia euclidea entre 2 nodos
+float ResultAlgorithms::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
+	//la formula es: sqrt(sumatoria((a_i - b_i)²))
+	float suma=0;
+
+	//sumatoria((a_i - b_i)²)
+	for(unsigned int i=0; i<nod1.size();++i){
+		suma += pow((nod1[i]-nod2[i]),2);
+	}
+	//sqrt(sumatoria)
+	return sqrt(suma);
+}

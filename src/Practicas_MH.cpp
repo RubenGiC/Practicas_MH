@@ -31,7 +31,7 @@ int main() {
 		float elapsed = float(end - start)/CLOCKS_PER_SEC;
 		cout << (i+1) << " Elapsed (Greedy PAR zoo 10): " << elapsed << "(seconds)" << endl;
 
-		cout << "Solution clusters (Greedy PAR zoo 10):" << endl;
+		/*cout << "Solution clusters (Greedy PAR zoo 10):" << endl;
 		int n = 0;
 		for(vector<vector<int>>::iterator it = clusters_sol.begin(); it != clusters_sol.end(); ++it){
 			cout << n << " [ ";
@@ -43,19 +43,25 @@ int main() {
 			}
 			cout << " ]" << endl;
 			++n;
-		}
+		}*/
 
 		cout << "\tInfeas: " << results->Infeasable(clusters_sol, par_zoo10->matriz) << endl;
+		cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
 		par_zoo10->clearClusters(false);//clear the clusters
 		par_zoo10->shuffleRSI();
 		par_zoo10->resetCentroides();
 	}
+
+
+	//PRUEBAS
+
+
 	//leo los archivos
 	//"datos/bupa_set.dat", "datos/bupa_set_const_10.const"
 	PAR *par = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const");
 	//par->lectura("datos/bupa_set.dat", "datos/bupa_set_const_10.const");
 
-
+	clusters_sol = par->algoritmoGreedy();
 
 	//BL (LOCAL SEARCH)
 	par->clearClusters(false);//clear the clusters
@@ -75,6 +81,5 @@ int main() {
 		cout << " ]" << endl;
 		++n;
 	}*/
-	par->createLanda();
 	return 0;
 }

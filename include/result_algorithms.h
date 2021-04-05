@@ -19,6 +19,8 @@ class ResultAlgorithms{
 
 public:
 	int Infeasable(vector<vector<int>> clusters, mat matriz);
+	float Distance(vector<vector<int>> clusters, vector<vector<float>> atributos,vector<vector<float>> centroides);
+	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);
 };
 
 #endif /* INCLUDE_RESULT_ALGORITHMS_H_ */

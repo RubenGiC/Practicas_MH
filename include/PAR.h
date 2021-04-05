@@ -26,11 +26,6 @@ public:
 	vector<vector<int>> clusters;//es la asignación de cada elementoa cada cluster
 	vector<int> RSI; //attribute index vector
 	int size_mat;
-<<<<<<< HEAD
-=======
-	vector<int> clusters_not_null;//vector of non-empty cluster indices
->>>>>>> b38ac7563d6ca67c0b1ea6e8c3c09b120e7b9e15
-	float landa;
 
 
 	PAR(string fichero_set, string fichero_set_const);//constructor que inicializa los valores
@@ -53,11 +48,13 @@ public:
 
 	//MAXIMIZATION FUNCTION
 	//calculate Landa
-	void createLanda();
+	float createLanda();
+	//calculate general deviation
+	float generalDeviation();
 
 	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL NUMERO DE RESTRICCIONES QUE INCUMPLE DEL CLUSTER QUE RECIBE
 	int infeasibility(int cluster, int actual, vector<int> clusters_not_null);
-	int infeasibility();//return the number of restrictions that the solution has
+	int infeasibility(vector<int> S);//return the number of restrictions that the solution has
 
 	//CALCULO QUE NODO TIENE LA DISTANCIA EUCLIDEA MINIMA
 	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);//calcula la distancia de 2 puntos
@@ -72,5 +69,7 @@ public:
 	//clear the clusters
 	void clearClusters(bool all=true);
 	void shuffleRSI();
+	//create the vector of clusters assigned to each node
+	vector<int> createS();
 };
 #endif /* INCLUDE_PAR_H_ */
