@@ -127,9 +127,17 @@ void PAR::lectura(string fichero_set, string fichero_set_const){
 					num += cad.at(i);
 				}
 				//solo guardo la diagonal
-				if(col>=col2)
+				if(col>=col2){
 					//guardo el valor en la matriz
 					matriz(row,col)=stod(num);
+
+					if(col != row and matriz(row,col) != 0){
+						if(matriz(row,col) >0)
+							ML.push_back(pair<int,int>(row,col));
+						if(matriz(row,col) < 0)
+							CL.push_back(pair<int,int>(row,col));
+					}
+				}
 
 				++col;
 			}
@@ -199,10 +207,8 @@ vector<vector<int>> PAR::algoritmoGreedy(){
 
 	vector<vector<int>> cop_clusters(k);//vector de clusters copia para comparar con el cluster modificado
 	vector<int> clusters_not_null;//vector of non-empty cluster indices
-	//initialize the vector to 0
-	/*for(unsigned int i=0; i< cop_clusters.size(); ++i){
-		cop_clusters[i].push_back(0);
-	}*/
+	vector<int> S(RSI.size(),-1);
+
 	int pos=-1, iterations = 0, not_null=0;
 	bool end = false;
 
@@ -220,9 +226,10 @@ vector<vector<int>> PAR::algoritmoGreedy(){
 		for(vector<int>::iterator it=RSI.begin(); it != RSI.end(); ++it){
 
 			//save the cluster that best fits that node
-			pos = minRestrictionsDistance(*it, clusters_not_null);
+			pos = minRestrictionsDistance(*it, clusters_not_null, S);
 			//access to the cluster and add actual node
 			clusters[pos].push_back(*it);
+			S[*it] = pos;
 
 			//if the actual cluster is not in the vector of not-null clusters
 			if(find(clusters_not_null.begin(),clusters_not_null.end(),pos) == clusters_not_null.end())
@@ -297,7 +304,7 @@ vector<float> PAR::updateDistance(vector<int> nodes){
 }
 
 //calculate the closest and least restriction to cluster
-int PAR::minRestrictionsDistance(int actual, vector<int> clusters_not_null){
+int PAR::minRestrictionsDistance(int actual, vector<int> clusters_not_null, vector<int> S){
 	int cluster=-1;
 	float min_distance=999;//save the minimum distance and less restriction
 	int less_restriction=999;
@@ -312,7 +319,7 @@ int PAR::minRestrictionsDistance(int actual, vector<int> clusters_not_null){
 
 
 		if(clusters_not_null.size()>0)
-			actual_restriction = infeasibility(i, actual, clusters_not_null);
+			actual_restriction = infeasibility(i, actual, clusters_not_null, S);
 
 		//cout << "if( " << actual_restriction << " <= " << less_restriction << " and " << actual_distance << " <= " << min_distance << endl;
 		//if the current cluster is less than the minimum saved, update the cluster and distance
@@ -327,7 +334,8 @@ int PAR::minRestrictionsDistance(int actual, vector<int> clusters_not_null){
 			}
 		}
 	}
-	//cout << "MIN RESTRICTIONS: " << less_restriction << endl;
+	/*if(less_restriction >0)
+		cout << "MIN RESTRICTIONS: " << less_restriction << endl;*/
 	return cluster;
 }
 
@@ -349,50 +357,79 @@ int PAR::minDistance(int actual){
 			cluster = i;
 		}
 	}
-
 	//cout << " minima distancia euclidea " << min_distance << " con cluster: " << cluster << endl;
 
 	return cluster;//return the cluster with minimum distance
 }
 
 //calculate infeasibility when assigning an atribute to each cluster and return the minimum
-int PAR::infeasibility(int clust, int actual, vector<int> clusters_not_null){
+int PAR::infeasibility(int clust, int actual, vector<int> clusters_not_null, vector<int> S){
 	// number of restrictions, matrix column and row and not empty cluster indexes
 	int rest=0, col=-1, row=-1;
+	unsigned int max = CL.size();;
+	if(ML.size()>CL.size())
+		max = ML.size();
+
+	for (unsigned int i = 0; i<max; ++i) {
+		if(i < ML.size()){
+			if(ML[i].first == actual){
+				if(S[ML[i].second] != -1 && S[ML[i].second] != clust){
+					++rest;
+				}
+			}else if(ML[i].second == actual){
+				if(S[ML[i].first] != -1 && S[ML[i].first] != clust){
+					++rest;
+				}
+			}
+		}
+
+		if(i < CL.size()){
+			if(CL[i].first == actual){
+				if(S[CL[i].second] != -1 && S[CL[i].second] == clust){
+					++rest;
+				}
+			}else if(CL[i].second == actual){
+				if(S[CL[i].first] != -1 && S[CL[i].first] == clust){
+					++rest;
+				}
+			}
+		}
+	}
 
 	//walk through non-empty clusters
-	for(unsigned int i=0; i<clusters_not_null.size(); ++i){
+	/*for(unsigned int i=0; i<clusters_not_null.size(); ++i){
 		//walk through nodes of cluster
-		for(unsigned int e = 0; e<clusters[i].size(); ++e){
+		for(unsigned int e = 0; e<clusters[clusters_not_null[i]].size(); ++e){
+
 			//Is a triangular matrix
-			if(clusters[i][e]<actual){
-				col = clusters[i][e];
+			if(clusters[clusters_not_null[i]][e]<actual){
+				col = clusters[clusters_not_null[i]][e];
 				row = actual;
 			}else{
 				col = actual;
-				row = clusters[i][e];
+				row = clusters[clusters_not_null[i]][e];
 			}
 			////if it isn't the identity and has a constraint
 			if(matriz(col,row)!=0 and col != row){
 				//if the node is not in the current cluster and the constraint is ML
-				if(matriz(col,row) == 1 and (int) i != clust)
+				if(matriz(col,row) == 1 and (int) clusters_not_null[i] != clust)
 					++rest;//increase constraint
 				//if the node is in the current cluster and the constraint is CL
-				else if(matriz(col,row) == -1 and (int) i == clust)
+				else if(matriz(col,row) == -1 and (int) clusters_not_null[i] == clust)
 					++rest;
 			}
 		}
-	}
+	}*/
 
 	return rest;// return the number of restrictions it violates
 }
 
 int PAR::infeasibility(vector<int> S){
-	int restrictions = 0, col = 0, row=0;
+	int restrictions = 0;
 
 	//walk through each restriction
-	for(int i = 1; i < matriz.n_cols; ++i)
-		for(int e = 0; e < i; ++e)
+	for(unsigned int i = 1; i < matriz.n_cols; ++i)
+		for(unsigned int e = 0; e < i; ++e)
 			/*
 			 * if the restriction is CL and the node is in the current cluster
 			 * or
@@ -472,48 +509,86 @@ vector<int> PAR::createS(){
 }
 
 vector<vector<int>> PAR::algoritmoBL(){
-	float fitness = 0;
+
 	vector<int> S = createS();//create the vector S
 	int infease = infeasibility(S);//calculate infeasibility
-	int gen_deviation = generalDeviation(); //calculate General Deviation
+	int gen_deviation = generalDeviation(clusters); //calculate General Deviation
 	float landa = createLanda();//calculate landa
 	//and calculate the fitness
 	float f = gen_deviation + (infease * landa);
+	float new_f;
 
-	for(vector<vector<int>>::iterator it = clusters.begin(); it != clusters.end(); ++it){
+	//copy of S and clusters
+	vector<int> S_cop = S;
+	vector<vector<int>> clusters_cop = clusters;
+	int i = 0;
 
-	}
+	bool end = false;
+	int iterate = 0;
+
+	do{
+		//if the node to change the cluster, the cluster has more than 1 element
+		if(clusters_cop[S[i]].size()>0){
+			//change of cluster
+			S_cop[i] = rand() % k + 0;
+			clusters_cop[S[i]].erase(find(clusters_cop[S[i]].begin(),clusters_cop[S[i]].end(),i));
+			clusters_cop[S_cop[i]].push_back(i);
+
+			//calculate the new fitness
+			infease = infeasibility(S_cop);
+			gen_deviation = generalDeviation(clusters_cop);
+
+			new_f = gen_deviation + (infease * landa);
+
+			//if the new f is less than the current f
+			if(new_f < f){
+				//update f and the clusters
+				f = new_f;
+				clusters = clusters_cop;
+				S = S_cop;
+			//if the new f is the same as the current f and there aren't change in the clusters
+			}else if(new_f == f && clusters == clusters_cop && S == S_cop){
+				end = true;//it end
+			}else{
+				clusters_cop = clusters;
+				S_cop = S;
+			}
+		}
+		++i;
+
+	}while(!end || iterate < 100000);
 	return clusters;
 }
 
 //calculate the general deviation
-float PAR::generalDeviation(){
+float PAR::generalDeviation(vector<vector<int>> v_clust){
 	float distance = 0;
 
 	//walk through each cluster
-	for(unsigned int i = 0; i< clusters.size(); ++i){
+	for(unsigned int i = 0; i< v_clust.size(); ++i){
 		//sumatorry(euclidean distance of all nodes in the cluster)
-		for(vector<int>::iterator it = clusters[i].begin(); it != clusters[i].end(); ++it){
+		for(vector<int>::iterator it = v_clust[i].begin(); it != v_clust[i].end(); ++it){
 			distance += distanciaEuclidea(atributos[(*it)],centroides[i]);
 		}
 		//mean intra-cluster distance
-		distance = distance / clusters[i].size();
+		distance = distance / v_clust[i].size();
 	}
 
-	return distance/clusters.size();
+	return distance/v_clust.size();
 }
 
 //calculate Landa
 float PAR::createLanda(){
-	float lan = 0, actual_distance=0, node1=-1, node2=-1;
+	float lan = 0, actual_distance=0;
+	//float node1=-1, node2=-1;
 	//calculate the maximum distance
 	for(unsigned int i = 0; i < atributos.size(); ++i){
 		for(unsigned int e = i+1; e < atributos.size(); ++e){
 			actual_distance = distanciaEuclidea(atributos[i],atributos[e]);
 			if(actual_distance > lan){
 				lan = actual_distance;
-				node1 = i;
-				node2 = e;
+				/*node1 = i;
+				node2 = e;*/
 			}
 		}
 	}

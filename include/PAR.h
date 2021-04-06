@@ -26,7 +26,8 @@ public:
 	vector<vector<int>> clusters;//es la asignación de cada elementoa cada cluster
 	vector<int> RSI; //attribute index vector
 	int size_mat;
-
+	vector<pair<int,int>> CL;
+	vector<pair<int,int>> ML;
 
 	PAR(string fichero_set, string fichero_set_const);//constructor que inicializa los valores
 	void lectura(string fichero_set, string fichero_set_const);//lee los archivos
@@ -42,7 +43,7 @@ public:
 
 	//MINIMIZATION FUNCTIONS
 	//calculate the closest and least restriction cluster
-	int minRestrictionsDistance(int actual, vector<int> clusters_not_null);
+	int minRestrictionsDistance(int actual, vector<int> clusters_not_null, vector<int> S);
 	//calculate the cluster with minimum distance, only in the first iteration
 	int minDistance(int actual);
 
@@ -50,10 +51,10 @@ public:
 	//calculate Landa
 	float createLanda();
 	//calculate general deviation
-	float generalDeviation();
+	float generalDeviation(vector<vector<int>> v_clust);
 
 	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL NUMERO DE RESTRICCIONES QUE INCUMPLE DEL CLUSTER QUE RECIBE
-	int infeasibility(int cluster, int actual, vector<int> clusters_not_null);
+	int infeasibility(int cluster, int actual, vector<int> clusters_not_null, vector<int> S);
 	int infeasibility(vector<int> S);//return the number of restrictions that the solution has
 
 	//CALCULO QUE NODO TIENE LA DISTANCIA EUCLIDEA MINIMA

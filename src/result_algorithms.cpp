@@ -8,9 +8,32 @@
 
 #include "../include/result_algorithms.h"
 
-int ResultAlgorithms::Infeasable(vector<vector<int>> clusters, mat matriz){
+int ResultAlgorithms::Infeasable(vector<vector<int>> clusters, vector<pair<int,int>> ML, vector<pair<int,int>> CL){
 	int restrictions = 0, col = 0, row=0;
-	//walk through each cluster
+
+	for (const auto &it: ML) {
+		for(const auto &it2: clusters){
+			if(find(it2.begin(),it2.end(), it.first) != it2.end()){
+				if(find(it2.begin(),it2.end(), it.second) == it2.end()){
+					//cout << "Incumple ML: " << it.first << ", " << it.second << endl;
+					++restrictions;
+				}
+			}
+		}
+	}
+
+	for (const auto &it: CL) {
+			for(const auto &it2: clusters){
+				if(find(it2.begin(),it2.end(), it.first) != it2.end()){
+					if(find(it2.begin(),it2.end(), it.second) != it2.end()){
+						//cout << "Incumple CL: " << it.first << ", " << it.second << endl;
+						++restrictions;
+					}
+				}
+			}
+		}
+
+	/*//walk through each cluster
 	for(vector<vector<int>>::iterator it = clusters.begin(); it != clusters.end(); ++it){
 		//walk through each node of the cluster
 		for(vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
@@ -38,20 +61,23 @@ int ResultAlgorithms::Infeasable(vector<vector<int>> clusters, mat matriz){
 				}
 			}
 		}
-	}
+	}*/
 	return restrictions;
 }
 //calculate the general deviation
 float ResultAlgorithms::Distance(vector<vector<int>> clusters, vector<vector<float>> atributos,vector<vector<float>> centroides){
 	float distance = 0;
+	float intracluster = 0;
 	//walk through each cluster
 	for(unsigned int i = 0; i< clusters.size(); ++i){
+		intracluster = 0;
 		//sumatorry(euclidean distance of all nodes in the cluster)
 		for(vector<int>::iterator it = clusters[i].begin(); it != clusters[i].end(); ++it){
-			distance += distanciaEuclidea(atributos[(*it)],centroides[i]);
+			intracluster += distanciaEuclidea(atributos[(*it)],centroides[i]);
 		}
 		//mean intra-cluster distance
-		distance = distance / clusters[i].size();
+		intracluster = intracluster / clusters[i].size();
+		distance += intracluster;
 	}
 
 	return distance/clusters.size();
