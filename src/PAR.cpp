@@ -370,30 +370,39 @@ int PAR::infeasibility(int clust, int actual, vector<int> clusters_not_null, vec
 	if(ML.size()>CL.size())
 		max = ML.size();
 
-	for (unsigned int i = 0; i<max; ++i) {
+	for (unsigned int i = 0; i<ML.size(); ++i) {
 		if(i < ML.size()){
 			if(ML[i].first == actual){
+
 				if(S[ML[i].second] != -1 && S[ML[i].second] != clust){
+
 					++rest;
 				}
 			}else if(ML[i].second == actual){
+
 				if(S[ML[i].first] != -1 && S[ML[i].first] != clust){
+
 					++rest;
 				}
+			}
+		}
+	}
+
+	for (unsigned int i = 0; i<CL.size(); ++i) {
+
+
+		if(CL[i].first == actual){
+			if(S[CL[i].second] != -1 && S[CL[i].second] == clust){
+				//cout << "Position: " << i << ", first: " << CL[i].first << ", second: " << CL[i].second << endl;
+				//cout << "S: " << S[CL[i].second] << endl;
+				++rest;
+			}
+		}else if(CL[i].second == actual){
+			if(S[CL[i].first] != -1 && S[CL[i].first] == clust){
+				++rest;
 			}
 		}
 
-		if(i < CL.size()){
-			if(CL[i].first == actual){
-				if(S[CL[i].second] != -1 && S[CL[i].second] == clust){
-					++rest;
-				}
-			}else if(CL[i].second == actual){
-				if(S[CL[i].first] != -1 && S[CL[i].first] == clust){
-					++rest;
-				}
-			}
-		}
 	}
 
 	//walk through non-empty clusters

@@ -61,6 +61,9 @@ int main() {
 		par_zoo10->clearClusters(false);//clear the clusters
 		par_zoo10->shuffleRSI();
 		par_zoo10->resetCentroides();
+		for(unsigned int i = 0; i < clusters_sol.size(); ++i)
+			clusters_sol[i].clear();
+		clusters_sol.clear();
 	}
 	cout << results_all << endl;
 
