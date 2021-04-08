@@ -38,7 +38,7 @@ int main() {
 		clock_t end = clock();
 		float elapsed = float(end - start)/CLOCKS_PER_SEC;
 		results_all += to_string(i+1) + " Elapsed (Greedy PAR zoo 10): " + to_string(elapsed) + "(seconds)\n";
-		cout << (i+1) << " Elapsed (Greedy PAR zoo 10): " << elapsed << "(seconds)" << endl;
+		//cout << (i+1) << " Elapsed (Greedy PAR zoo 10): " << elapsed << "(seconds)" << endl;
 
 		/*cout << "Solution clusters (Greedy PAR zoo 10):" << endl;
 		int n = 0;

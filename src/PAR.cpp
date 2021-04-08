@@ -11,7 +11,7 @@
 #include <string.h>
 #include <math.h> // para calculos matematicos (sqrt, pow (x^y), ...)
 #include <algorithm>// para barajar el vector
-#include <ctime>// libreria de time para el shufle aleatorio de vectores
+#include <ctime>// libreria de time para el shuffle aleatorio de vectores
 #include <stack>// use stack
 
 #include "../include/PAR.h"
@@ -511,6 +511,8 @@ vector<int> PAR::createS(){
 vector<vector<int>> PAR::algoritmoBL(){
 
 	vector<int> S = createS();//create the vector S
+	vector<int> node_select = RSI;//vector of nodes to select in each iteration
+	random_shuffle(node_select.begin(), node_select.end());//barajo el vector
 	int infease = infeasibility(S);//calculate infeasibility
 	int gen_deviation = generalDeviation(clusters); //calculate General Deviation
 	float landa = createLanda();//calculate landa
@@ -528,11 +530,14 @@ vector<vector<int>> PAR::algoritmoBL(){
 
 	do{
 		//if the node to change the cluster, the cluster has more than 1 element
-		if(clusters_cop[S[i]].size()>0){
-			//change of cluster
-			S_cop[i] = rand() % k + 0;
-			clusters_cop[S[i]].erase(find(clusters_cop[S[i]].begin(),clusters_cop[S[i]].end(),i));
-			clusters_cop[S_cop[i]].push_back(i);
+		if(clusters_cop[S[node_select[i]]].size()>1){
+			do{
+				//change of cluster
+				S_cop[i] = rand() % k + 0;
+			}while(S_cop[i] == S[i]);//select another cluster except himself
+
+			clusters_cop[S[node_select[i]]].erase(find(clusters_cop[S[node_select[i]]].begin(),clusters_cop[S[node_select[i]]].end(),node_select[i]));
+			clusters_cop[S_cop[node_select[i]]].push_back(node_select[i]);
 
 			//calculate the new fitness
 			infease = infeasibility(S_cop);
@@ -549,12 +554,15 @@ vector<vector<int>> PAR::algoritmoBL(){
 			//if the new f is the same as the current f and there aren't change in the clusters
 			}else if(new_f == f && clusters == clusters_cop && S == S_cop){
 				end = true;//it end
-			}else{
+			}else{//if it's worse, not change
 				clusters_cop = clusters;
 				S_cop = S;
 			}
 		}
 		++i;
+		//resetea el indice para la selección del nuevo nodo
+		if(i == node_select.size())
+			i = 0;
 
 	}while(!end || iterate < 100000);
 	return clusters;
