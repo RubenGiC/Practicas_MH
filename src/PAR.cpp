@@ -373,15 +373,11 @@ int PAR::infeasibility(int clust, int actual, vector<int> clusters_not_null, vec
 	for (unsigned int i = 0; i<ML.size(); ++i) {
 		if(i < ML.size()){
 			if(ML[i].first == actual){
-
 				if(S[ML[i].second] != -1 && S[ML[i].second] != clust){
-
 					++rest;
 				}
 			}else if(ML[i].second == actual){
-
 				if(S[ML[i].first] != -1 && S[ML[i].first] != clust){
-
 					++rest;
 				}
 			}
