@@ -21,11 +21,11 @@ using namespace arma;
 
 int main() {
 	PAR *par_zoo10 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const");
-	PAR *par_zoo20 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_20.const");
+	//PAR *par_zoo20 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_20.const");
 	PAR *par_glass10 = new PAR("datos/glass_set.dat", "datos/glass_set_const_10.const");
-	PAR *par_glass20 = new PAR("datos/glass_set.dat", "datos/glass_set_const_20.const");
+	//PAR *par_glass20 = new PAR("datos/glass_set.dat", "datos/glass_set_const_20.const");
 	PAR *par_bupa10 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_10.const");
-	PAR *par_bupa20 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_20.const");
+	//PAR *par_bupa20 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_20.const");
 	vector<vector<int>> clusters_sol;
 	ResultAlgorithms *results = new ResultAlgorithms();
 
@@ -36,7 +36,7 @@ int main() {
 
 	cout << "Calculate Greedy (ZOO, GLASS, BUPA) and BL (ZOO, GLASS, BUPA)" << endl;
 
-	for(int i = 0; i<5; ++i){
+	/*for(int i = 0; i<5; ++i){
 		//ZOO 10
 		start = clock();
 		clusters_sol = par_zoo10->algoritmoGreedy();
@@ -44,24 +44,12 @@ int main() {
 		elapsed = float(end - start)/CLOCKS_PER_SEC;
 		zoo_10 += to_string(i+1) + " Elapsed (Greedy PAR ZOO 10): " + to_string(elapsed) + "(seconds)\n";
 
-		zoo_10 += "\tInfeas: " + to_string(results->Infeasable(clusters_sol, par_zoo10->ML, par_zoo10->CL)) + "\n";
+		zoo_10 += "\tInfeas: " + to_string(results->Infeasable(clusters_sol, par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
 		zoo_10 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides)-0.904799856)) + "\n";
-		zoo_10 += "\tFitness: " + to_string(results->Fitness(par_zoo10->atributos,par_zoo10->matriz, clusters_sol, par_zoo10->centroides)) + "\n";
+		zoo_10 += "\tFitness: " + to_string(results->Fitness(par_zoo10->atributos,par_zoo10->matriz, clusters_sol, par_zoo10->centroides, par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
 		//cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
 
 		cout << i << " ZOO ------------------------------" << endl;
-		int n = 0;
-		for(vector<vector<int>>::iterator it = clusters_sol.begin(); it != clusters_sol.end(); ++it){
-			cout << n << " [ ";
-			for(vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
-				if(it2+1 != (*it).end())
-					cout << (*it2) << ", ";
-				else
-					cout << (*it2);
-			}
-			cout << " ]" << endl;
-			++n;
-		}
 
 		par_zoo10->clearClusters(false);//clear the clusters
 		par_zoo10->shuffleRSI();
@@ -77,24 +65,13 @@ int main() {
 		elapsed = float(end - start)/CLOCKS_PER_SEC;
 		glass_10 += to_string(i+1) + " Elapsed (Greedy PAR GLASS 10): " + to_string(elapsed) + "(seconds)\n";
 
-		glass_10 += "\tInfeas: " + to_string(results->Infeasable(clusters_sol, par_glass10->ML, par_glass10->CL)) + "\n";
+		glass_10 += "\tInfeas: " + to_string(results->Infeasable(clusters_sol, par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
 		glass_10 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_glass10->atributos, par_glass10->centroides)-0.364290282)) + "\n";
-		glass_10 += "\tFitness: " + to_string(results->Fitness(par_glass10->atributos,par_glass10->matriz, clusters_sol, par_glass10->centroides)) + "\n";
+		glass_10 += "\tFitness: " + to_string(results->Fitness(par_glass10->atributos,par_glass10->matriz, clusters_sol, par_glass10->centroides, par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
+
 		//cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
 
 		cout << i << " GLASS ------------------------------" << endl;
-		n = 0;
-		for(vector<vector<int>>::iterator it = clusters_sol.begin(); it != clusters_sol.end(); ++it){
-			cout << n << " [ ";
-			for(vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
-				if(it2+1 != (*it).end())
-					cout << (*it2) << ", ";
-				else
-					cout << (*it2);
-			}
-			cout << " ]" << endl;
-			++n;
-		}
 
 		par_glass10->clearClusters(false);//clear the clusters
 		par_glass10->shuffleRSI();
@@ -110,24 +87,9 @@ int main() {
 		elapsed = float(end - start)/CLOCKS_PER_SEC;
 		bupa_10 += to_string(i+1) + " Elapsed (Greedy PAR BUPA 10): " + to_string(elapsed) + "(seconds)\n";
 
-		bupa_10 += "\tInfeas: " + to_string(results->Infeasable(clusters_sol, par_bupa10->ML, par_bupa10->CL)) + "\n";
+		bupa_10 += "\tInfeas: " + to_string(results->Infeasable(clusters_sol, par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
 		bupa_10 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_bupa10->atributos, par_bupa10->centroides)-0.220423749)) + "\n";
-		bupa_10 += "\tFitness: " + to_string(results->Fitness(par_bupa10->atributos,par_bupa10->matriz, clusters_sol, par_bupa10->centroides)) + "\n";
-		//cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
-
-		cout << i << " BUPA ------------------------------" << endl;
-		n = 0;
-		for(vector<vector<int>>::iterator it = clusters_sol.begin(); it != clusters_sol.end(); ++it){
-			cout << n << " [ ";
-			for(vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
-				if(it2+1 != (*it).end())
-					cout << (*it2) << ", ";
-				else
-					cout << (*it2);
-			}
-			cout << " ]" << endl;
-			++n;
-		}
+		bupa_10 += "\tFitness: " + to_string(results->Fitness(par_bupa10->atributos,par_bupa10->matriz, clusters_sol, par_bupa10->centroides, par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
 
 		par_bupa10->clearClusters(false);//clear the clusters
 		par_bupa10->shuffleRSI();
@@ -135,7 +97,7 @@ int main() {
 		for(unsigned int i = 0; i < clusters_sol.size(); ++i)
 			clusters_sol[i].clear();
 		clusters_sol.clear();
-
+		*/
 		//ZOO 20
 		/*start = clock();
 		clusters_sol = par_zoo20->algoritmoGreedy();
@@ -155,7 +117,7 @@ int main() {
 		clusters_sol.clear();*/
 
 
-		//cout << (i+1) << " Elapsed (Greedy PAR zoo 10): " << elapsed << "(seconds)" << endl;
+		//cout << (i+1) << " Elapsed (Greedy PAR zoo 10): " << elapsed << "(seconds)" << endl;*/
 
 		/*cout << "Solution clusters (Greedy PAR zoo 10):" << endl;
 		int n = 0;
@@ -170,7 +132,7 @@ int main() {
 			cout << " ]" << endl;
 			++n;
 		}*/
-	}
+	//}
 
 	cout << endl << "ZOO ********************************************* " << endl;
 	cout << zoo_10 << endl;
@@ -194,13 +156,20 @@ int main() {
 	PAR *par = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const");
 	//par->lectura("datos/bupa_set.dat", "datos/bupa_set_const_10.const");
 
-	//clusters_sol = par->algoritmoGreedy();
-
 	//BL (LOCAL SEARCH)
 	par->clearClusters(false);//clear the clusters
 	par->resetCentroides();//randomly generate the centroids
 	par->randomAssign();//assign each node to a cluster randomly
 
+	start = clock();
+	clusters_sol = par->algoritmoBL();
+	end = clock();
+	elapsed = float(end - start)/CLOCKS_PER_SEC;
+	cout << " Elapsed (BL PAR ZOO 10): " << elapsed << "(seconds)\n";
+
+	cout << "\tInfeas: " << results->Infeasable(clusters_sol, par->ML, par->CL, par->createS()) << "\n";
+	cout << "\tError Distance: " << abs(results->Distance(clusters_sol, par->atributos, par->centroides)-0.904799856) << "\n";
+	cout << "\tFitness: " << results->Fitness(par->atributos,par->matriz, clusters_sol, par->centroides, par->ML, par->CL, par->createS()) << "\n";
 	/*cout << "Asign cluster randomly:" << endl;
 	n = 0;
 	for(vector<vector<int>>::iterator it = par->clusters.begin(); it != par->clusters.end(); ++it){
