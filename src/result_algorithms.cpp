@@ -8,7 +8,7 @@
 
 #include "../include/result_algorithms.h"
 //calculates the number of constrains it violates
-int ResultAlgorithms::Infeasable(vector<vector<int>> clusters, vector<pair<int,int>> ML, vector<pair<int,int>> CL, vector<int> S){
+int ResultAlgorithms::Infeasable(vector<pair<int,int>> ML, vector<pair<int,int>> CL, vector<int> S){
 	int restrictions = 0;
 	unsigned int max = CL.size();;
 
@@ -74,7 +74,7 @@ float ResultAlgorithms::distanciaEuclidea(vector<float> nod1, vector<float> nod2
 //calculate the fitness
 float ResultAlgorithms::Fitness(vector<vector<float>> atributos, mat matriz, vector<vector<int>> clusters, vector<vector<float>> centroides, vector<pair<int,int>> ML, vector<pair<int,int>> CL, vector<int> S){
 	//fitness = general deviation + (infeasable * landa)
-	float f = generalDeviation(clusters, atributos, centroides) + (Infeasable(clusters, ML, CL, S) * createLanda(atributos, matriz));
+	float f = generalDeviation(clusters, atributos, centroides) + (Infeasable(ML, CL, S) * createLanda(atributos, matriz));
 
 	return f;
 }

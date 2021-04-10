@@ -18,7 +18,7 @@ using namespace arma;
 class ResultAlgorithms{
 
 public:
-	int Infeasable(vector<vector<int>> clusters, vector<pair<int,int>> ML, vector<pair<int,int>> CL, vector<int> S);
+	int Infeasable(vector<pair<int,int>> ML, vector<pair<int,int>> CL, vector<int> S);
 	float Distance(vector<vector<int>> clusters, vector<vector<float>> atributos,vector<vector<float>> centroides);
 	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);
 	float Fitness(vector<vector<float>> atributos, mat matriz, vector<vector<int>> clusters, vector<vector<float>> centroides, vector<pair<int,int>> ML, vector<pair<int,int>> CL, vector<int> S);

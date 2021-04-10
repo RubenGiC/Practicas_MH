@@ -37,7 +37,7 @@ PAR::PAR(string fichero_set, string fichero_set_const){
 	centroides.resize(k);//reservo el tamaño del vector de tamaño k
 	clusters.resize(k);//reservo memoria para el vector de elementos de cada cluster
 
-	Set_random(37);//creo una semilla para los valores aleatorios
+	Set_random(38);//creo una semilla para los valores aleatorios
 
 	//Y genero aleatoriamente los centroides inicialmente distintos de dimensión n
 	for(int i=0; i<k; ++i){
@@ -51,7 +51,7 @@ PAR::PAR(string fichero_set, string fichero_set_const){
 	}
 
 	//despues barajo los indices de los atributos
-	srand(unsigned (37));//genero una semilla fija
+	srand(unsigned (38));//genero una semilla fija
 	random_shuffle(RSI.begin(), RSI.end());//barajo el vector
 }
 
@@ -209,7 +209,8 @@ vector<vector<int>> PAR::algoritmoGreedy(){
 	vector<int> S_cop(RSI.size(),-1);
 	S = S_cop;
 
-	int pos=-1, iterations = 0, not_null=0;
+	int pos=-1, not_null=0;
+	//int iterations = 0;
 	bool end = false, first = true;
 
 	do{//mientras los vectores sean distintos
@@ -241,7 +242,7 @@ vector<vector<int>> PAR::algoritmoGreedy(){
 			}
 		}
 
-		++iterations;
+		//++iterations;
 		//if the clusters don't undergo changes
 		if(clusters==cop_clusters){
 
@@ -366,12 +367,12 @@ int PAR::infeasibility(vector<int> S_cop){
 
 	for(unsigned int i = 0; i< max; ++i){
 		if(i<CL.size()){
-			if(S[CL[i].first] == S[CL[i].second])
+			if(S_cop[CL[i].first] == S_cop[CL[i].second])
 				++restrictions;
 		}
 
 		if(i<ML.size()){
-			if(S[ML[i].first] != S[ML[i].second])
+			if(S_cop[ML[i].first] != S_cop[ML[i].second])
 				++restrictions;
 		}
 	}
@@ -464,7 +465,7 @@ vector<vector<int>> PAR::algoritmoBL(){
 	vector<int> node_select = RSI;//vector of nodes to select in each iteration
 	random_shuffle(node_select.begin(), node_select.end());//barajo el vector
 	int infease = infeasibility(S);//calculate infeasibility
-	int gen_deviation = generalDeviation(clusters); //calculate General Deviation
+	float gen_deviation = generalDeviation(clusters); //calculate General Deviation
 	float landa = createLanda();//calculate landa
 	//and calculate the fitness
 	float f = gen_deviation + (infease * landa);
@@ -473,7 +474,7 @@ vector<vector<int>> PAR::algoritmoBL(){
 	//copy of S and clusters
 	vector<int> S_cop = S;
 	vector<vector<int>> clusters_cop = clusters;
-	unsigned int i = 0;
+	unsigned int i = 0, contador = 0;
 
 	bool end = false;
 	int iterate = 0;
@@ -482,26 +483,11 @@ vector<vector<int>> PAR::algoritmoBL(){
 
 		//if the node to change the cluster, the cluster has more than 1 element
 		if(clusters_cop[S[node_select[i]]].size()>1){
-			cout << "DO" << endl;
+
 			do{
 				//change of cluster
 				S_cop[node_select[i]] = rand() % k + 0;
 			}while(S_cop[node_select[i]] == S[node_select[i]]);//select another cluster except himself
-			cout << "CLEAR AND PUSH BACK" << endl;
-			/*if(find(clusters_cop[S[node_select[i]]].begin(),clusters_cop[S[node_select[i]]].end(),node_select[i]) == clusters_cop[S[node_select[i]]].end()){
-				cout << S_cop[node_select[i]] << endl;
-				cout << S[node_select[i]] << ", node: " << node_select[i] << endl;
-
-				for(unsigned int e = 0; e < clusters_cop.size(); ++e){
-					cout << e << " [";
-					for(unsigned int j = 0; j < clusters_cop[e].size(); ++j){
-						if(clusters_cop[e][j] == node_select[i])
-							cout << endl << "(((" << clusters_cop[e][j] << ")))" << endl;
-						cout << clusters_cop[e][j] << ", ";
-					}
-					cout << "]" << endl;
-				}
-			}*/
 
 			//update clusters_cop
 			//erase the node in old cluster
@@ -509,75 +495,36 @@ vector<vector<int>> PAR::algoritmoBL(){
 			//add the node in new cluster
 			clusters_cop[S_cop[node_select[i]]].push_back(node_select[i]);
 
-			cout << "FITNESS" << endl;
 			//calculate the new fitness
 			infease = infeasibility(S_cop);
 			gen_deviation = generalDeviation(clusters_cop);
 
 			new_f = gen_deviation + (infease * landa);
 
-			if(new_f < f)
-				cout << new_f << " vs " << f << endl;
-
-			/*if(new_f == f){
-
-				if(clusters == clusters_cop){
-					cout << S[i] << " vs " << S_cop[i] << endl;
-
-					cout << "ORIGINAL **********************************************************************" << endl;
-					int n = 0;
-					for(vector<vector<int>>::iterator it = clusters.begin(); it != clusters.end(); ++it){
-						cout << n << " [ ";
-						for(vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
-							if(it2+1 != (*it).end())
-								cout << (*it2) << ", ";
-							else
-								cout << (*it2);
-						}
-						cout << " ]" << endl;
-						++n;
-					}
-					cout << "CHANGE **********************************************************************" << endl;
-					n = 0;
-					for(vector<vector<int>>::iterator it = clusters_cop.begin(); it != clusters_cop.end(); ++it){
-						cout << n << " [ ";
-						for(vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
-							if(it2+1 != (*it).end())
-								cout << (*it2) << ", ";
-							else
-								cout << (*it2);
-						}
-						cout << " ]" << endl;
-						++n;
-					}
-					cout << " ****************************************************************************" << endl;
-				}*/
-
-				/*cout << new_f << " == " << f << ", ";
-				if(clusters == clusters_cop)
-					cout << "TRUE , ";
-				else cout << "FALSE , ";
-				if(S == S_cop)
-					cout << "TRUE" << endl;
-				else cout << "FALSE , " << endl;*/
-			//}
-			cout << f << " vs " << new_f << endl;
+			//cout << f << " vs " << new_f << endl;
 			//if the new f is less than the current f
 			if(new_f < f){
 				//update f and the clusters
 				f = new_f;
 				clusters = clusters_cop;
 				S = S_cop;
-				cout << "CHANGE" << endl;
+				//cout << "CHANGE" << endl;
+				contador = 0;
 			//if the new f is the same as the current f and there aren't change in the clusters
 			}else if(new_f == f){
-				cout << "END" << endl;
-				cout << S[57] << endl;
-				end = true;//it end
+				if(contador == S.size()){
+					//cout << "END" << endl;
+					end = true;//it end
+				}else{
+					S_cop = S;
+					clusters_cop = clusters;
+				}
+				++contador;
 			}else{//if it's worse, not change
 				clusters_cop = clusters;
 				S_cop = S;
-				cout << "NOT CHANGE" << endl;
+				//++contador;
+				//cout << "NOT CHANGE" << endl;
 			}
 		}
 		++i;
@@ -601,7 +548,8 @@ float PAR::generalDeviation(vector<vector<int>> v_clust){
 				distance += distanciaEuclidea(atributos[(*it)],centroides[i]);
 			}
 			//mean intra-cluster distance
-			intra_cluster += distance / v_clust[i].size();
+			distance = distance / v_clust[i].size();
+			intra_cluster += distance;
 		}
 
 		return intra_cluster/v_clust.size();
