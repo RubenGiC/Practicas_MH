@@ -19,9 +19,10 @@ class ResultAlgorithms{
 
 public:
 	int Infeasable(vector<pair<int,int>> ML, vector<pair<int,int>> CL, vector<int> S);
-	float Distance(vector<vector<int>> clusters, vector<vector<float>> atributos,vector<vector<float>> centroides);
+	//calculate the error distance
 	float ErrorDistance(vector<vector<int>> clusters, vector<vector<float>> atributos,vector<vector<float>> centroides, string type_data_file);
 	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);
+	//calculate fitness = general deviation + (landa * infeasable)
 	float Fitness(vector<vector<float>> atributos, mat matriz, vector<vector<int>> clusters, vector<vector<float>> centroides, vector<pair<int,int>> ML, vector<pair<int,int>> CL, vector<int> S);
 	//calculate Landa
 	float createLanda(vector<vector<float>> atributos, mat matriz);

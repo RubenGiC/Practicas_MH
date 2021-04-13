@@ -16,6 +16,7 @@
 
 #include "../include/PAR.h"
 #include "../include/result_algorithms.h"
+
 using namespace std;
 using namespace arma;
 
@@ -26,7 +27,7 @@ int main() {
 	PAR *par_glass20 = new PAR("datos/glass_set.dat", "datos/glass_set_const_20.const");
 	PAR *par_bupa10 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_10.const");
 	PAR *par_bupa20 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_20.const");
-	vector<vector<int>> clusters_sol;
+	vector<vector<int>> clusters_sol, clusters_sol_gred, clusters_sol_bl;
 	ResultAlgorithms *results = new ResultAlgorithms();
 
 	string greedy_zoo_20 = "", greedy_zoo_10 = "", greedy_glass_10 = "", greedy_glass_20 = "", greedy_bupa_10 = "", greedy_bupa_20 = "";
@@ -168,7 +169,7 @@ int main() {
 	elapsed = float(end_global - start_global)/CLOCKS_PER_SEC;
 	cout << " Elapsed Total (GREEDY): " << elapsed << "(seconds)\n";
 
-	cout << "Calculate BL (ZOO, GLASS, BUPA) Aproximate 2 minutes" << endl;
+	cout << "Calculate BL (ZOO, GLASS, BUPA) Aproximate 7 minutes" << endl;
 	start_global = clock();
 	for(int i = 0; i < 5; ++i){
 		//LOCAL SEARCH
@@ -305,7 +306,7 @@ int main() {
 
 	end_global = clock();
 	elapsed = float(end_global - start_global)/CLOCKS_PER_SEC;
-	cout << " Elapsed Total (BL): " << elapsed << "(seconds)\n" << endl;
+	cout << " Elapsed Total (BL): " << (elapsed/60) << "(minutes)\n" << endl;
 
 	cout << "GREEDY: " << endl;
 	cout << endl << "ZOO ********************************************* " << endl;
@@ -336,6 +337,61 @@ int main() {
 
 	cout << endl << bl_bupa_10 << endl;
 	cout << endl << bl_bupa_20 << endl;
+
+	/*greedy_bupa_10 = greedy_bupa_20 = bl_bupa_10 = bl_bupa_20 = "";
+
+	par_bupa10->clearClusters(false);//clear the clusters
+	par_bupa10->shuffleRSI();//shuffle indices
+	par_bupa10->resetCentroides();//reset centroides
+	for(unsigned int i = 0; i < clusters_sol.size(); ++i)//and clear the clusters solution
+		clusters_sol[i].clear();
+	clusters_sol.clear();
+
+	cout << "Calculando Experimento: " << endl;
+	//PRUEBA CON UNA SOLUCIÓN OPTIMA GREEDY AL ALGORITMO BL
+	for(int i = 0; i<5; ++i){
+
+		//BUPA 10
+		start = clock();
+		clusters_sol = par_bupa10->algoritmoGreedy();
+		end = clock();
+		elapsed = float(end - start)/CLOCKS_PER_SEC;
+		greedy_bupa_10 += to_string(i+1) + " Elapsed (Greedy PAR BUPA 10): " + to_string(elapsed) + "(seconds)\n";
+
+		greedy_bupa_10 += "\tInfeas: " + to_string(results->Infeasable(par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
+		greedy_bupa_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa10->atributos, par_bupa10->centroides,"BUPA")) + "\n";
+		greedy_bupa_10 += "\tFitness: " + to_string(results->Fitness(par_bupa10->atributos,par_bupa10->matriz, clusters_sol, par_bupa10->centroides, par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
+
+
+		cout << i << " BUPA GREEDY 10 ------------------------------" << endl;
+		start = clock();
+		clusters_sol = par_bupa10->algoritmoBL();
+		end = clock();
+		elapsed = float(end - start)/CLOCKS_PER_SEC;
+		bl_bupa_10 += to_string(i+1) + " Elapsed (BL PAR BUPA 10): " + to_string(elapsed) + "(seconds)\n";
+
+		bl_bupa_10 += "\tInfeas: " + to_string(results->Infeasable(par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
+		bl_bupa_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa10->atributos, par_bupa10->centroides,"BUPA")) + "\n";
+		bl_bupa_10 += "\tFitness: " + to_string(results->Fitness(par_bupa10->atributos,par_bupa10->matriz, clusters_sol, par_bupa10->centroides, par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
+
+		cout << i << " BUPA BL 10 ------------------------------" << endl;
+
+		par_bupa10->clearClusters(false);//clear the clusters
+		par_bupa10->shuffleRSI();//shuffle indices
+		par_bupa10->resetCentroides();//reset centroides
+		for(unsigned int i = 0; i < clusters_sol.size(); ++i)//and clear the clusters solution
+			clusters_sol[i].clear();
+		clusters_sol.clear();
+
+	}
+
+	cout << "GREEDY BUPA ********************************************* " << endl;
+
+	cout << endl << greedy_bupa_10 << endl;
+
+	cout << "BL BUPA ********************************************* " << endl;
+
+	cout << endl << bl_bupa_10 << endl;*/
 
 	return 0;
 }

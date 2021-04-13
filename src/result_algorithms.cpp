@@ -43,30 +43,12 @@ int ResultAlgorithms::Infeasable(vector<pair<int,int>> ML, vector<pair<int,int>>
 
 	return restrictions;
 }
-//calculate the general deviation
-float ResultAlgorithms::Distance(vector<vector<int>> clusters, vector<vector<float>> atributos,vector<vector<float>> centroides){
-	float distance = 0;
-	float intracluster = 0;
-	//walk through each cluster
-	for(unsigned int i = 0; i< clusters.size(); ++i){
-		intracluster = 0;
-		//sumatorry(euclidean distance of all nodes in the cluster)
-		for(vector<int>::iterator it = clusters[i].begin(); it != clusters[i].end(); ++it){
-			intracluster += distanciaEuclidea(atributos[(*it)],centroides[i]);
-		}
-		//mean intra-cluster distance
-		intracluster = intracluster / clusters[i].size();
-		distance += intracluster;
-	}
-
-	return distance/clusters.size();
-}
 
 //calculate the distance error
 float ResultAlgorithms::ErrorDistance(vector<vector<int>> clusters, vector<vector<float>> atributos,vector<vector<float>> centroides, string type_data_file){
 	float error_distance = 0, optimal_distance = 0;
 	//calculate the distance
-	error_distance = Distance(clusters, atributos, centroides);
+	error_distance = generalDeviation(clusters, atributos, centroides);
 
 	//choose the optimal distance
 	if(type_data_file.compare("ZOO") == 0)

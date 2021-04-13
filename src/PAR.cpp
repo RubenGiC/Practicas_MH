@@ -98,7 +98,7 @@ void PAR::lectura(string fichero_set, string fichero_set_const){
 	atributos.pop_back();
 
 	--size;//le decremento 1 porque cuenta el salto de linea del vacio
-	//cout << size << endl;
+
 	matriz.set_size(size,size);//redimensiono la matriz
 	size_mat = size;
 
@@ -116,7 +116,7 @@ void PAR::lectura(string fichero_set, string fichero_set_const){
 	int col=0, row=0, col2=1;
 	while(!read.eof()) {
 		read >> cad;
-		//cout << row << ", " << col << endl;
+
 		if(row<size){//esto lo hago porque lee el salto de linea de la ultima linea
 			//recorro la linea
 			for(unsigned int i=0; i<cad.size(); i+=2){
@@ -149,9 +149,6 @@ void PAR::lectura(string fichero_set, string fichero_set_const){
 
 	}
 	read.close();
-
-	/*cout << "Resultados: " << endl;
-	cout << matriz << endl;*/
 }
 
 //reset Centroides
@@ -359,34 +356,27 @@ int PAR::infeasibility(int clust, int actual){
 	return rest;// return the number of restrictions it violates
 }
 
+//same the infeasibility(int clust, int actual) except it receives the solution
 int PAR::infeasibility(vector<int> S_cop){
 	int restrictions = 0;
-
+	//CALCULATE the max size
 	unsigned int max = CL.size();
 	if(ML.size()>max) max = ML.size();
 
+	//walk through all restrictions
 	for(unsigned int i = 0; i< max; ++i){
 		if(i<CL.size()){
+			//check if it violate the CL constraint
 			if(S_cop[CL[i].first] == S_cop[CL[i].second])
 				++restrictions;
 		}
 
 		if(i<ML.size()){
+			//check if it violate the ML constraint
 			if(S_cop[ML[i].first] != S_cop[ML[i].second])
 				++restrictions;
 		}
 	}
-
-	/*//walk through each restriction
-	for(unsigned int i = 1; i < matriz.n_cols; ++i)
-		for(unsigned int e = 0; e < i; ++e)*/
-			/*
-			 * if the restriction is CL and the node is in the current cluster
-			 * or
-			 * it isn't and the constraint is ML
-			*/
-			/*if((matriz(i,e) > 0 && S_cop[i] != S_cop[e]) || (matriz(i,e) < 0 && S_cop[i] == S_cop[e]))
-				++restrictions;*/
 
 	return restrictions;
 }
@@ -463,77 +453,111 @@ vector<int> PAR::createS(){
 }
 
 vector<vector<int>> PAR::algoritmoBL(){
+	int max = 100000;
 
 	S = createS();//create the vector S
 
-	vector<int> node_select = RSI;//vector of nodes to select in each iteration
-	random_shuffle(node_select.begin(), node_select.end());//barajo el vector
 	int infease = infeasibility(S);//calculate infeasibility
 	float gen_deviation = generalDeviation(clusters); //calculate General Deviation
 	float landa = createLanda();//calculate landa
 	//and calculate the fitness
 	float f = gen_deviation + (infease * landa);
-	float new_f=0;
 
-	//copy of S and clusters
-	vector<int> S_cop = S;
-	vector<vector<int>> clusters_cop = clusters;
-	unsigned int i = 0, contador = 0;
+	vector<pair<int,int>> vecindario = generateNeig();//create the neighborhood
+	random_shuffle(vecindario.begin(), vecindario.end());//shuffle vector
 
-	bool end = false;
+	bool end = false;//algorithm completion
 	int iterate = 0;
 
 	do{
-
-		//if the node to change the cluster, the cluster has more than 1 element
-		if(clusters_cop[S[node_select[i]]].size()>1){
-
-			do{
-				//change of cluster
-				S_cop[node_select[i]] = rand() % k + 0;
-			}while(S_cop[node_select[i]] == S[node_select[i]]);//select another cluster except himself
-
-			//update clusters_cop
-			//erase the node in old cluster
-			clusters_cop[S[node_select[i]]].erase(find(clusters_cop[S[node_select[i]]].begin(),clusters_cop[S[node_select[i]]].end(),node_select[i]));
-			//add the node in new cluster
-			clusters_cop[S_cop[node_select[i]]].push_back(node_select[i]);
-
-			//calculate the new fitness
-			infease = infeasibility(S_cop);
-			gen_deviation = generalDeviation(clusters_cop);
-
-			new_f = gen_deviation + (infease * landa);
-
-			//cout << f << " vs " << new_f << endl;
-			//if the new f is less than the current f
-			if(new_f < f){
-				//update f and the clusters
-				f = new_f;
-				clusters = clusters_cop;
-				S = S_cop;
-				//cout << "CHANGE" << endl;
-				contador = 0;
-			//if the new f is the same as the current f and there aren't change in the clusters
-			}else{//if it's worse or same, not change
-				clusters_cop = clusters;
-				S_cop = S;
-				++contador;
-				//cout << "NOT CHANGE" << endl;
+		//if the number of iterate don't reach 100000
+		if(iterate < max){//calculate the new solution
+			iterate = betterFitness(vecindario, f, landa, iterate, max);
+			//update centroides
+			for(unsigned int i = 0; i < clusters.size(); ++i){
+				centroides[i] = updateDistance(clusters[i]);
 			}
-		}
-		//if runs through the neighborhood and there isn't improvement
-		if(contador == S.size())
-			end = true;//ends the algorithm
+		}else
+			end = true;//else the algorithm ends
 
-		++i;
-		//resetea el indice para la selección del nuevo nodo
-		if(i == node_select.size())
-			i = 0;
-		++iterate;
-	}while(!end && iterate < 100000);
+		if(iterate < max){
+			//calculate the new neighborhood
+			vecindario = generateNeig();
+			random_shuffle(vecindario.begin(), vecindario.end());//barajo el vector
+		}
+
+	}while(!end);
 	//cout << iterate << endl;
 	return clusters;
+}
+
+//genereate the possible neighborhoods
+vector<pair<int,int>> PAR::generateNeig(){
+	vector<pair<int,int>> vecindario;
+	for(unsigned int i=0; i<RSI.size(); ++i){
+		for(int e = 0; e<k; ++e){
+			vecindario.push_back(pair<int, int>(RSI[i],e));
+		}
+	}
+	return vecindario;
+}
+
+//calculates the new better solution than the current solution
+int PAR::betterFitness(vector<pair<int,int>> vecindario, float &f, float landa, int it, int max){
+	int iterate = it;
+	int infease = 0;//calculate infeasibility
+	float gen_deviation = 0; //calculate General Deviation
+	//copy the solution and neighborhood
+	vector<int> S_cop = S;
+	vector<vector<int>> clusters_cop = clusters;
+	vector<pair<int,int>> vecindario_cop = vecindario;
+	float new_f = 0;
+	//tour the neighborhood
+	for(auto i=vecindario_cop.begin(); i<vecindario_cop.end(); ++i){
+		//if the cluster has more than 1 node
+		if(clusters_cop[S_cop[(*i).first]].size()>1){
+			//and the new cluster is different from the current one
+			if(S_cop[(*i).first] != (*i).second){
+				//change
+				S_cop[(*i).first] = (*i).second;
+
+				//update clusters_cop
+				//erase the node in old cluster
+				clusters_cop[S[(*i).first]].erase(find(clusters_cop[S[(*i).first]].begin(),clusters_cop[S[(*i).first]].end(),(*i).first));
+				//add the node in new cluster
+				clusters_cop[S_cop[(*i).first]].push_back((*i).first);
+
+				//calculate the new fitness
+				gen_deviation = generalDeviation(clusters_cop);
+				infease = infeasibility(S_cop);
+				new_f = gen_deviation + (infease * landa);
+
+				++iterate;//increase the number of iterations
+
+				//if the new solution is better than current solution
+				if(new_f < f){
+					//update the current solution
+					f = new_f;
+					S = S_cop;
+					clusters = clusters_cop;
+
+					return iterate;//and return the actual iteration
+				}
+				//else restore to the previous solution
+				S_cop = S;
+				clusters_cop = clusters;
+
+				//if the iterate reaches 100000
+				if(iterate == max){
+					return iterate;//ends
+				}
+
+
+			}
+		}
+	}
+	//if it calculate all the possibilities, it ends
+	return max;
 }
 
 //calculate the general deviation

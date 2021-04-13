@@ -59,6 +59,12 @@ public:
 	//CALCULO QUE NODO TIENE LA DISTANCIA EUCLIDEA MINIMA
 	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);//calcula la distancia de 2 puntos
 
+	//generates the possible neighborhoods
+	vector<pair<int,int>> generateNeig();
+
+	//calculate a better fitness
+	int betterFitness(vector<pair<int,int>> vecindario, float &f, float landa, int it, int max);
+
 	//OTHER FUNCTIONS
 	//update the distance for each cluster
 	vector<float> updateDistance(vector<int> nodes);
