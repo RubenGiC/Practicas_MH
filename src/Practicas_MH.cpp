@@ -3,7 +3,7 @@
 // Author      : Ruben Girela Castellón
 // Version     :
 // Copyright   : Ruben Girela Castellón
-// Description : Hello World in C++, Ansi-style
+// Description : Apply Greedy algorithms and Local Search in the PAR problem (Grouping with Constraints Problem (GCP)) in C++, Ansi-style
 //============================================================================
 
 #include <iostream>
@@ -48,7 +48,7 @@ int main() {
 		greedy_zoo_10 += to_string(i+1) + " Elapsed (Greedy PAR ZOO 10): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_zoo_10 += "\tInfeas: " + to_string(results->Infeasable(par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
-		greedy_zoo_10 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides)-0.904799856)) + "\n";
+		greedy_zoo_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides,"ZOO")) + "\n";
 		greedy_zoo_10 += "\tFitness: " + to_string(results->Fitness(par_zoo10->atributos,par_zoo10->matriz, clusters_sol, par_zoo10->centroides, par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
 		//cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
 
@@ -69,7 +69,7 @@ int main() {
 		greedy_glass_10 += to_string(i+1) + " Elapsed (Greedy PAR GLASS 10): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_glass_10 += "\tInfeas: " + to_string(results->Infeasable(par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
-		greedy_glass_10 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_glass10->atributos, par_glass10->centroides)-0.364290282)) + "\n";
+		greedy_glass_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_glass10->atributos, par_glass10->centroides,"GLASS")) + "\n";
 		greedy_glass_10 += "\tFitness: " + to_string(results->Fitness(par_glass10->atributos,par_glass10->matriz, clusters_sol, par_glass10->centroides, par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
 
 		//cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
@@ -91,7 +91,7 @@ int main() {
 		greedy_bupa_10 += to_string(i+1) + " Elapsed (Greedy PAR BUPA 10): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_bupa_10 += "\tInfeas: " + to_string(results->Infeasable(par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
-		greedy_bupa_10 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_bupa10->atributos, par_bupa10->centroides)-0.220423749)) + "\n";
+		greedy_bupa_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa10->atributos, par_bupa10->centroides,"BUPA")) + "\n";
 		greedy_bupa_10 += "\tFitness: " + to_string(results->Fitness(par_bupa10->atributos,par_bupa10->matriz, clusters_sol, par_bupa10->centroides, par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
 
 		par_bupa10->clearClusters(false);//clear the clusters
@@ -111,7 +111,7 @@ int main() {
 		greedy_zoo_20 += to_string(i+1) + " Elapsed (Greedy PAR zoo 20): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_zoo_20 += "\tInfeas: " + to_string(results->Infeasable(par_zoo20->ML, par_zoo20->CL, par_zoo20->createS())) + "\n";
-		greedy_zoo_20 += "\t Error Distance: " + to_string(abs(results->Distance(clusters_sol, par_zoo20->atributos, par_zoo20->centroides)-0.904799856)) + "\n";
+		greedy_zoo_20 += "\t Error Distance: " + to_string(results->ErrorDistance(clusters_sol, par_zoo20->atributos, par_zoo20->centroides,"ZOO")) + "\n";
 		greedy_zoo_20 += "\t Fitness: " + to_string(results->Fitness(par_zoo20->atributos,par_zoo20->matriz, clusters_sol, par_zoo20->centroides, par_zoo20->ML, par_zoo20->CL, par_zoo20->createS())) + "\n";
 		//cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
 		par_zoo20->clearClusters(false);//clear the clusters
@@ -131,7 +131,7 @@ int main() {
 		greedy_glass_20 += to_string(i+1) + " Elapsed (Greedy PAR GLASS 20): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_glass_20 += "\tInfeas: " + to_string(results->Infeasable(par_glass20->ML, par_glass20->CL, par_glass20->createS())) + "\n";
-		greedy_glass_20 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_glass20->atributos, par_glass20->centroides)-0.364290282)) + "\n";
+		greedy_glass_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_glass20->atributos, par_glass20->centroides,"GLASS")) + "\n";
 		greedy_glass_20 += "\tFitness: " + to_string(results->Fitness(par_glass20->atributos,par_glass20->matriz, clusters_sol, par_glass20->centroides, par_glass20->ML, par_glass20->CL, par_glass20->createS())) + "\n";
 
 		par_glass20->clearClusters(false);//clear the clusters
@@ -151,7 +151,7 @@ int main() {
 		greedy_bupa_20 += to_string(i+1) + " Elapsed (Greedy PAR BUPA 20): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_bupa_20 += "\tInfeas: " + to_string(results->Infeasable(par_bupa20->ML, par_bupa20->CL, par_bupa20->createS())) + "\n";
-		greedy_bupa_20 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_bupa20->atributos, par_bupa20->centroides)-0.220423749)) + "\n";
+		greedy_bupa_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa20->atributos, par_bupa20->centroides,"BUPA")) + "\n";
 		greedy_bupa_20 += "\tFitness: " + to_string(results->Fitness(par_bupa20->atributos,par_bupa20->matriz, clusters_sol, par_bupa20->centroides, par_bupa20->ML, par_bupa20->CL, par_bupa20->createS())) + "\n";
 
 		par_bupa20->clearClusters(false);//clear the clusters
@@ -168,7 +168,7 @@ int main() {
 	elapsed = float(end_global - start_global)/CLOCKS_PER_SEC;
 	cout << " Elapsed Total (GREEDY): " << elapsed << "(seconds)\n";
 
-	cout << "Calculate BL (ZOO, GLASS, BUPA) Aproximate 15 minutes" << endl;
+	cout << "Calculate BL (ZOO, GLASS, BUPA) Aproximate 2 minutes" << endl;
 	start_global = clock();
 	for(int i = 0; i < 5; ++i){
 		//LOCAL SEARCH
@@ -183,12 +183,14 @@ int main() {
 		bl_zoo_10 += to_string(i+1) + " Elapsed (BL PAR ZOO 10): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_zoo_10 += "\tInfeas: " + to_string(results->Infeasable(par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
-		bl_zoo_10 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides)-0.904799856)) + "\n";
+		bl_zoo_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides,"ZOO")) + "\n";
 		bl_zoo_10 += "\tFitness: " + to_string(results->Fitness(par_zoo10->atributos,par_zoo10->matriz, clusters_sol, par_zoo10->centroides, par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
 
 		par_zoo10->clearClusters(false);//clear the clusters
-		par_zoo10->resetCentroides();//randomly generate the centroids
 		par_zoo10->shuffleRSI();
+		for(unsigned int i = 0; i < clusters_sol.size(); ++i)
+			clusters_sol[i].clear();
+		clusters_sol.clear();
 
 		//cout << i << " ZOO BL 10 ------------------------------" << endl;
 
@@ -203,12 +205,14 @@ int main() {
 		bl_glass_10 += to_string(i+1) + " Elapsed (BL PAR GLASS 10): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_glass_10 += "\tInfeas: " + to_string(results->Infeasable(par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
-		bl_glass_10 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_glass10->atributos, par_glass10->centroides)-0.364290282)) + "\n";
+		bl_glass_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_glass10->atributos, par_glass10->centroides,"GLASS")) + "\n";
 		bl_glass_10 += "\tFitness: " + to_string(results->Fitness(par_glass10->atributos,par_glass10->matriz, clusters_sol, par_glass10->centroides, par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
 
 		par_glass10->clearClusters(false);//clear the clusters
 		par_glass10->shuffleRSI();
-		par_glass10->resetCentroides();
+		for(unsigned int i = 0; i < clusters_sol.size(); ++i)
+			clusters_sol[i].clear();
+		clusters_sol.clear();
 
 		//cout << i << " GLASS BL 10 ------------------------------" << endl;
 
@@ -222,12 +226,11 @@ int main() {
 		bl_bupa_10 += to_string(i+1) + " Elapsed (BL PAR BUPA 10): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_bupa_10 += "\tInfeas: " + to_string(results->Infeasable(par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
-		bl_bupa_10 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_bupa10->atributos, par_bupa10->centroides)-0.220423749)) + "\n";
+		bl_bupa_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa10->atributos, par_bupa10->centroides,"BUPA")) + "\n";
 		bl_bupa_10 += "\tFitness: " + to_string(results->Fitness(par_bupa10->atributos,par_bupa10->matriz, clusters_sol, par_bupa10->centroides, par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
 
 		par_bupa10->clearClusters(false);//clear the clusters
 		par_bupa10->shuffleRSI();
-		par_bupa10->resetCentroides();
 		for(unsigned int i = 0; i < clusters_sol.size(); ++i)
 			clusters_sol[i].clear();
 		clusters_sol.clear();
@@ -245,12 +248,14 @@ int main() {
 		bl_zoo_20 += to_string(i+1) + " Elapsed (BL PAR ZOO 20): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_zoo_20 += "\tInfeas: " + to_string(results->Infeasable(par_zoo20->ML, par_zoo20->CL, par_zoo20->createS())) + "\n";
-		bl_zoo_20 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_zoo20->atributos, par_zoo20->centroides)-0.904799856)) + "\n";
+		bl_zoo_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_zoo20->atributos, par_zoo20->centroides,"ZOO")) + "\n";
 		bl_zoo_20 += "\tFitness: " + to_string(results->Fitness(par_zoo20->atributos,par_zoo20->matriz, clusters_sol, par_zoo20->centroides, par_zoo20->ML, par_zoo20->CL, par_zoo20->createS())) + "\n";
 
 		par_zoo20->clearClusters(false);//clear the clusters
-		par_zoo20->resetCentroides();//randomly generate the centroids
 		par_zoo20->shuffleRSI();
+		for(unsigned int i = 0; i < clusters_sol.size(); ++i)
+			clusters_sol[i].clear();
+		clusters_sol.clear();
 
 		//cout << i << " ZOO BL 20 ------------------------------" << endl;
 
@@ -265,12 +270,14 @@ int main() {
 		bl_glass_20 += to_string(i+1) + " Elapsed (BL PAR GLASS 20): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_glass_20 += "\tInfeas: " + to_string(results->Infeasable(par_glass20->ML, par_glass20->CL, par_glass20->createS())) + "\n";
-		bl_glass_20 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_glass20->atributos, par_glass20->centroides)-0.364290282)) + "\n";
+		bl_glass_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_glass20->atributos, par_glass20->centroides,"GLASS")) + "\n";
 		bl_glass_20 += "\tFitness: " + to_string(results->Fitness(par_glass20->atributos,par_glass20->matriz, clusters_sol, par_glass20->centroides, par_glass20->ML, par_glass20->CL, par_glass20->createS())) + "\n";
 
 		par_glass20->clearClusters(false);//clear the clusters
 		par_glass20->shuffleRSI();
-		par_glass20->resetCentroides();
+		for(unsigned int i = 0; i < clusters_sol.size(); ++i)
+			clusters_sol[i].clear();
+		clusters_sol.clear();
 
 		//cout << i << " GLASS BL 20 ------------------------------" << endl;
 
@@ -284,12 +291,11 @@ int main() {
 		bl_bupa_20 += to_string(i+1) + " Elapsed (BL PAR BUPA 20): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_bupa_20 += "\tInfeas: " + to_string(results->Infeasable(par_bupa20->ML, par_bupa20->CL, par_bupa20->createS())) + "\n";
-		bl_bupa_20 += "\tError Distance: " + to_string(abs(results->Distance(clusters_sol, par_bupa20->atributos, par_bupa20->centroides)-0.220423749)) + "\n";
+		bl_bupa_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa20->atributos, par_bupa20->centroides,"BUPA")) + "\n";
 		bl_bupa_20 += "\tFitness: " + to_string(results->Fitness(par_bupa20->atributos,par_bupa20->matriz, clusters_sol, par_bupa20->centroides, par_bupa20->ML, par_bupa20->CL, par_bupa20->createS())) + "\n";
 
 		par_bupa20->clearClusters(false);//clear the clusters
 		par_bupa20->shuffleRSI();
-		par_bupa20->resetCentroides();
 		for(unsigned int i = 0; i < clusters_sol.size(); ++i)
 			clusters_sol[i].clear();
 		clusters_sol.clear();
@@ -299,7 +305,7 @@ int main() {
 
 	end_global = clock();
 	elapsed = float(end_global - start_global)/CLOCKS_PER_SEC;
-	cout << " Elapsed Total (BL): " << elapsed/60 << "(minutes)\n";
+	cout << " Elapsed Total (BL): " << elapsed << "(seconds)\n" << endl;
 
 	cout << "GREEDY: " << endl;
 	cout << endl << "ZOO ********************************************* " << endl;

@@ -436,6 +436,10 @@ void PAR::randomAssign(){
 			not_null = true;
 
 	}
+	//calculates centroids of that random solution
+	for(unsigned int i = 0; i < clusters.size(); ++i){
+		centroides[i] = updateDistance(clusters[i]);
+	}
 }
 
 void PAR::clearClusters(bool all){
@@ -518,9 +522,9 @@ vector<vector<int>> PAR::algoritmoBL(){
 				//cout << "NOT CHANGE" << endl;
 			}
 		}
-
+		//if runs through the neighborhood and there isn't improvement
 		if(contador == S.size())
-			end = true;
+			end = true;//ends the algorithm
 
 		++i;
 		//resetea el indice para la selección del nuevo nodo

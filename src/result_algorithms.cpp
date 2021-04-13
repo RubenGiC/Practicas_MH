@@ -7,6 +7,10 @@
 
 
 #include "../include/result_algorithms.h"
+#include <string>
+#include <stdlib.h> //abs
+
+
 //calculates the number of constrains it violates
 int ResultAlgorithms::Infeasable(vector<pair<int,int>> ML, vector<pair<int,int>> CL, vector<int> S){
 	int restrictions = 0;
@@ -56,6 +60,26 @@ float ResultAlgorithms::Distance(vector<vector<int>> clusters, vector<vector<flo
 	}
 
 	return distance/clusters.size();
+}
+
+//calculate the distance error
+float ResultAlgorithms::ErrorDistance(vector<vector<int>> clusters, vector<vector<float>> atributos,vector<vector<float>> centroides, string type_data_file){
+	float error_distance = 0, optimal_distance = 0;
+	//calculate the distance
+	error_distance = Distance(clusters, atributos, centroides);
+
+	//choose the optimal distance
+	if(type_data_file.compare("ZOO") == 0)
+		optimal_distance = 0.904799856;
+	else if(type_data_file.compare("GLASS") == 0)
+		optimal_distance = 0.364290282;
+	else
+		optimal_distance = 0.220423749;
+
+	//calculate the distance error
+	error_distance = abs(error_distance-optimal_distance);
+
+	return error_distance;
 }
 
 //calcula la distancia euclidea entre 2 nodos
