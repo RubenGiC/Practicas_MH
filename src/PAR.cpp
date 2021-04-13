@@ -37,7 +37,7 @@ PAR::PAR(string fichero_set, string fichero_set_const){
 	centroides.resize(k);//reservo el tamaño del vector de tamaño k
 	clusters.resize(k);//reservo memoria para el vector de elementos de cada cluster
 
-	Set_random(38);//creo una semilla para los valores aleatorios
+	Set_random(37);//creo una semilla para los valores aleatorios
 
 	//Y genero aleatoriamente los centroides inicialmente distintos de dimensión n
 	for(int i=0; i<k; ++i){
@@ -51,7 +51,7 @@ PAR::PAR(string fichero_set, string fichero_set_const){
 	}
 
 	//despues barajo los indices de los atributos
-	srand(unsigned (38));//genero una semilla fija
+	srand(unsigned (37));//genero una semilla fija
 	random_shuffle(RSI.begin(), RSI.end());//barajo el vector
 }
 
@@ -511,28 +511,24 @@ vector<vector<int>> PAR::algoritmoBL(){
 				//cout << "CHANGE" << endl;
 				contador = 0;
 			//if the new f is the same as the current f and there aren't change in the clusters
-			}else if(new_f == f){
-				if(contador == S.size()){
-					//cout << "END" << endl;
-					end = true;//it end
-				}else{
-					S_cop = S;
-					clusters_cop = clusters;
-				}
-				++contador;
-			}else{//if it's worse, not change
+			}else{//if it's worse or same, not change
 				clusters_cop = clusters;
 				S_cop = S;
-				//++contador;
+				++contador;
 				//cout << "NOT CHANGE" << endl;
 			}
 		}
+
+		if(contador == S.size())
+			end = true;
+
 		++i;
 		//resetea el indice para la selección del nuevo nodo
 		if(i == node_select.size())
 			i = 0;
 		++iterate;
 	}while(!end && iterate < 100000);
+	//cout << iterate << endl;
 	return clusters;
 }
 
@@ -542,7 +538,7 @@ float PAR::generalDeviation(vector<vector<int>> v_clust){
 
 		//walk through each cluster
 		for(unsigned int i = 0; i< v_clust.size(); ++i){
-			distance = 0;
+
 			//sumatorry(euclidean distance of all nodes in the cluster)
 			for(vector<int>::iterator it = v_clust[i].begin(); it != v_clust[i].end(); ++it){
 				distance += distanciaEuclidea(atributos[(*it)],centroides[i]);
@@ -550,6 +546,7 @@ float PAR::generalDeviation(vector<vector<int>> v_clust){
 			//mean intra-cluster distance
 			distance = distance / v_clust[i].size();
 			intra_cluster += distance;
+			distance = 0;
 		}
 
 		return intra_cluster/v_clust.size();

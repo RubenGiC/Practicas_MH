@@ -299,7 +299,7 @@ int main() {
 
 	end_global = clock();
 	elapsed = float(end_global - start_global)/CLOCKS_PER_SEC;
-	cout << " Elapsed Total (BL): " << elapsed << "(seconds)\n";
+	cout << " Elapsed Total (BL): " << elapsed/60 << "(minutes)\n";
 
 	cout << "GREEDY: " << endl;
 	cout << endl << "ZOO ********************************************* " << endl;
