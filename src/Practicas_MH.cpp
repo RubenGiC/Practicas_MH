@@ -21,12 +21,13 @@ using namespace std;
 using namespace arma;
 
 int main() {
-	PAR *par_zoo10 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const");
-	PAR *par_zoo20 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_20.const");
-	PAR *par_glass10 = new PAR("datos/glass_set.dat", "datos/glass_set_const_10.const");
-	PAR *par_glass20 = new PAR("datos/glass_set.dat", "datos/glass_set_const_20.const");
-	PAR *par_bupa10 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_10.const");
-	PAR *par_bupa20 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_20.const");
+	int seed = 37;
+	PAR *par_zoo10 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const", seed);
+	PAR *par_zoo20 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_20.const", seed);
+	PAR *par_glass10 = new PAR("datos/glass_set.dat", "datos/glass_set_const_10.const", seed);
+	PAR *par_glass20 = new PAR("datos/glass_set.dat", "datos/glass_set_const_20.const", seed);
+	PAR *par_bupa10 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_10.const", seed);
+	PAR *par_bupa20 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_20.const", seed);
 	vector<vector<int>> clusters_sol, clusters_sol_gred, clusters_sol_bl;
 	ResultAlgorithms *results = new ResultAlgorithms();
 

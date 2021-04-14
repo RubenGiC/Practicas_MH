@@ -19,7 +19,7 @@
 using namespace std;
 using namespace arma;
 
-PAR::PAR(string fichero_set, string fichero_set_const){
+PAR::PAR(string fichero_set, string fichero_set_const, int semilla){
 
 	//creo el vector de atributos y la matriz de restricciones
 	lectura(fichero_set, fichero_set_const);
@@ -37,7 +37,7 @@ PAR::PAR(string fichero_set, string fichero_set_const){
 	centroides.resize(k);//reservo el tamaño del vector de tamaño k
 	clusters.resize(k);//reservo memoria para el vector de elementos de cada cluster
 
-	Set_random(37);//creo una semilla para los valores aleatorios
+	Set_random(semilla);//creo una semilla para los valores aleatorios
 
 	//Y genero aleatoriamente los centroides inicialmente distintos de dimensión n
 	for(int i=0; i<k; ++i){
@@ -51,7 +51,7 @@ PAR::PAR(string fichero_set, string fichero_set_const){
 	}
 
 	//despues barajo los indices de los atributos
-	srand(unsigned (37));//genero una semilla fija
+	srand(unsigned (semilla));//genero una semilla fija
 	random_shuffle(RSI.begin(), RSI.end());//barajo el vector
 }
 

@@ -30,7 +30,7 @@ public:
 	vector<pair<int,int>> ML;//save the par of nodes that it have ML constraints
 	vector<int> S;//list of clusters assigned to each node
 
-	PAR(string fichero_set, string fichero_set_const);//constructor que inicializa los valores
+	PAR(string fichero_set, string fichero_set_const, int semilla);//constructor que inicializa los valores
 	void lectura(string fichero_set, string fichero_set_const);//lee los archivos
 
 	//PRINT TO CONSOLE
