@@ -1,7 +1,7 @@
 /*
  * lector_ficheros.cpp
  *
- *  Created on: 14 mar. 2021
+ *  Created on: 23 april 2021
  *      Author: Ruben Girela Castellón
  */
 #include <iostream>
@@ -14,12 +14,12 @@
 #include <ctime>// libreria de time para el shuffle aleatorio de vectores
 #include <stack>// use stack
 
-#include "../include/PAR.h"
+#include "../include/PAR_GENETICOS_AND_MEMETICOS.h"
 #include "../include/random.h"
 using namespace std;
 using namespace arma;
 
-PAR::PAR(string fichero_set, string fichero_set_const, int semilla){
+PAR_GM::PAR_GM(string fichero_set, string fichero_set_const, int semilla){
 
 	//creo el vector de atributos y la matriz de restricciones
 	lectura(fichero_set, fichero_set_const);
@@ -55,11 +55,11 @@ PAR::PAR(string fichero_set, string fichero_set_const, int semilla){
 	random_shuffle(RSI.begin(), RSI.end());//barajo el vector
 }
 
-void PAR::shuffleRSI(){
+void PAR_GM::shuffleRSI(){
 	random_shuffle(RSI.begin(), RSI.end());//barajo el vector
 }
 
-void PAR::lectura(string fichero_set, string fichero_set_const){
+void PAR_GM::lectura(string fichero_set, string fichero_set_const){
 	//leo el fichero *_set.dat
 	ifstream read(fichero_set);
 
@@ -152,7 +152,7 @@ void PAR::lectura(string fichero_set, string fichero_set_const){
 }
 
 //reset Centroides
-void PAR::resetCentroides(){
+void PAR_GM::resetCentroides(){
 	//vuelvo a generar aleatoriamente los centroides inicialmente distintos de dimensión n
 	for(int i=0; i<k; ++i){
 		centroides[i].clear();
@@ -161,8 +161,26 @@ void PAR::resetCentroides(){
 	}
 }
 
+//print the elements of each cluster
+void PAR_GM::printS(){
+	vector<int> elements;
+	int count = 0, total = 0;
+	for(int i = 0; i<k; ++i){
+		elements = findInCluster(S,i);
+		cout << i << ": [ ";
+		for(auto e = elements.begin(); e != elements.end(); ++e){
+			cout << *e << ", ";
+			++count;
+		}
+		cout << " ] n = " << count << endl;
+		total += count;
+		count = 0;
+	}
+	cout << "total elements = " << total << endl;
+}
+
 //imprime los atributos de cada nodo
-void PAR::printDistanciasEuclideas(){
+void PAR_GM::printDistanciasEuclideas(){
 	for(vector<vector<float>>::iterator it=atributos.begin(); it != atributos.end(); ++it){
 		for(vector<float>::iterator it2=(*it).begin(); it2 != (*it).end(); ++it2){
 			if(it2+1 != (*it).end())
@@ -174,7 +192,7 @@ void PAR::printDistanciasEuclideas(){
 	}
 }
 //imprime los centroides de cada cluster
-void PAR::printCentroides(){
+void PAR_GM::printCentroides(){
 	int i=0;
 	for(vector<vector<float>>::iterator it=centroides.begin(); it != centroides.end(); ++it){
 		cout << i << " [ ";
@@ -190,7 +208,7 @@ void PAR::printCentroides(){
 }
 
 //print the indexes of the attributes
-void PAR::printRSI(){
+void PAR_GM::printRSI(){
 	for(vector<int>::iterator it=RSI.begin(); it != RSI.end(); ++it){
 		if(it+1 != RSI.end())
 			cout << (*it) << ", ";
@@ -200,7 +218,7 @@ void PAR::printRSI(){
 }
 
 //algoritmo Greedy
-vector<vector<int>> PAR::algoritmoGreedy(){
+vector<vector<int>> PAR_GM::algoritmoGreedy(){
 
 	vector<vector<int>> cop_clusters(k);//vector de clusters copia para comparar con el cluster modificado
 	vector<int> S_cop(RSI.size(),-1);
@@ -267,7 +285,7 @@ vector<vector<int>> PAR::algoritmoGreedy(){
 }
 
 //Update the distance
-vector<float> PAR::updateDistance(vector<int> nodes){
+vector<float> PAR_GM::updateDistance(vector<int> nodes){
 	//save the actual distance
 	vector<float> distance(atributos[nodes[0]].size(),0);
 	for(unsigned int e=0; e<nodes.size(); ++e){
@@ -286,7 +304,7 @@ vector<float> PAR::updateDistance(vector<int> nodes){
 }
 
 //calculate the closest and least restriction to cluster
-int PAR::minRestrictionsDistance(int actual, bool first){
+int PAR_GM::minRestrictionsDistance(int actual, bool first){
 	int cluster=-1;
 	float min_distance=999;//save the minimum distance and less restriction
 	int less_restriction=999;
@@ -319,7 +337,7 @@ int PAR::minRestrictionsDistance(int actual, bool first){
 }
 
 //calculate infeasibility when assigning an atribute to each cluster and return the minimum
-int PAR::infeasibility(int clust, int actual){
+int PAR_GM::infeasibility(int clust, int actual){
 	// number of restrictions, matrix column and row and not empty cluster indexes
 	int rest=0;
 	//walk through each constrain ML
@@ -357,7 +375,7 @@ int PAR::infeasibility(int clust, int actual){
 }
 
 //same the infeasibility(int clust, int actual) except it receives the solution
-int PAR::infeasibility(vector<int> S_cop){
+int PAR_GM::infeasibility(vector<int> S_cop){
 	int restrictions = 0;
 	//CALCULATE the max size
 	unsigned int max = CL.size();
@@ -382,7 +400,7 @@ int PAR::infeasibility(vector<int> S_cop){
 }
 
 //calcula la distancia euclidea entre 2 nodos
-float PAR::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
+float PAR_GM::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
 	//la formula es: sqrt(sumatoria((a_i - b_i)²))
 	float suma=0;
 
@@ -395,30 +413,39 @@ float PAR::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
 }
 
 //random assignment of each node with a cluster
-void PAR::randomAssign(){
+void PAR_GM::randomAssign(){
 	bool not_null = true;
+	bool find = false;
 	stack<int> clusters_null;
+
+	S.resize(RSI.size());
+	cout << S.size() << endl;
 
 	//go through all nodes
 	for(unsigned int i = 0; i < RSI.size(); ++i){
 		//if it has traversed half the nodes
 		if(i == RSI.size()/2){
 			//check that no cluster is empty
-			for(unsigned int i = 0; i < clusters.size(); ++i){
-				//if the cluster is empty
-				if(clusters[i].size() == 0){//add the cluster to the stack
-					not_null = false;
-					clusters_null.push(i);
+			for(int e = 0; e < k; ++e){
+				for(unsigned int j=0; j<RSI.size()/2 && !find; ++j){
+					if(S[(int)RSI[j]] == e)
+						find=true;
 				}
+				//if the cluster is empty
+				if(!find){//add the cluster to the stack
+					not_null = false;
+					clusters_null.push(e);
+				}else
+					find = false;
 			}
 		}
 
 
 		//if all clusters aren't empty or haven't yet traveled half of the nodes
 		if(not_null)
-			clusters[rand() % k + 0].push_back(RSI[i]);//randomly assign a cluster
+			S[RSI[i]] = rand() % k + 0;
 		else{//else it asigns to the cluster that is empty
-			clusters[clusters_null.top()].push_back(RSI[i]);
+			S[RSI[i]] = clusters_null.top();
 			clusters_null.pop();
 		}
 		//if all the clusters aren't empty, assign the rest of the nodes randomly
@@ -427,12 +454,12 @@ void PAR::randomAssign(){
 
 	}
 	//calculates centroids of that random solution
-	for(unsigned int i = 0; i < clusters.size(); ++i){
-		centroides[i] = updateDistance(clusters[i]);
+	for(int i = 0; i < k; ++i){
+		centroides[i] = updateDistance(findInCluster(S,i));
 	}
 }
 
-void PAR::clearClusters(bool all){
+void PAR_GM::clearClusters(bool all){
 
 	for(unsigned int i = 0; i<clusters.size(); ++i){
 		clusters[i].clear();
@@ -442,7 +469,7 @@ void PAR::clearClusters(bool all){
 }
 
 //create the vector of clusters assigned to each node
-vector<int> PAR::createS(){
+vector<int> PAR_GM::createS(){
 	S.resize(RSI.size());
 
 	for(unsigned int e = 0; e < clusters.size(); ++e){
@@ -452,13 +479,13 @@ vector<int> PAR::createS(){
 	return S;
 }
 
-vector<vector<int>> PAR::algoritmoBL(){
+vector<vector<int>> PAR_GM::algoritmoBL(){
 	int max = 100000;
 
 	S = createS();//create the vector S
 
 	int infease = infeasibility(S);//calculate infeasibility
-	float gen_deviation = generalDeviation(clusters); //calculate General Deviation
+	float gen_deviation = generalDeviation(S); //calculate General Deviation
 	float landa = createLanda();//calculate landa
 	//and calculate the fitness
 	float f = gen_deviation + (infease * landa);
@@ -490,7 +517,7 @@ vector<vector<int>> PAR::algoritmoBL(){
 }
 
 //genereate the possible neighborhoods
-vector<pair<int,int>> PAR::generateNeig(){
+vector<pair<int,int>> PAR_GM::generateNeig(){
 	vector<pair<int,int>> vecindario;
 	for(unsigned int i=0; i<RSI.size(); ++i){
 		for(int e = 0; e<k; ++e){
@@ -501,7 +528,7 @@ vector<pair<int,int>> PAR::generateNeig(){
 }
 
 //calculates the new better solution than the current solution
-int PAR::betterFitness(vector<pair<int,int>> vecindario, float &f, float landa, int it, int max){
+int PAR_GM::betterFitness(vector<pair<int,int>> vecindario, float &f, float landa, int it, int max){
 	int iterate = it;
 	int infease = 0;//calculate infeasibility
 	float gen_deviation = 0; //calculate General Deviation
@@ -526,7 +553,7 @@ int PAR::betterFitness(vector<pair<int,int>> vecindario, float &f, float landa, 
 				clusters_cop[S_cop[(*i).first]].push_back((*i).first);
 
 				//calculate the new fitness
-				gen_deviation = generalDeviation(clusters_cop);
+				gen_deviation = generalDeviation(S_cop);
 				infease = infeasibility(S_cop);
 				new_f = gen_deviation + (infease * landa);
 
@@ -559,27 +586,39 @@ int PAR::betterFitness(vector<pair<int,int>> vecindario, float &f, float landa, 
 }
 
 //calculate the general deviation
-float PAR::generalDeviation(vector<vector<int>> v_clust){
+float PAR_GM::generalDeviation(vector<int> s_cop){
 	float distance = 0, intra_cluster = 0;
+	vector<int> elements;
 
 		//walk through each cluster
-		for(unsigned int i = 0; i< v_clust.size(); ++i){
+		for(int i = 0; i< k; ++i){
 
+			elements = findInCluster(s_cop,i);
 			//sumatorry(euclidean distance of all nodes in the cluster)
-			for(vector<int>::iterator it = v_clust[i].begin(); it != v_clust[i].end(); ++it){
+			for(vector<int>::iterator it = elements.begin(); it != elements.end(); ++it){
 				distance += distanciaEuclidea(atributos[(*it)],centroides[i]);
 			}
 			//mean intra-cluster distance
-			distance = distance / v_clust[i].size();
+			distance = distance / elements.size();
 			intra_cluster += distance;
 			distance = 0;
 		}
 
-		return intra_cluster/v_clust.size();
+		return intra_cluster/k;
+}
+
+//find all elements of the cluster
+vector<int> PAR_GM::findInCluster(vector<int> s_cop, int clust){
+	vector<int> elements;
+	for(unsigned int i=0; i<s_cop.size(); ++i)
+		if(clust == s_cop[i])
+			elements.push_back(i);
+
+	return elements;
 }
 
 //calculate Landa
-float PAR::createLanda(){
+float PAR_GM::createLanda(){
 	float lan = 0, actual_distance=0;
 
 	//calculate the maximum distance

@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "../include/PAR.h"
+#include "../include/PAR_GENETICOS_AND_MEMETICOS.h"
 #include "../include/result_algorithms.h"
 
 using namespace std;
@@ -22,7 +23,7 @@ using namespace arma;
 
 int main() {
 	int seed = 37;
-	PAR *par_zoo10 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const", seed);
+	/*PAR *par_zoo10 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const", seed);
 	PAR *par_zoo20 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_20.const", seed);
 	PAR *par_glass10 = new PAR("datos/glass_set.dat", "datos/glass_set_const_10.const", seed);
 	PAR *par_glass20 = new PAR("datos/glass_set.dat", "datos/glass_set_const_20.const", seed);
@@ -337,7 +338,7 @@ int main() {
 	cout << "BUPA ********************************************* " << endl;
 
 	cout << endl << bl_bupa_10 << endl;
-	cout << endl << bl_bupa_20 << endl;
+	cout << endl << bl_bupa_20 << endl;*/
 
 	/*greedy_bupa_10 = greedy_bupa_20 = bl_bupa_10 = bl_bupa_20 = "";
 
@@ -393,6 +394,27 @@ int main() {
 	cout << "BL BUPA ********************************************* " << endl;
 
 	cout << endl << bl_bupa_10 << endl;*/
+
+
+	PAR_GM *par_zoo10_gm = new PAR_GM("datos/zoo_set.dat", "datos/zoo_set_const_10.const", seed);
+	/*PAR_GM *par_zoo20_gm = new PAR_GM("datos/zoo_set.dat", "datos/zoo_set_const_20.const", seed);
+	PAR_GM *par_glass10_gm = new PAR_GM("datos/glass_set.dat", "datos/glass_set_const_10.const", seed);
+	PAR_GM *par_glass20_gm = new PAR_GM("datos/glass_set.dat", "datos/glass_set_const_20.const", seed);
+	PAR_GM *par_bupa10_gm = new PAR_GM("datos/bupa_set.dat", "datos/bupa_set_const_10.const", seed);
+	PAR_GM *par_bupa20_gm = new PAR_GM("datos/bupa_set.dat", "datos/bupa_set_const_20.const", seed);
+	vector<vector<int>> clusters_sol, clusters_sol_gred, clusters_sol_bl;
+	ResultAlgorithms *results = new ResultAlgorithms();
+
+	string greedy_zoo_20 = "", greedy_zoo_10 = "", greedy_glass_10 = "", greedy_glass_20 = "", greedy_bupa_10 = "", greedy_bupa_20 = "";
+	string bl_zoo_20 = "", bl_zoo_10 = "", bl_glass_10 = "", bl_glass_20 = "", bl_bupa_10 = "", bl_bupa_20 = "";
+	float elapsed;
+	clock_t start;
+	clock_t end;
+	clock_t start_global;
+	clock_t end_global;*/
+
+	par_zoo10_gm->randomAssign();
+	par_zoo10_gm->printS();
 
 	return 0;
 }
