@@ -34,17 +34,6 @@ PAR_GM::PAR_GM(string fichero_set, string fichero_set_const, int semilla){
 		break;
 	}
 
-	centroides.resize(k);//reservo el tamaño del vector de tamaño k
-	clusters.resize(k);//reservo memoria para el vector de elementos de cada cluster
-
-	Set_random(semilla);//creo una semilla para los valores aleatorios
-
-	//Y genero aleatoriamente los centroides inicialmente distintos de dimensión n
-	for(int i=0; i<k; ++i){
-		for(unsigned int e=0; e <atributos[0].size(); ++e)
-			centroides[i].push_back(Rand());
-	}
-
 	//insert all indices of atributos
 	for(unsigned int i=0; i<atributos.size(); ++i){
 		RSI.push_back(i);
@@ -152,14 +141,14 @@ void PAR_GM::lectura(string fichero_set, string fichero_set_const){
 }
 
 //reset Centroides
-void PAR_GM::resetCentroides(){
+/*void PAR_GM::resetCentroides(){
 	//vuelvo a generar aleatoriamente los centroides inicialmente distintos de dimensión n
 	for(int i=0; i<k; ++i){
 		centroides[i].clear();
 		for(unsigned int e=0; e <atributos[0].size(); ++e)
 			centroides[i].push_back(Rand());
 	}
-}
+}*/
 
 //print the elements of each cluster
 void PAR_GM::printS(){
@@ -192,7 +181,7 @@ void PAR_GM::printDistanciasEuclideas(){
 	}
 }
 //imprime los centroides de cada cluster
-void PAR_GM::printCentroides(){
+void PAR_GM::printCentroides(vector<vector<float>> centroides){
 	int i=0;
 	for(vector<vector<float>>::iterator it=centroides.begin(); it != centroides.end(); ++it){
 		cout << i << " [ ";
@@ -217,90 +206,59 @@ void PAR_GM::printRSI(){
 	}
 }
 
-//algoritmo Greedy
-vector<vector<int>> PAR_GM::algoritmoGreedy(){
+vector<int> PAR_GM::AGE(string tipo){
 
-	vector<vector<int>> cop_clusters(k);//vector de clusters copia para comparar con el cluster modificado
-	vector<int> S_cop(RSI.size(),-1);
-	S = S_cop;
+	return S;
+}
 
-	int pos=-1, not_null=0;
-	//int iterations = 0;
-	bool end = false, first = true;
+vector <int> PAR_GM::AGG(){
 
-	do{//mientras los vectores sean distintos
-		if(clusters.size()>0){
-			cop_clusters = clusters;//copio el vector de clusters antes de que sea modificado
+	vector <int> S_padres = S;
+	return S;
+}
 
-			//clear vector of clusters
-			clearClusters(false);
-		}
+int PAR_GM::selectionOperator(vector<int> padres){
+	int best = -1;
+	int indv1= -1, indv2= -1;
+	do{
+		indv1 = rand() % RSI.size() + 0;
+		indv2 = rand() % RSI.size() + 0;
+	}while(indv1 == indv2);
 
-		//go through all nodes
-		for(vector<int>::iterator it=RSI.begin(); it != RSI.end(); ++it){
-			//save the cluster that best fits that node
-			pos = minRestrictionsDistance(*it, first);
-			//access to the cluster and add actual node
-			clusters[pos].push_back(*it);
-			S[*it] = pos;
+	//if
 
-			pos = -1;//reset cluster
-			first = false;
-		}
-		first = true;
-
-		//update centroids
-		for(int i = 0; i<k; ++i){
-			//cout << "cluster: " << i << " size: " << clusters[i].size() << endl;
-			if(clusters[i].size()>0){
-				centroides[i] = updateDistance(clusters[i]);
-			}
-		}
-
-		//++iterations;
-		//if the clusters don't undergo changes
-		if(clusters==cop_clusters){
-
-			//check that no cluster is empty
-			for(int i =0; i < k; ++i){
-				if(clusters[i].size()>0) ++not_null;
-			}
-			//if all the clusters aren't empty, finish Greedy
-			if(not_null == k)
-				end = true;
-			//otherwise reset the centroids and clean clusters and cop_clusters
-			else{
-				resetCentroides();//reset the centroids
-				not_null = 0;
-				//clean clusters and cop_clusters
-				clearClusters(false);
-				for(unsigned int i=0; i< cop_clusters.size(); ++i){cop_clusters[i].clear();}
-				//S = S_cop;
-			}
-		}
-
-	}while(not end);
-
-	return clusters;//devuelvo el vector de cluster definitivo
+	return best;
 }
 
 //Update the distance
-vector<float> PAR_GM::updateDistance(vector<int> nodes){
+vector<vector<float>> PAR_GM::updateDistance(vector<int> nodes){
 	//save the actual distance
 	vector<float> distance(atributos[nodes[0]].size(),0);
-	for(unsigned int e=0; e<nodes.size(); ++e){
-		//calculate average distance
-		for(unsigned int i=0; i < atributos[nodes[e]].size(); ++i){
-			//sumatorry
-			distance[i] += atributos[nodes[e]][i];
+	vector<vector<float>> centroides;
+	centroides.resize(k);
+
+	int size = 0;
+	for(int j = 0; j<k; ++j){
+		for(unsigned int e=0; e<nodes.size(); ++e){
+			if(nodes[e] == j){
+				++size;
+				//calculate average distance
+				for(unsigned int i=0; i < atributos[e].size(); ++i){
+					//sumatorry
+					distance[i] += atributos[e][i];
+				}
+			}
 		}
-	}
-	//average
-	for(unsigned int i = 0; i < distance.size(); ++i){
-		distance[i] = distance[i]/nodes.size();
+
+		//average
+		for(unsigned int i = 0; i < distance.size(); ++i){
+			distance[i] = distance[i]/nodes.size();
+		}
+		centroides[j] = distance;
 	}
 
-	return distance;
+
+	return centroides;
 }
 
 //calculate the closest and least restriction to cluster
@@ -312,7 +270,7 @@ int PAR_GM::minRestrictionsDistance(int actual, bool first){
 	int actual_restriction=0;//save the actual number of restrictions
 
 	//go through all clusters
-	for(unsigned int i=0; i < centroides.size(); ++i){
+	/*for(unsigned int i=0; i < centroides.size(); ++i){
 
 		//calculate the Euclidea distance with the current cluster
 		actual_distance = distanciaEuclidea(atributos[actual],centroides[i]);
@@ -332,7 +290,7 @@ int PAR_GM::minRestrictionsDistance(int actual, bool first){
 				cluster = i;
 			}
 		}
-	}
+	}*/
 	return cluster;
 }
 
@@ -413,13 +371,19 @@ float PAR_GM::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
 }
 
 //random assignment of each node with a cluster
-void PAR_GM::randomAssign(){
+void PAR_GM::randomAssign(int n){
 	bool not_null = true;
 	bool find = false;
 	stack<int> clusters_null;
 
+	vector_solutions.resize(n);
+
 	S.resize(RSI.size());
-	cout << S.size() << endl;
+	//cout << S.size() << endl;
+
+	for(int i = 0; i<n; ++i){
+
+	}
 
 	//go through all nodes
 	for(unsigned int i = 0; i < RSI.size(); ++i){
@@ -453,78 +417,6 @@ void PAR_GM::randomAssign(){
 			not_null = true;
 
 	}
-	//calculates centroids of that random solution
-	for(int i = 0; i < k; ++i){
-		centroides[i] = updateDistance(findInCluster(S,i));
-	}
-}
-
-void PAR_GM::clearClusters(bool all){
-
-	for(unsigned int i = 0; i<clusters.size(); ++i){
-		clusters[i].clear();
-	}
-	if(all)
-		clusters.clear();
-}
-
-//create the vector of clusters assigned to each node
-vector<int> PAR_GM::createS(){
-	S.resize(RSI.size());
-
-	for(unsigned int e = 0; e < clusters.size(); ++e){
-		for(vector<int>::iterator it = clusters[e].begin(); it != clusters[e].end(); ++it)
-			S[*it] = e;
-	}
-	return S;
-}
-
-vector<vector<int>> PAR_GM::algoritmoBL(){
-	int max = 100000;
-
-	S = createS();//create the vector S
-
-	int infease = infeasibility(S);//calculate infeasibility
-	float gen_deviation = generalDeviation(S); //calculate General Deviation
-	float landa = createLanda();//calculate landa
-	//and calculate the fitness
-	float f = gen_deviation + (infease * landa);
-
-	vector<pair<int,int>> vecindario = generateNeig();//create the neighborhood
-	random_shuffle(vecindario.begin(), vecindario.end());//shuffle vector
-
-	bool end = false;//algorithm completion
-	int iterate = 0;
-
-	do{
-		//if the number of iterate don't reach 100000
-		if(iterate < max){//calculate the new solution
-			iterate = betterFitness(vecindario, f, landa, iterate, max);
-			//update centroides
-			for(unsigned int i = 0; i < clusters.size(); ++i){
-				centroides[i] = updateDistance(clusters[i]);
-			}
-
-			//calculate the new neighborhood
-			vecindario = generateNeig();
-			random_shuffle(vecindario.begin(), vecindario.end());//barajo el vector
-		}else
-			end = true;//else the algorithm ends
-
-	}while(!end);
-	//cout << iterate << endl;
-	return clusters;
-}
-
-//genereate the possible neighborhoods
-vector<pair<int,int>> PAR_GM::generateNeig(){
-	vector<pair<int,int>> vecindario;
-	for(unsigned int i=0; i<RSI.size(); ++i){
-		for(int e = 0; e<k; ++e){
-			vecindario.push_back(pair<int, int>(RSI[i],e));
-		}
-	}
-	return vecindario;
 }
 
 //calculates the new better solution than the current solution
@@ -534,23 +426,18 @@ int PAR_GM::betterFitness(vector<pair<int,int>> vecindario, float &f, float land
 	float gen_deviation = 0; //calculate General Deviation
 	//copy the solution and neighborhood
 	vector<int> S_cop = S;
-	vector<vector<int>> clusters_cop = clusters;
+	vector<int> cluster_of_elements;
 	float new_f = 0;
 
 	//tour the neighborhood
-	for(auto i=vecindario.begin(); i<vecindario.end(); ++i){
+	for(auto i:vecindario){
+		cluster_of_elements = findInCluster(S_cop,S_cop[i.first]);
 		//if the cluster has more than 1 node
-		if(clusters_cop[S_cop[(*i).first]].size()>1){
+		if(cluster_of_elements.size()>1){
 			//and the new cluster is different from the current one
-			if(S_cop[(*i).first] != (*i).second){
+			if(S_cop[i.first] != i.second){
 				//change
-				S_cop[(*i).first] = (*i).second;
-
-				//update clusters_cop
-				//erase the node in old cluster
-				clusters_cop[S[(*i).first]].erase(find(clusters_cop[S[(*i).first]].begin(),clusters_cop[S[(*i).first]].end(),(*i).first));
-				//add the node in new cluster
-				clusters_cop[S_cop[(*i).first]].push_back((*i).first);
+				S_cop[i.first] = i.second;
 
 				//calculate the new fitness
 				gen_deviation = generalDeviation(S_cop);
@@ -564,13 +451,11 @@ int PAR_GM::betterFitness(vector<pair<int,int>> vecindario, float &f, float land
 					//update the current solution
 					f = new_f;
 					S = S_cop;
-					clusters = clusters_cop;
 
 					return iterate;//and return the actual iteration
 				}
 				//else restore to the previous solution
 				S_cop = S;
-				clusters_cop = clusters;
 
 				//if the iterate reaches 100000
 				if(iterate == max){
@@ -589,6 +474,8 @@ int PAR_GM::betterFitness(vector<pair<int,int>> vecindario, float &f, float land
 float PAR_GM::generalDeviation(vector<int> s_cop){
 	float distance = 0, intra_cluster = 0;
 	vector<int> elements;
+	vector<vector<float>> centroides;
+	centroides = updateDistance(s_cop);
 
 		//walk through each cluster
 		for(int i = 0; i< k; ++i){

@@ -413,7 +413,7 @@ int main() {
 	clock_t start_global;
 	clock_t end_global;*/
 
-	par_zoo10_gm->randomAssign();
+	par_zoo10_gm->randomAssign(5);
 	par_zoo10_gm->printS();
 
 	return 0;
