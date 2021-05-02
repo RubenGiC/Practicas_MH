@@ -151,21 +151,41 @@ void PAR_GM::lectura(string fichero_set, string fichero_set_const){
 }*/
 
 //print the elements of each cluster
-void PAR_GM::printS(){
+void PAR_GM::printS(int s){
 	vector<int> elements;
 	int count = 0, total = 0;
-	for(int i = 0; i<k; ++i){
-		elements = findInCluster(S,i);
-		cout << i << ": [ ";
-		for(auto e = elements.begin(); e != elements.end(); ++e){
-			cout << *e << ", ";
-			++count;
+	if(s == 0){
+
+		for(int j=0; j< size_sol; ++j){
+			cout << "SOLUCIÓN: " << j+1 << endl;
+			for(int i = 0; i<k; ++i){
+				elements = findInCluster(vector_solutions[j],i);
+				cout << i << ": [ ";
+				for(auto e = elements.begin(); e != elements.end(); ++e){
+					cout << *e << ", ";
+					++count;
+				}
+				cout << " ] n = " << count << endl;
+				total += count;
+				count = 0;
+			}
+			cout << "total elements = " << total << endl;
+			total = 0;
 		}
-		cout << " ] n = " << count << endl;
-		total += count;
-		count = 0;
+	}else{
+		for(int i = 0; i<k; ++i){
+			elements = findInCluster(vector_solutions[s],i);
+			cout << i << ": [ ";
+			for(auto e = elements.begin(); e != elements.end(); ++e){
+				cout << *e << ", ";
+				++count;
+			}
+			cout << " ] n = " << count << endl;
+			total += count;
+			count = 0;
+		}
+		cout << "total elements = " << total << endl;
 	}
-	cout << "total elements = " << total << endl;
 }
 
 //imprime los atributos de cada nodo
@@ -206,28 +226,61 @@ void PAR_GM::printRSI(){
 	}
 }
 
-vector<int> PAR_GM::AGE(string tipo){
+vector<int> PAR_GM::GENETIC(TIPE_CROSS tipo){
+
+	//choose the tipe of crossover operator and genetic algorithm
+	if(tipo == (AGG_UN || AGG_SF))
+		AGG(tipo);
+	else
+		AGE(tipo);
+
+
 
 	return S;
 }
 
-vector <int> PAR_GM::AGG(){
+vector <int> PAR_GM::AGE(TIPE_CROSS cruce){
 
-	vector <int> S_padres = S;
+	vector<vector<int>> vector_padres = selectionOperator(vector_solutions, 2);
+
+	if(cruce == AGE_UN)
+		uniformCross(vector_padres);
+	else
+		fixedSegmentCross(vector_padres);
+
 	return S;
 }
 
-int PAR_GM::selectionOperator(vector<int> padres){
-	int best = -1;
+vector <int> PAR_GM::AGG(TIPE_CROSS cruce){
+
+	vector<vector<int>> vector_padres = selectionOperator(vector_solutions, vector_solutions.size());
+
+	if(cruce == AGG_UN)
+		uniformCross(vector_padres);
+	else
+		fixedSegmentCross(vector_padres);
+
+	return S;
+}
+
+vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney){
 	int indv1= -1, indv2= -1;
-	do{
-		indv1 = rand() % RSI.size() + 0;
-		indv2 = rand() % RSI.size() + 0;
-	}while(indv1 == indv2);
+	vector<vector<int>> padres;
+	landa = createLanda();
 
-	//if
+	for(int i=0; i < tourney; ++i){
+		do{
+			indv1 = rand() % actual.size() + 0;
+			indv2 = rand() % actual.size() + 0;
+		}while(indv1 == indv2);
 
-	return best;
+		//cout << indv1 << " vs " << indv2 << endl;
+
+		cout << "THE BEST: " << betterFitness(actual,indv1,indv2) << endl;
+		padres.push_back(actual[betterFitness(actual,indv1,indv2)]);
+	}
+
+	return padres;
 }
 
 //Update the distance
@@ -264,13 +317,13 @@ vector<vector<float>> PAR_GM::updateDistance(vector<int> nodes){
 //calculate the closest and least restriction to cluster
 int PAR_GM::minRestrictionsDistance(int actual, bool first){
 	int cluster=-1;
-	float min_distance=999;//save the minimum distance and less restriction
+	/*float min_distance=999;//save the minimum distance and less restriction
 	int less_restriction=999;
 	float actual_distance=0;//save the actual distance
 	int actual_restriction=0;//save the actual number of restrictions
 
 	//go through all clusters
-	/*for(unsigned int i=0; i < centroides.size(); ++i){
+	for(unsigned int i=0; i < centroides.size(); ++i){
 
 		//calculate the Euclidea distance with the current cluster
 		actual_distance = distanciaEuclidea(atributos[actual],centroides[i]);
@@ -373,101 +426,94 @@ float PAR_GM::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
 //random assignment of each node with a cluster
 void PAR_GM::randomAssign(int n){
 	bool not_null = true;
-	bool find = false;
+	//bool find = false;
 	stack<int> clusters_null;
+	vector<int> clusters_asign;
 
+	size_sol = n;
 	vector_solutions.resize(n);
 
 	S.resize(RSI.size());
 	//cout << S.size() << endl;
 
+	//initialize vector
 	for(int i = 0; i<n; ++i){
-
+		vector_solutions[i].resize(RSI.size());
 	}
 
-	//go through all nodes
-	for(unsigned int i = 0; i < RSI.size(); ++i){
-		//if it has traversed half the nodes
-		if(i == RSI.size()/2){
-			//check that no cluster is empty
-			for(int e = 0; e < k; ++e){
-				for(unsigned int j=0; j<RSI.size()/2 && !find; ++j){
-					if(S[(int)RSI[j]] == e)
-						find=true;
+	for(int j=0; j<n; ++j){
+
+		//go through all nodes
+		for(unsigned int i = 0; i < RSI.size(); ++i){
+			//if it has traversed half the nodes
+			if(i == RSI.size()/2){
+				//check that no cluster is empty
+				for(int e = 0; e < k; ++e){
+					/*for(unsigned int l=0; l<RSI.size()/2 && !find; ++l){
+						if(vector_solutions[j][(int)RSI[l]] == e)
+							find=true;
+					}*/
+					//if the cluster is empty
+					/*if(!find){//add the cluster to the stack
+						not_null = false;
+						clusters_null.push(e);
+					}else
+						find = false;*/
+
+					//find cluster empty
+					if(find(clusters_asign.begin(), clusters_asign.end(), e) == clusters_asign.end()){
+
+						clusters_null.push(e);
+						not_null = false;
+					}
 				}
-				//if the cluster is empty
-				if(!find){//add the cluster to the stack
-					not_null = false;
-					clusters_null.push(e);
-				}else
-					find = false;
 			}
+
+
+			//if all clusters aren't empty or haven't yet traveled half of the nodes
+			if(not_null){
+				vector_solutions[j][RSI[i]] = rand() % k + 0;
+
+				if(find(clusters_asign.begin(), clusters_asign.end(), vector_solutions[j][RSI[i]]) == clusters_asign.end()){
+					clusters_asign.push_back(vector_solutions[j][RSI[i]]);
+				}
+
+			}else{//else it asigns to the cluster that is empty
+				vector_solutions[j][RSI[i]] = clusters_null.top();
+				clusters_null.pop();
+			}
+			//if all the clusters aren't empty, assign the rest of the nodes randomly
+			if(clusters_null.size() == 0)
+				not_null = true;
+
 		}
-
-
-		//if all clusters aren't empty or haven't yet traveled half of the nodes
-		if(not_null)
-			S[RSI[i]] = rand() % k + 0;
-		else{//else it asigns to the cluster that is empty
-			S[RSI[i]] = clusters_null.top();
-			clusters_null.pop();
-		}
-		//if all the clusters aren't empty, assign the rest of the nodes randomly
-		if(clusters_null.size() == 0)
-			not_null = true;
-
 	}
 }
 
-//calculates the new better solution than the current solution
-int PAR_GM::betterFitness(vector<pair<int,int>> vecindario, float &f, float landa, int it, int max){
-	int iterate = it;
+//calculates wich of the 2 individuals is the best
+int PAR_GM::betterFitness(vector<vector<int>> padres, int indv1, int indv2){
+
 	int infease = 0;//calculate infeasibility
 	float gen_deviation = 0; //calculate General Deviation
-	//copy the solution and neighborhood
-	vector<int> S_cop = S;
-	vector<int> cluster_of_elements;
-	float new_f = 0;
+	float f1 = 0, f2 = 0;
 
-	//tour the neighborhood
-	for(auto i:vecindario){
-		cluster_of_elements = findInCluster(S_cop,S_cop[i.first]);
-		//if the cluster has more than 1 node
-		if(cluster_of_elements.size()>1){
-			//and the new cluster is different from the current one
-			if(S_cop[i.first] != i.second){
-				//change
-				S_cop[i.first] = i.second;
+	//calculate the fitness indv1
+	gen_deviation = generalDeviation(padres[indv1]);
+	infease = infeasibility(padres[indv1]);
+	f1 = gen_deviation + (infease * landa);
 
-				//calculate the new fitness
-				gen_deviation = generalDeviation(S_cop);
-				infease = infeasibility(S_cop);
-				new_f = gen_deviation + (infease * landa);
+	//calculate the fitness indv2
+	gen_deviation = generalDeviation(padres[indv2]);
+	infease = infeasibility(padres[indv2]);
+	f2 = gen_deviation + (infease * landa);
 
-				++iterate;//increase the number of iterations
+	cout << "Fitness: " << f1 << " vs " << f2 << endl;
 
-				//if the new solution is better than current solution
-				if(new_f < f){
-					//update the current solution
-					f = new_f;
-					S = S_cop;
+	//if the new solution is better than current solution
+	if(f1 < f2)
+		return indv1;//and return the actual iteration
 
-					return iterate;//and return the actual iteration
-				}
-				//else restore to the previous solution
-				S_cop = S;
-
-				//if the iterate reaches 100000
-				if(iterate == max){
-					return iterate;//ends
-				}
-
-
-			}
-		}
-	}
-	//if it calculate all the possibilities, it ends
-	return max;
+	return indv2;
 }
 
 //calculate the general deviation

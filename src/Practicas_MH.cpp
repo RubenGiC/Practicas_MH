@@ -415,6 +415,7 @@ int main() {
 
 	par_zoo10_gm->randomAssign(5);
 	par_zoo10_gm->printS();
+	par_zoo10_gm->AGG();
 
 	return 0;
 }

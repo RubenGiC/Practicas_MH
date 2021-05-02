@@ -15,6 +15,10 @@
 using namespace std;
 using namespace arma;
 
+static enum TIPE_CROSS{
+	AGG_UN, AGG_SF, AGE_UN, AGE_SF
+};
+
 class PAR_GM{
 
 public:
@@ -28,6 +32,8 @@ public:
 	vector<pair<int,int>> CL;//save the par of nodes that it have CL constraints
 	vector<pair<int,int>> ML;//save the par of nodes that it have ML constraints
 	vector<int> S;//list of clusters assigned to each node
+	int size_sol;
+	float landa;
 
 	vector<vector<int>> vector_solutions; //Vector of solutions
 
@@ -38,14 +44,22 @@ public:
 	void printDistanciasEuclideas();//imprime el vector de distancias euclideas
 	void printCentroides(vector<vector<float>> centroides);//imprime el vector de centroides
 	void printRSI();
-	void printS();
+	void printS(int s=0);
 
 	//ALGORITHMS
-	vector<int> AGG();
-	vector<int> AGE();
-	vector<int> AGE(string tipo);
+	vector<int> AGG(TIPE_CROSS cruce);
+	vector<int> AGE(TIPE_CROSS cruce);
+	vector<int> GENETIC(TIPE_CROSS tipo);
 
-	int selectionOperator(vector<int> padres);
+	//use the binary tournament, to select the best
+	vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney);
+
+	//CROSSOVER OPERATORS
+	//uniform crossover operator
+	vector<vector<int>> uniformCross(vector<vector<int>> padres);
+	//fixed segment crossover operator
+	vector<vector<int>> fixedSegmentCross(vector<vector<int>> padres);
+
 
 	//MINIMIZATION FUNCTIONS
 	//calculate the closest and least restriction cluster
@@ -65,7 +79,7 @@ public:
 	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);//calcula la distancia de 2 puntos
 
 	//calculate a better fitness
-	int betterFitness(vector<pair<int,int>> vecindario, float &f, float landa, int it, int max);
+	int betterFitness(vector<vector<int>> padres, int indv1, int indv2);
 
 	//OTHER FUNCTIONS
 	//update the distance for each cluster
