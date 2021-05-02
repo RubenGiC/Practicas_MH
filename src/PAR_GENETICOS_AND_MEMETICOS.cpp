@@ -254,11 +254,12 @@ vector <int> PAR_GM::AGE(TIPE_CROSS cruce){
 vector <int> PAR_GM::AGG(TIPE_CROSS cruce){
 
 	vector<vector<int>> vector_padres = selectionOperator(vector_solutions, vector_solutions.size());
+	vector<vector<int>> vector_intermedia;
 
 	if(cruce == AGG_UN)
-		uniformCross(vector_padres);
+		vector_intermedia = uniformCross(vector_padres);
 	else
-		fixedSegmentCross(vector_padres);
+		vector_intermedia = fixedSegmentCross(vector_padres);
 
 	return S;
 }
@@ -275,8 +276,8 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 	for(int i=0; i < tourney; ++i){
 		//randomly select 2 diferents individuals
 		do{
-			indv1 = rand() % actual.size() + 0;
-			indv2 = rand() % actual.size() + 0;
+			indv1 = rand() % actual.size();
+			indv2 = rand() % actual.size();
 		}while(indv1 == indv2);
 
 		//cout << indv1 << " vs " << indv2 << endl;
@@ -293,9 +294,11 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres){
 	vector<vector<int>> descendientes;
 	vector<int> RSI_CROSS = RSI;
-	vector<int> descendiente;
+	vector<int> descendiente1;
+	vector<int> descendiente2;
 
-	descendiente.resize(RSI.size());
+	descendiente1.resize(RSI.size(), -1);
+	descendiente2.resize(RSI.size(), -1);
 
 	for(unsigned int i=0; i< padres.size(); i +=2){
 		//generates n/2 different random indices different from genes one parent and the rest of the other parent
@@ -305,29 +308,44 @@ vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres){
 		for(unsigned int e=0; e<RSI_CROSS.size(); ++e){
 
 			//n/2 genes first parent
-			if(e < (RSI_CROSS.size()/2))
-				descendiente[RSI_CROSS[e]] = padres[i][RSI_CROSS[e]];
+			if(e < (RSI_CROSS.size()/2)){
+				descendiente1[RSI_CROSS[e]] = padres[i][RSI_CROSS[e]];
+				descendiente2[RSI_CROSS[e]] = padres[i+1][RSI_CROSS[e]];
 			//and rest of the second parent
-			else
-				descendiente[RSI_CROSS[e]] = padres[i+1][RSI_CROSS[e]];
+			}else{
+				descendiente1[RSI_CROSS[e]] = padres[i+1][RSI_CROSS[e]];
+				descendiente2[RSI_CROSS[e]] = padres[i][RSI_CROSS[e]];
+			}
 		}
 
 		//add the son
-		descendientes.push_back(descendiente);
+		descendientes.push_back(descendiente1);
+		descendientes.push_back(descendiente2);
 
 
-		/*cout << "HIJO: " << (i/2)+1 << endl;
+		/*cout << "HIJO: " << i+1 << endl;
 		for(int j = 0; j<k; ++j){
-			vector<int> elements = findInCluster(descendiente,j);
+			vector<int> elements = findInCluster(descendiente1,j);
 			cout << j << ": [ ";
 			for(auto e : elements){
 				cout << e << ", ";
 			}
-			cout << " ]" << endl;
+			cout << " ] n = " << elements.size() << endl;
+		}
+		cout << "HIJO: " << i+2 << endl;
+		for(int j = 0; j<k; ++j){
+			vector<int> elements = findInCluster(descendiente2,j);
+			cout << j << ": [ ";
+			for(auto e : elements){
+				cout << e << ", ";
+			}
+			cout << " ] n = " << elements.size() << endl;
 		}*/
 
-		descendiente.clear();
-		descendiente.resize(RSI.size());
+		descendiente1.clear();
+		descendiente2.clear();
+		descendiente1.resize(RSI.size(), -1);
+		descendiente2.resize(RSI.size(), -1);
 	}
 
 	return descendientes;
@@ -335,9 +353,93 @@ vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres){
 
 //fixed segment crossover operator
 vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres){
-	vector<vector<int>> nose;
+	vector<vector<int>> descendientes;
+	//random start segment and size of segment
+	unsigned int start_seg = 0, size_seg = 0, end_seg=0;
+	//size of other elements, number of elements to first and second parent
+	int size_other = 0, parent1 = 0, parent2 = 0, choose_parent=-1;
+	bool not_seg = true;
+	//create 2 new descendents
+	vector<int> descendiente1;
+	vector<int> descendiente2;
 
-	return nose;
+	descendiente1.resize(RSI.size(), -1);
+	descendiente2.resize(RSI.size(), -1);
+
+	for(unsigned int i=0; i< padres.size(); i +=2){
+		//generate the start segment
+		start_seg = rand() % RSI.size();
+		//the size of segment
+		size_seg = 1 + rand() % (RSI.size() - 1);
+		//and the end of the segment
+		end_seg = (start_seg + size_seg)%RSI.size() - 1;
+		//size of other descents
+		size_other = RSI.size() - size_seg;
+		//and divide that size between the 2 parents
+		parent1 = size_other /2;
+		parent2 = size_other - parent1;
+
+		//go through all elements
+		for(unsigned int e = 0; e< RSI.size(); ++e){
+
+			//if element is within range add element of the fisrt parent
+			//if the range is 0...k
+			if(start_seg < end_seg){
+
+				if(e>= start_seg && e<=end_seg){
+					descendiente1[e] = padres[i][e];
+					not_seg = false;
+				}
+			//if the range is k..n and 0..j
+			}else{
+
+				if(e>= start_seg){
+					descendiente1[e] = padres[i][e];
+					not_seg = false;
+				}else if(e<=end_seg){
+					descendiente1[e] = padres[i][e];
+					not_seg = false;
+				}
+			}
+
+			if(not_seg){
+				//choose the parent randomly
+				if(parent1>0 and parent2>0)
+					choose_parent = rand() % 2;
+
+				//and add gen of parent in descendent
+				if((choose_parent == 0 && parent1 >0) || parent2<=0){
+					descendiente1[e] = padres[i][e];
+					--parent1;
+				}else if((choose_parent == 1 && parent2 >0) || parent1<=0){
+					descendiente1[e] = padres[i][e];
+					--parent1;
+				}
+			}
+			not_seg = true;
+
+		}
+		/*cout << "HIJO: " << (i/2)+1 << endl;
+		cout << ": [ ";
+		for(auto e : descendiente1){
+			cout << e << ", ";
+		}
+		cout << " ]" << endl;*/
+		/*for(int j = 0; j<k; ++j){
+			vector<int> elements = findInCluster(descendiente1,j);
+			cout << j << ": [ ";
+			for(auto e : elements){
+				cout << e << ", ";
+			}
+			cout << " ] n = " << elements.size() << endl;
+		}*/
+
+		descendiente1.clear();
+		descendiente1.resize(RSI.size(), -1);
+	}
+
+
+	return descendientes;
 }
 
 //Update the distance
@@ -529,7 +631,7 @@ void PAR_GM::randomAssign(int n){
 
 			//if all clusters aren't empty or haven't yet traveled half of the nodes
 			if(not_null){
-				vector_solutions[j][RSI[i]] = rand() % k + 0;
+				vector_solutions[j][RSI[i]] = rand() % k;
 
 				if(find(clusters_asign.begin(), clusters_asign.end(), vector_solutions[j][RSI[i]]) == clusters_asign.end()){
 					clusters_asign.push_back(vector_solutions[j][RSI[i]]);
@@ -564,7 +666,7 @@ int PAR_GM::betterFitness(vector<vector<int>> padres, int indv1, int indv2){
 	infease = infeasibility(padres[indv2]);
 	f2 = gen_deviation + (infease * landa);
 
-	cout << "Fitness: " << f1 << " vs " << f2 << endl;
+	//cout << "Fitness: " << f1 << " vs " << f2 << endl;
 
 	//if the new solution is better than current solution
 	if(f1 < f2)

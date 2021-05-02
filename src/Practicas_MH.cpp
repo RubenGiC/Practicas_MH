@@ -21,8 +21,26 @@
 using namespace std;
 using namespace arma;
 
-int main() {
+int main(int argc, char** argv) {
+
 	int seed = 37;
+	vector<int> seeds;
+	vector<string> paths_data;
+	vector<string> paths_const;
+
+	if(argc>1){
+		for(int i = 1; i <argc; i+=3){
+			seeds.push_back(atoi(argv[i]));
+			paths_data.push_back(argv[i+1]);
+			paths_const.push_back(argv[i+2]);
+		}
+	}
+
+		for(unsigned int i = 0; i<paths_data.size(); ++i){
+			cout << "SEED: " << seeds[i] << endl;
+			cout << "PATH DATA: " << paths_data[i] << endl;
+			cout << "PATH CONST: " << paths_const[i] << endl;
+		}
 	/*PAR *par_zoo10 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const", seed);
 	PAR *par_zoo20 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_20.const", seed);
 	PAR *par_glass10 = new PAR("datos/glass_set.dat", "datos/glass_set_const_10.const", seed);
@@ -413,9 +431,12 @@ int main() {
 	clock_t start_global;
 	clock_t end_global;*/
 
-	par_zoo10_gm->randomAssign(6);
-	par_zoo10_gm->printS();
-	par_zoo10_gm->AGG(AGG_UN);
+	par_zoo10_gm->randomAssign(50);
+	//par_zoo10_gm->printS();
+	//par_zoo10_gm->GENETIC(AGG_SF);
+	par_zoo10_gm->GENETIC(AGG_UN);
+	/*par_zoo10_gm->GENETIC(AGE_SF);
+	par_zoo10_gm->GENETIC(AGE_UN);*/
 
 	return 0;
 }

@@ -59,7 +59,8 @@ public:
 	vector<vector<int>> uniformCross(vector<vector<int>> padres);
 	//fixed segment crossover operator
 	vector<vector<int>> fixedSegmentCross(vector<vector<int>> padres);
-
+	//uniform mutation operator
+	vector<vector<int>> uniformMutation(vector<vector<int>> padres);
 
 	//MINIMIZATION FUNCTIONS
 	//calculate the closest and least restriction cluster
