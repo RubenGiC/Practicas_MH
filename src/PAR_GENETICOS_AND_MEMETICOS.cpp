@@ -262,13 +262,18 @@ vector <int> PAR_GM::AGG(TIPE_CROSS cruce){
 
 	return S;
 }
-
+//select the best new set of solutions
 vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney){
+	//choose 2 solutions
 	int indv1= -1, indv2= -1;
+	//save the best solution
 	vector<vector<int>> padres;
+	//create landa
 	landa = createLanda();
 
+	//generate n torney depend of tipe AGG or AGE
 	for(int i=0; i < tourney; ++i){
+		//randomly select 2 diferents individuals
 		do{
 			indv1 = rand() % actual.size() + 0;
 			indv2 = rand() % actual.size() + 0;
@@ -276,11 +281,27 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 
 		//cout << indv1 << " vs " << indv2 << endl;
 
-		cout << "THE BEST: " << betterFitness(actual,indv1,indv2) << endl;
+		//cout << "THE BEST: " << betterFitness(actual,indv1,indv2) << endl;
+		//and save the best of the 2
 		padres.push_back(actual[betterFitness(actual,indv1,indv2)]);
 	}
 
 	return padres;
+}
+
+//uniform crossover operator
+vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres){
+	vector<vector<int>> nose;
+	vector<int> RSI_CROSS = RSI;
+
+	//generates n/2 different random indices different from genes one parent and the rest of the other parent
+	random_shuffle(RSI_CROSS.begin(), RSI_CROSS.end());//barajo el vector
+
+	for(int i=0; i<(RSI_CROSS.size()/2); ++i){
+
+	}
+
+	return nose;
 }
 
 //Update the distance
