@@ -15,7 +15,7 @@
 using namespace std;
 using namespace arma;
 
-static enum TIPE_CROSS{
+enum TIPE_CROSS{
 	AGG_UN, AGG_SF, AGE_UN, AGE_SF
 };
 

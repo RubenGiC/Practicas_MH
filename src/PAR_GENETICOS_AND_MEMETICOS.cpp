@@ -291,15 +291,51 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 
 //uniform crossover operator
 vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres){
-	vector<vector<int>> nose;
+	vector<vector<int>> descendientes;
 	vector<int> RSI_CROSS = RSI;
+	vector<int> descendiente;
 
-	//generates n/2 different random indices different from genes one parent and the rest of the other parent
-	random_shuffle(RSI_CROSS.begin(), RSI_CROSS.end());//barajo el vector
+	descendiente.resize(RSI.size());
 
-	for(int i=0; i<(RSI_CROSS.size()/2); ++i){
+	for(unsigned int i=0; i< padres.size(); i +=2){
+		//generates n/2 different random indices different from genes one parent and the rest of the other parent
+		random_shuffle(RSI_CROSS.begin(), RSI_CROSS.end());//barajo el vector
 
+		//create the son
+		for(unsigned int e=0; e<RSI_CROSS.size(); ++e){
+
+			//n/2 genes first parent
+			if(e < (RSI_CROSS.size()/2))
+				descendiente[RSI_CROSS[e]] = padres[i][RSI_CROSS[e]];
+			//and rest of the second parent
+			else
+				descendiente[RSI_CROSS[e]] = padres[i+1][RSI_CROSS[e]];
+		}
+
+		//add the son
+		descendientes.push_back(descendiente);
+
+
+		/*cout << "HIJO: " << (i/2)+1 << endl;
+		for(int j = 0; j<k; ++j){
+			vector<int> elements = findInCluster(descendiente,j);
+			cout << j << ": [ ";
+			for(auto e : elements){
+				cout << e << ", ";
+			}
+			cout << " ]" << endl;
+		}*/
+
+		descendiente.clear();
+		descendiente.resize(RSI.size());
 	}
+
+	return descendientes;
+}
+
+//fixed segment crossover operator
+vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres){
+	vector<vector<int>> nose;
 
 	return nose;
 }

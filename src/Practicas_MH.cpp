@@ -413,9 +413,9 @@ int main() {
 	clock_t start_global;
 	clock_t end_global;*/
 
-	par_zoo10_gm->randomAssign(5);
+	par_zoo10_gm->randomAssign(6);
 	par_zoo10_gm->printS();
-	par_zoo10_gm->AGG();
+	par_zoo10_gm->AGG(AGG_UN);
 
 	return 0;
 }
