@@ -23,7 +23,7 @@ using namespace arma;
 
 int main(int argc, char** argv) {
 
-	int seed = 37;
+	//int seed = 37;
 	vector<int> seeds;
 	vector<string> paths_data;
 	vector<string> paths_const;
@@ -36,11 +36,12 @@ int main(int argc, char** argv) {
 		}
 	}
 
-		for(unsigned int i = 0; i<paths_data.size(); ++i){
-			cout << "SEED: " << seeds[i] << endl;
-			cout << "PATH DATA: " << paths_data[i] << endl;
-			cout << "PATH CONST: " << paths_const[i] << endl;
-		}
+	/*for(unsigned int i = 0; i<paths_data.size(); ++i){
+		cout << "SEED: " << seeds[i] << endl;
+		cout << "PATH DATA: " << paths_data[i] << endl;
+		cout << "PATH CONST: " << paths_const[i] << endl;
+	}*/
+
 	/*PAR *par_zoo10 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const", seed);
 	PAR *par_zoo20 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_20.const", seed);
 	PAR *par_glass10 = new PAR("datos/glass_set.dat", "datos/glass_set_const_10.const", seed);
@@ -414,7 +415,7 @@ int main(int argc, char** argv) {
 	cout << endl << bl_bupa_10 << endl;*/
 
 
-	PAR_GM *par_zoo10_gm = new PAR_GM("datos/zoo_set.dat", "datos/zoo_set_const_10.const", seed);
+	PAR_GM *par_zoo10_gm = new PAR_GM(paths_data[0], paths_const[0], seeds[0]);
 	/*PAR_GM *par_zoo20_gm = new PAR_GM("datos/zoo_set.dat", "datos/zoo_set_const_20.const", seed);
 	PAR_GM *par_glass10_gm = new PAR_GM("datos/glass_set.dat", "datos/glass_set_const_10.const", seed);
 	PAR_GM *par_glass20_gm = new PAR_GM("datos/glass_set.dat", "datos/glass_set_const_20.const", seed);
