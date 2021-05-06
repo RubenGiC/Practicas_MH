@@ -27,13 +27,34 @@ int main(int argc, char** argv) {
 	vector<int> seeds;
 	vector<string> paths_data;
 	vector<string> paths_const;
+	int iterations = 100000;
+
+	string tipo;
 
 	if(argc>1){
-		for(int i = 1; i <argc; i+=3){
-			seeds.push_back(atoi(argv[i]));
-			paths_data.push_back(argv[i+1]);
-			paths_const.push_back(argv[i+2]);
+		if(argc > 2){
+			if(argc%2 == 0){
+				for(int i = 1; i <argc-1; i+=3){
+					//seed
+					seeds.push_back(atoi(argv[i]));
+					//data
+					paths_data.push_back(argv[i+1]);
+					//constraints
+					paths_const.push_back(argv[i+2]);
+				}
+			}else{
+				for(int i = 1; i <argc-1; i+=3){
+					//seed
+					seeds.push_back(atoi(argv[i]));
+					//data
+					paths_data.push_back(argv[i+1]);
+					//constraints
+					paths_const.push_back(argv[i+2]);
+				}
+			}
 		}
+		if(argc%2 == 0)
+			iterations = atoi(argv[argc-1]);
 	}
 
 	/*for(unsigned int i = 0; i<paths_data.size(); ++i){
@@ -434,8 +455,8 @@ int main(int argc, char** argv) {
 
 	par_zoo10_gm->randomAssign(50);
 	//par_zoo10_gm->printS();
-	//par_zoo10_gm->GENETIC(AGG_SF);
-	par_zoo10_gm->GENETIC(AGG_UN);
+	//par_zoo10_gm->GENETIC(AGG_SF, 0.7);
+	par_zoo10_gm->GENETIC(AGG_UN, 0.7, iterations);
 	/*par_zoo10_gm->GENETIC(AGE_SF);
 	par_zoo10_gm->GENETIC(AGE_UN);*/
 

@@ -1,9 +1,11 @@
 Para la compilación no necesita unos parametros especificos.
-Para la ejecución recibe minimo 3 parametros:
+Para la ejecución recibe minimo 4 parametros:
  - la semilla
  - la ruta de los datos
  - la ruta de las restricciones
+ - numero de iteraciones (si no se indica nada por defecto es 100000)
 Puede recibir más por parametro siguiendo el orden semilla, datos y restricciones.
+Si queremos indicar el numero de iteraciones se pone al final
 
 Ejemplo: ./program 37 datos/d1.dat datos/c1.const 22 datos/d2.dat datos/c2.const...
 

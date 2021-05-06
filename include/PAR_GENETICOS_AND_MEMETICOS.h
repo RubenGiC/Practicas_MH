@@ -47,20 +47,22 @@ public:
 	void printS(int s=0);
 
 	//ALGORITHMS
-	vector<int> AGG(TIPE_CROSS cruce);
-	vector<int> AGE(TIPE_CROSS cruce);
-	vector<int> GENETIC(TIPE_CROSS tipo);
+	vector<int> AGG(TIPE_CROSS cruce, float probability, int stop);
+	vector<int> AGE(TIPE_CROSS cruce, float probability, int stop);
+	vector<int> GENETIC(TIPE_CROSS tipo, float probability, int stop);
 
 	//use the binary tournament, to select the best
 	vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney);
 
 	//CROSSOVER OPERATORS
 	//uniform crossover operator
-	vector<vector<int>> uniformCross(vector<vector<int>> padres);
+	vector<vector<int>> uniformCross(vector<vector<int>> padres, float probability);
 	//fixed segment crossover operator
-	vector<vector<int>> fixedSegmentCross(vector<vector<int>> padres);
+	vector<vector<int>> fixedSegmentCross(vector<vector<int>> padres, float probability);
 	//uniform mutation operator
 	vector<vector<int>> uniformMutation(vector<vector<int>> padres);
+	//replacement operator
+	vector<vector<int>> replaceOperator(vector<vector<int>> hijos);
 
 	//MINIMIZATION FUNCTIONS
 	//calculate the closest and least restriction cluster
@@ -79,8 +81,10 @@ public:
 	//CALCULO QUE NODO TIENE LA DISTANCIA EUCLIDEA MINIMA
 	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);//calcula la distancia de 2 puntos
 
-	//calculate a better fitness
+	//check wich solution is better
 	int betterFitness(vector<vector<int>> padres, int indv1, int indv2);
+	//calculate fitness
+	float fitness(vector<int> solution);
 
 	//OTHER FUNCTIONS
 	//update the distance for each cluster

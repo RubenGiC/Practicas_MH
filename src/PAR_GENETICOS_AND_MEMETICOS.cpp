@@ -226,42 +226,79 @@ void PAR_GM::printRSI(){
 	}
 }
 
-vector<int> PAR_GM::GENETIC(TIPE_CROSS tipo){
+vector<int> PAR_GM::GENETIC(TIPE_CROSS tipo, float probability, int stop){
 
 	//choose the tipe of crossover operator and genetic algorithm
-	if(tipo == (AGG_UN || AGG_SF))
-		AGG(tipo);
-	else
-		AGE(tipo);
+	if(tipo == AGG_UN || tipo == AGG_SF){
+		AGG(tipo, probability, stop);
+	}else
+		AGE(tipo, probability, stop);
 
-
+	cout << stop << endl;
 
 	return S;
 }
 
-vector <int> PAR_GM::AGE(TIPE_CROSS cruce){
+vector <int> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 
 	vector<vector<int>> vector_padres = selectionOperator(vector_solutions, 2);
 
 	if(cruce == AGE_UN)
-		uniformCross(vector_padres);
+		uniformCross(vector_padres, probability);
 	else
-		fixedSegmentCross(vector_padres);
+		fixedSegmentCross(vector_padres, probability);
 
 	return S;
 }
 
-vector <int> PAR_GM::AGG(TIPE_CROSS cruce){
+vector <int> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 
+	vector<int> mejor_solucion;
 	vector<vector<int>> vector_padres = selectionOperator(vector_solutions, vector_solutions.size());
-	vector<vector<int>> vector_intermedia;
+	vector<vector<int>> vector_hijos;
+	int mejor_padre = -1;
+	float mejor_f=999, f_actual;
 
-	if(cruce == AGG_UN)
-		vector_intermedia = uniformCross(vector_padres);
-	else
-		vector_intermedia = fixedSegmentCross(vector_padres);
+	for(int i=0; i<stop; i+=50){
+		cout << "iteracion: " << i << endl;
+		if(cruce == AGG_UN)
+			vector_hijos = uniformMutation(uniformCross(vector_padres, probability));//uniformMutation(uniformCross(vector_padres));
+		else
+			vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
-	return S;
+		//cout << "iteracion despues: " << i << endl;
+		for(unsigned int i=0; i < vector_padres.size(); ++i){
+
+			f_actual = fitness(vector_padres[i]);
+
+			if(f_actual < mejor_f){
+				mejor_padre = i;
+				mejor_f = f_actual;
+			}
+		}
+
+		vector_hijos[mejor_padre] = vector_padres[mejor_padre];
+
+		cout << "MEJOR PADRE: " << mejor_f << endl;
+
+		vector_padres = vector_hijos;
+
+		mejor_f = 999;
+		mejor_padre = -1;
+	}
+	mejor_f = 999;
+	for(unsigned int i=0; i < vector_hijos.size(); ++i){
+
+		f_actual = fitness(vector_hijos[i]);
+
+		if(f_actual < mejor_f){
+			mejor_f = f_actual;
+			mejor_solucion = vector_hijos[i];
+		}
+	}
+	cout << "MEJOR HIJO: " << mejor_f << endl;
+
+	return mejor_solucion;
 }
 //select the best new set of solutions
 vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney){
@@ -291,16 +328,30 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 }
 
 //uniform crossover operator
-vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres){
-	vector<vector<int>> descendientes;
+vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres,float probability){
+	vector<vector<int>> descendientes = padres;
 	vector<int> RSI_CROSS = RSI;
 	vector<int> descendiente1;
 	vector<int> descendiente2;
 
+	int number_cross = (probability*padres.size())/2;
+	int parent1=-1, parent2=-1;
+
+	/*cout << (probability*padres.size())/2 << endl;
+	cout << number_cross << endl;*/
+
 	descendiente1.resize(RSI.size(), -1);
 	descendiente2.resize(RSI.size(), -1);
 
-	for(unsigned int i=0; i< padres.size(); i +=2){
+	for(int i=0; i< number_cross; ++i){
+
+		//choose random 2 parents
+		do{
+			parent1 = rand() % descendientes.size();
+			parent2 = rand() % descendientes.size();
+		}while(parent1 != parent2);
+
+
 		//generates n/2 different random indices different from genes one parent and the rest of the other parent
 		random_shuffle(RSI_CROSS.begin(), RSI_CROSS.end());//barajo el vector
 
@@ -309,18 +360,18 @@ vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres){
 
 			//n/2 genes first parent
 			if(e < (RSI_CROSS.size()/2)){
-				descendiente1[RSI_CROSS[e]] = padres[i][RSI_CROSS[e]];
-				descendiente2[RSI_CROSS[e]] = padres[i+1][RSI_CROSS[e]];
+				descendiente1[RSI_CROSS[e]] = descendientes[parent1][RSI_CROSS[e]];
+				descendiente2[RSI_CROSS[e]] = descendientes[parent2][RSI_CROSS[e]];
 			//and rest of the second parent
 			}else{
-				descendiente1[RSI_CROSS[e]] = padres[i+1][RSI_CROSS[e]];
-				descendiente2[RSI_CROSS[e]] = padres[i][RSI_CROSS[e]];
+				descendiente1[RSI_CROSS[e]] = descendientes[parent2][RSI_CROSS[e]];
+				descendiente2[RSI_CROSS[e]] = descendientes[parent1][RSI_CROSS[e]];
 			}
 		}
 
 		//add the son
-		descendientes.push_back(descendiente1);
-		descendientes.push_back(descendiente2);
+		descendientes[parent1] = descendiente1;
+		descendientes[parent2] = descendiente2;
 
 
 		/*cout << "HIJO: " << i+1 << endl;
@@ -352,21 +403,31 @@ vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres){
 }
 
 //fixed segment crossover operator
-vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres){
-	vector<vector<int>> descendientes;
+vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres, float probability){
+	vector<vector<int>> descendientes = padres;
 	//random start segment and size of segment
 	unsigned int start_seg = 0, size_seg = 0, end_seg=0;
 	//size of other elements, number of elements to first and second parent
-	int size_other = 0, parent1 = 0, parent2 = 0, choose_parent=-1;
+	int size_other = 0, n_parent1 = 0, n_parent2 = 0, choose_parent=-1;
 	bool not_seg = true;
 	//create 2 new descendents
 	vector<int> descendiente1;
 	vector<int> descendiente2;
 
+	int number_cross = (probability*padres.size())/2;
+	int parent1=-1, parent2=-1;
+
 	descendiente1.resize(RSI.size(), -1);
 	descendiente2.resize(RSI.size(), -1);
 
-	for(unsigned int i=0; i< padres.size(); i +=2){
+	for(int i=0; i< number_cross; ++i){
+
+		//choose random 2 parents
+		do{
+			parent1 = rand() % descendientes.size();
+			parent2 = rand() % descendientes.size();
+		}while(parent1 != parent2);
+
 		//generate the start segment
 		start_seg = rand() % RSI.size();
 		//the size of segment
@@ -376,8 +437,8 @@ vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres){
 		//size of other descents
 		size_other = RSI.size() - size_seg;
 		//and divide that size between the 2 parents
-		parent1 = size_other /2;
-		parent2 = size_other - parent1;
+		n_parent1 = size_other /2;
+		n_parent2 = size_other - n_parent1;
 
 		//go through all elements
 		for(unsigned int e = 0; e< RSI.size(); ++e){
@@ -387,46 +448,105 @@ vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres){
 			if(start_seg < end_seg){
 
 				if(e>= start_seg && e<=end_seg){
-					descendiente1[e] = padres[i][e];
+					descendiente1[e] = descendientes[parent1][e];
 					not_seg = false;
 				}
 			//if the range is k..n and 0..j
 			}else{
 
 				if(e>= start_seg){
-					descendiente1[e] = padres[i][e];
+					descendiente1[e] = descendientes[parent1][e];
 					not_seg = false;
 				}else if(e<=end_seg){
-					descendiente1[e] = padres[i][e];
+					descendiente1[e] = descendientes[parent1][e];
 					not_seg = false;
 				}
 			}
 
 			if(not_seg){
 				//choose the parent randomly
-				if(parent1>0 and parent2>0)
+				if(n_parent1>0 and n_parent2>0)
 					choose_parent = rand() % 2;
 
 				//and add gen of parent in descendent
-				if((choose_parent == 0 && parent1 >0) || parent2<=0){
-					descendiente1[e] = padres[i][e];
-					--parent1;
-				}else if((choose_parent == 1 && parent2 >0) || parent1<=0){
-					descendiente1[e] = padres[i][e];
-					--parent1;
+				//parent 1
+				if((choose_parent == 0 && n_parent1 >0) || n_parent2<=0){
+					descendiente1[e] = descendientes[parent1][e];
+					--n_parent1;
+				//parent 2
+				}else if((choose_parent == 1 && n_parent2 >0) || n_parent1<=0){
+					descendiente1[e] = descendientes[parent2][e];
+					--n_parent2;
 				}
 			}
 			not_seg = true;
 
 		}
-		/*cout << "HIJO: " << (i/2)+1 << endl;
-		cout << ": [ ";
-		for(auto e : descendiente1){
-			cout << e << ", ";
+
+		//generate the start segment for second descendent (a traves del segundo padre)
+		start_seg = rand() % RSI.size();
+		//the size of segment
+		size_seg = 1 + rand() % (RSI.size() - 1);
+		//and the end of the segment
+		end_seg = (start_seg + size_seg)%RSI.size() - 1;
+		//size of other descents
+		size_other = RSI.size() - size_seg;
+		//and divide that size between the 2 parents
+		n_parent1 = size_other /2;
+		n_parent2 = size_other - n_parent1;
+
+		//go through all elements
+		for(unsigned int e = 0; e< RSI.size(); ++e){
+
+			//if element is within range add element of the fisrt parent
+			//if the range is 0...k
+			if(start_seg < end_seg){
+
+				if(e>= start_seg && e<=end_seg){
+					descendiente2[e] = descendientes[parent2][e];
+					not_seg = false;
+				}
+			//if the range is k..n and 0..j
+			}else{
+
+				if(e>= start_seg){
+					descendiente2[e] = descendientes[parent2][e];
+					not_seg = false;
+				}else if(e<=end_seg){
+					descendiente2[e] = descendientes[parent2][e];
+					not_seg = false;
+				}
+			}
+
+			if(not_seg){
+				//choose the parent randomly
+				if(n_parent1>0 and n_parent2>0)
+					choose_parent = rand() % 2;
+
+				//and add gen of parent in descendent
+				if((choose_parent == 0 && n_parent1 >0) || n_parent2<=0){
+					descendiente2[e] = descendientes[parent1][e];
+					--n_parent1;
+				}else if((choose_parent == 1 && n_parent2 >0) || n_parent1<=0){
+					descendiente2[e] = descendientes[parent2][e];
+					--n_parent2;
+				}
+			}
+			not_seg = true;
+
 		}
-		cout << " ]" << endl;*/
-		/*for(int j = 0; j<k; ++j){
+		/*cout << "HIJO 1: " << i+1 << endl;
+		for(int j = 0; j<k; ++j){
 			vector<int> elements = findInCluster(descendiente1,j);
+			cout << j << ": [ ";
+			for(auto e : elements){
+				cout << e << ", ";
+			}
+			cout << " ] n = " << elements.size() << endl;
+		}
+		cout << "HIJO 2: " << i+2 << endl;
+		for(int j = 0; j<k; ++j){
+			vector<int> elements = findInCluster(descendiente2,j);
 			cout << j << ": [ ";
 			for(auto e : elements){
 				cout << e << ", ";
@@ -434,10 +554,51 @@ vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres){
 			cout << " ] n = " << elements.size() << endl;
 		}*/
 
+		descendientes[parent1]=descendiente1;
+		descendientes.push_back(descendiente2);
+
 		descendiente1.clear();
 		descendiente1.resize(RSI.size(), -1);
+		descendiente2.clear();
+		descendiente2.resize(RSI.size(), -1);
 	}
 
+
+	return descendientes;
+}
+
+//uniform mutation operator
+vector<vector<int>> PAR_GM::uniformMutation(vector<vector<int>> padres){
+	vector<vector<int>> descendientes = padres;
+	vector<int> clust;
+	int gen, new_value, crom=-1;
+
+	float probability =0.1/RSI.size();
+	int n_genes = RSI.size()*padres.size() * probability;
+
+	//cout << "genes: " << RSI.size() << ", cromosomas: " << padres.size() << endl;
+	//cout << probability << ", " << n_genes << endl;
+
+	for(int i = 0; i<n_genes; ++i){
+
+		//cout << "GEN: " << i << endl;
+
+		//choose random chromosome
+		crom = rand() % descendientes.size();
+
+		do{
+		 gen = rand() % RSI.size();
+		 new_value = rand() % k;
+		 //cout << "GEN: " << gen << ", Value: " << new_value << endl;
+
+		 clust = findInCluster(descendientes[crom],descendientes[crom][gen]);
+
+		}while(clust.size() < 2 && gen != descendientes[crom][gen]);
+
+		//cout << "(ORIGINAL) GEN: " << gen << ", Value: " << descendientes[crom][gen] << endl;
+		descendientes[crom][gen] = new_value;
+		//cout << "(NEW) GEN: " << gen << ", Value: " << descendientes[crom][gen] << endl;
+	}
 
 	return descendientes;
 }
@@ -649,22 +810,21 @@ void PAR_GM::randomAssign(int n){
 	}
 }
 
+float PAR_GM::fitness(vector<int> solution){
+	float f = generalDeviation(solution) + infeasibility(solution) * landa;
+	return f;
+}
+
 //calculates wich of the 2 individuals is the best
 int PAR_GM::betterFitness(vector<vector<int>> padres, int indv1, int indv2){
 
-	int infease = 0;//calculate infeasibility
-	float gen_deviation = 0; //calculate General Deviation
 	float f1 = 0, f2 = 0;
 
 	//calculate the fitness indv1
-	gen_deviation = generalDeviation(padres[indv1]);
-	infease = infeasibility(padres[indv1]);
-	f1 = gen_deviation + (infease * landa);
+	f1 = fitness(padres[indv1]);
 
 	//calculate the fitness indv2
-	gen_deviation = generalDeviation(padres[indv2]);
-	infease = infeasibility(padres[indv2]);
-	f2 = gen_deviation + (infease * landa);
+	f2 = fitness(padres[indv2]);
 
 	//cout << "Fitness: " << f1 << " vs " << f2 << endl;
 
