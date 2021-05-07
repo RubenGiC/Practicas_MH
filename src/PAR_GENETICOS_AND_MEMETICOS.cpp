@@ -241,12 +241,16 @@ vector<int> PAR_GM::GENETIC(TIPE_CROSS tipo, float probability, int stop){
 
 vector <int> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 
+	vector<int> mejor_solucion;
 	vector<vector<int>> vector_padres = selectionOperator(vector_solutions, 2);
+	vector<vector<int>> vector_hijos;
 
 	if(cruce == AGE_UN)
-		uniformCross(vector_padres, probability);
+		vector_hijos = uniformCross(vector_padres, probability);
 	else
-		fixedSegmentCross(vector_padres, probability);
+		vector_hijos = fixedSegmentCross(vector_padres, probability);
+
+
 
 	return S;
 }
@@ -259,14 +263,18 @@ vector <int> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 	int mejor_padre = -1;
 	float mejor_f=999, f_actual;
 
-	for(int i=0; i<stop; i+=50){
-		cout << "iteracion: " << i << endl;
+	for(unsigned int i=0; i<stop; i+=vector_padres.size()){
+		//cout << "iteracion: " << i << endl;
+
+		//choose the type of cross and calculate the mutation
 		if(cruce == AGG_UN)
 			vector_hijos = uniformMutation(uniformCross(vector_padres, probability));//uniformMutation(uniformCross(vector_padres));
 		else
 			vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
 		//cout << "iteracion despues: " << i << endl;
+
+		//choose the best parent
 		for(unsigned int i=0; i < vector_padres.size(); ++i){
 
 			f_actual = fitness(vector_padres[i]);
@@ -277,16 +285,20 @@ vector <int> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 			}
 		}
 
+		//and that parent isn't replaced
 		vector_hijos[mejor_padre] = vector_padres[mejor_padre];
 
-		cout << "MEJOR PADRE: " << mejor_f << endl;
+		//cout << "MEJOR PADRE: " << mejor_f << endl;
 
+		//update vector with new parents
 		vector_padres = vector_hijos;
 
+		//reset
 		mejor_f = 999;
 		mejor_padre = -1;
 	}
 	mejor_f = 999;
+	//choose the best solution
 	for(unsigned int i=0; i < vector_hijos.size(); ++i){
 
 		f_actual = fitness(vector_hijos[i]);
@@ -296,8 +308,9 @@ vector <int> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 			mejor_solucion = vector_hijos[i];
 		}
 	}
-	cout << "MEJOR HIJO: " << mejor_f << endl;
+	//cout << "MEJOR HIJO: " << mejor_f << endl;
 
+	//and return it
 	return mejor_solucion;
 }
 //select the best new set of solutions
@@ -334,6 +347,7 @@ vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres,float probab
 	vector<int> descendiente1;
 	vector<int> descendiente2;
 
+	//create 2 new descendents
 	int number_cross = (probability*padres.size())/2;
 	int parent1=-1, parent2=-1;
 
@@ -369,7 +383,7 @@ vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres,float probab
 			}
 		}
 
-		//add the son
+		//add the children
 		descendientes[parent1] = descendiente1;
 		descendientes[parent2] = descendiente2;
 
@@ -414,6 +428,7 @@ vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres, float 
 	vector<int> descendiente1;
 	vector<int> descendiente2;
 
+	//calculate the number of pairs to cross
 	int number_cross = (probability*padres.size())/2;
 	int parent1=-1, parent2=-1;
 
@@ -470,10 +485,12 @@ vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres, float 
 
 				//and add gen of parent in descendent
 				//parent 1
+				//if you have choose the first parent and still can add genes from that first parent or the second parent  has already selected all the genes
 				if((choose_parent == 0 && n_parent1 >0) || n_parent2<=0){
 					descendiente1[e] = descendientes[parent1][e];
 					--n_parent1;
 				//parent 2
+				//if you have choose the second parent and still can add genes from that second parent or the first parent  has already selected all the genes
 				}else if((choose_parent == 1 && n_parent2 >0) || n_parent1<=0){
 					descendiente1[e] = descendientes[parent2][e];
 					--n_parent2;
@@ -554,9 +571,11 @@ vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres, float 
 			cout << " ] n = " << elements.size() << endl;
 		}*/
 
+		//replace the parents with their children
 		descendientes[parent1]=descendiente1;
-		descendientes.push_back(descendiente2);
+		descendientes[parent2]=descendiente2;
 
+		//and clear children
 		descendiente1.clear();
 		descendiente1.resize(RSI.size(), -1);
 		descendiente2.clear();
@@ -573,12 +592,15 @@ vector<vector<int>> PAR_GM::uniformMutation(vector<vector<int>> padres){
 	vector<int> clust;
 	int gen, new_value, crom=-1;
 
+	//calculate the probability of mutations
 	float probability =0.1/RSI.size();
+	//calculate the number of genes to mutate
 	int n_genes = RSI.size()*padres.size() * probability;
 
 	//cout << "genes: " << RSI.size() << ", cromosomas: " << padres.size() << endl;
 	//cout << probability << ", " << n_genes << endl;
 
+	//mutates n_genes
 	for(int i = 0; i<n_genes; ++i){
 
 		//cout << "GEN: " << i << endl;
@@ -587,19 +609,26 @@ vector<vector<int>> PAR_GM::uniformMutation(vector<vector<int>> padres){
 		crom = rand() % descendientes.size();
 
 		do{
-		 gen = rand() % RSI.size();
-		 new_value = rand() % k;
-		 //cout << "GEN: " << gen << ", Value: " << new_value << endl;
+			//choose random gen
+			gen = rand() % RSI.size();
+			//create new value 0 to k-1
+			new_value = rand() % k;
 
-		 clust = findInCluster(descendientes[crom],descendientes[crom][gen]);
+			//cout << "GEN: " << gen << ", Value: " << new_value << endl;
 
-		}while(clust.size() < 2 && gen != descendientes[crom][gen]);
+			//calculates the gene vector of that cluster
+			clust = findInCluster(descendientes[crom],descendientes[crom][gen]);
+
+		//while the number of genes is less 2 or the new value is equal to the actual gene
+		}while(clust.size() < 2 || new_value == descendientes[crom][gen]);
 
 		//cout << "(ORIGINAL) GEN: " << gen << ", Value: " << descendientes[crom][gen] << endl;
+
+		//change to the new value
 		descendientes[crom][gen] = new_value;
 		//cout << "(NEW) GEN: " << gen << ", Value: " << descendientes[crom][gen] << endl;
 	}
-
+	//return the new population
 	return descendientes;
 }
 

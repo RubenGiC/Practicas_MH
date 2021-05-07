@@ -455,8 +455,8 @@ int main(int argc, char** argv) {
 
 	par_zoo10_gm->randomAssign(50);
 	//par_zoo10_gm->printS();
-	//par_zoo10_gm->GENETIC(AGG_SF, 0.7);
-	par_zoo10_gm->GENETIC(AGG_UN, 0.7, iterations);
+	par_zoo10_gm->GENETIC(AGG_SF, 0.7, iterations);
+	//par_zoo10_gm->GENETIC(AGG_UN, 0.7, iterations);
 	/*par_zoo10_gm->GENETIC(AGE_SF);
 	par_zoo10_gm->GENETIC(AGE_UN);*/
 
