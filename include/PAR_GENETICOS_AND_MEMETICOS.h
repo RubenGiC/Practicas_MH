@@ -45,6 +45,7 @@ public:
 	void printCentroides(vector<vector<float>> centroides);//imprime el vector de centroides
 	void printRSI();
 	void printS(int s=0);
+	void printSolution(vector<int> s);
 
 	//ALGORITHMS
 	vector<vector <int>> AGG(TIPE_CROSS cruce, float probability, int stop);

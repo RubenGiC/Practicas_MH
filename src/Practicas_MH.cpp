@@ -453,31 +453,43 @@ int main(int argc, char** argv) {
 	clock_t start_global;
 	clock_t end_global;*/
 
+	vector<int> solution;
+
 	par_zoo10_gm->randomAssign(50);
 	//par_zoo10_gm->printS();
-	/*start = clock();
-	par_zoo10_gm->GENETIC(AGG_SF, 0.7, iterations);
+	start = clock();
+	solution = par_zoo10_gm->GENETIC(AGG_SF, 0.7, iterations);
 	end = clock();
 	elapsed = float(end - start)/CLOCKS_PER_SEC;
+	cout << "AGG-------------------------------------------------------------" << endl;
 	cout << " Elapsed Total (AGG SF): " << elapsed << "(seconds)\n" << endl;
+	cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;
+	par_zoo10_gm->printSolution(solution);
 
 	start = clock();
-	par_zoo10_gm->GENETIC(AGG_UN, 0.7, iterations);
+	solution = par_zoo10_gm->GENETIC(AGG_UN, 0.7, iterations);
 	end = clock();
 	elapsed = float(end - start)/CLOCKS_PER_SEC;
 	cout << " Elapsed Total (AGG UN): " << elapsed << "(seconds)\n" << endl;
+	cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;
+	par_zoo10_gm->printSolution(solution);
 
+	cout << "AGE-------------------------------------------------------------" << endl;
 	start = clock();
-	par_zoo10_gm->GENETIC(AGE_SF, 1, iterations);
+	solution = par_zoo10_gm->GENETIC(AGE_SF, 1, iterations);
 	end = clock();
 	elapsed = float(end - start)/CLOCKS_PER_SEC;
 	cout << " Elapsed Total (AGE SF): " << elapsed << "(seconds)\n" << endl;
-	*/
+	cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;
+	par_zoo10_gm->printSolution(solution);
+
 	start = clock();
-	par_zoo10_gm->GENETIC(AGE_UN, 1, iterations);
+	solution = par_zoo10_gm->GENETIC(AGE_UN, 1, iterations);
 	end = clock();
 	elapsed = float(end - start)/CLOCKS_PER_SEC;
 	cout << " Elapsed Total (AGE UN): " << elapsed << "(seconds)\n" << endl;
+	cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;
+	par_zoo10_gm->printSolution(solution);
 
 	return 0;
 }
