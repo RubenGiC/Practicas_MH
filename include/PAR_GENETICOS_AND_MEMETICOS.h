@@ -47,8 +47,8 @@ public:
 	void printS(int s=0);
 
 	//ALGORITHMS
-	vector<int> AGG(TIPE_CROSS cruce, float probability, int stop);
-	vector<int> AGE(TIPE_CROSS cruce, float probability, int stop);
+	vector<vector <int>> AGG(TIPE_CROSS cruce, float probability, int stop);
+	vector<vector <int>> AGE(TIPE_CROSS cruce, float probability, int stop);
 	vector<int> GENETIC(TIPE_CROSS tipo, float probability, int stop);
 
 	//use the binary tournament, to select the best

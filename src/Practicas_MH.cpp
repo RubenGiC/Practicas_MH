@@ -73,13 +73,13 @@ int main(int argc, char** argv) {
 	ResultAlgorithms *results = new ResultAlgorithms();
 
 	string greedy_zoo_20 = "", greedy_zoo_10 = "", greedy_glass_10 = "", greedy_glass_20 = "", greedy_bupa_10 = "", greedy_bupa_20 = "";
-	string bl_zoo_20 = "", bl_zoo_10 = "", bl_glass_10 = "", bl_glass_20 = "", bl_bupa_10 = "", bl_bupa_20 = "";
+	string bl_zoo_20 = "", bl_zoo_10 = "", bl_glass_10 = "", bl_glass_20 = "", bl_bupa_10 = "", bl_bupa_20 = "";*/
 	float elapsed;
 	clock_t start;
 	clock_t end;
 	clock_t start_global;
 	clock_t end_global;
-
+/*
 	cout << "Calculate Greedy (ZOO, GLASS, BUPA) Aproximate 1 minute" << endl;
 	start_global = clock();
 	for(int i = 0; i<5; ++i){
@@ -455,10 +455,29 @@ int main(int argc, char** argv) {
 
 	par_zoo10_gm->randomAssign(50);
 	//par_zoo10_gm->printS();
+	/*start = clock();
 	par_zoo10_gm->GENETIC(AGG_SF, 0.7, iterations);
-	//par_zoo10_gm->GENETIC(AGG_UN, 0.7, iterations);
-	/*par_zoo10_gm->GENETIC(AGE_SF);
-	par_zoo10_gm->GENETIC(AGE_UN);*/
+	end = clock();
+	elapsed = float(end - start)/CLOCKS_PER_SEC;
+	cout << " Elapsed Total (AGG SF): " << elapsed << "(seconds)\n" << endl;
+
+	start = clock();
+	par_zoo10_gm->GENETIC(AGG_UN, 0.7, iterations);
+	end = clock();
+	elapsed = float(end - start)/CLOCKS_PER_SEC;
+	cout << " Elapsed Total (AGG UN): " << elapsed << "(seconds)\n" << endl;
+
+	start = clock();
+	par_zoo10_gm->GENETIC(AGE_SF, 1, iterations);
+	end = clock();
+	elapsed = float(end - start)/CLOCKS_PER_SEC;
+	cout << " Elapsed Total (AGE SF): " << elapsed << "(seconds)\n" << endl;
+	*/
+	start = clock();
+	par_zoo10_gm->GENETIC(AGE_UN, 1, iterations);
+	end = clock();
+	elapsed = float(end - start)/CLOCKS_PER_SEC;
+	cout << " Elapsed Total (AGE UN): " << elapsed << "(seconds)\n" << endl;
 
 	return 0;
 }

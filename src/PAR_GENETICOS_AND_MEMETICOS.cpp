@@ -228,42 +228,78 @@ void PAR_GM::printRSI(){
 
 vector<int> PAR_GM::GENETIC(TIPE_CROSS tipo, float probability, int stop){
 
+	vector<vector<int>> mejores;
+	vector<int> mejor_solucion;
+	float f_actual, mejor_f = 999;
+
 	//choose the tipe of crossover operator and genetic algorithm
 	if(tipo == AGG_UN || tipo == AGG_SF){
-		AGG(tipo, probability, stop);
+		mejores = AGG(tipo, probability, stop);
 	}else
-		AGE(tipo, probability, stop);
+		mejores = AGE(tipo, probability, stop);
 
-	cout << stop << endl;
+	for(unsigned int i=0; i < mejores.size(); ++i){
 
-	return S;
+		f_actual = fitness(mejores[i]);
+
+		if(f_actual < mejor_f){
+			mejor_f = f_actual;
+			mejor_solucion = mejores[i];
+		}
+	}
+
+	return mejor_solucion;
 }
 
-vector <int> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
+vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 
-	vector<int> mejor_solucion;
 	vector<vector<int>> vector_padres = selectionOperator(vector_solutions, 2);
 	vector<vector<int>> vector_hijos;
 
-	if(cruce == AGE_UN)
-		vector_hijos = uniformCross(vector_padres, probability);
-	else
-		vector_hijos = fixedSegmentCross(vector_padres, probability);
+	float f_actual, f_peor1=-999, f_peor2=-999;
+	int parent1=-1, parent2=-1;
+
+	for(int i=0; i<stop; i+=vector_padres.size()){
+
+		if(cruce == AGE_UN)
+			vector_hijos = uniformMutation(uniformCross(vector_padres, probability));
+		else
+			vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
+
+
+		//choose the 2 worst parent
+		for(unsigned int i=0; i < vector_padres.size(); ++i){
+
+			//calculate fitness
+			f_actual = fitness(vector_padres[i]);
+
+			if(f_actual > f_peor1){
+				parent2 = parent1;
+				f_peor2 = f_peor1;
+				parent1 = i;
+				f_peor1 = f_actual;
+			}else if(f_actual > f_peor2){
+				parent2 = i;
+				f_peor2 = f_actual;
+			}
+		}
+		vector_padres[parent1] = vector_hijos[0];
+		vector_padres[parent2] = vector_hijos[1];
+	}
 
 
 
-	return S;
+	return vector_padres;
 }
 
-vector <int> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
+vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 
-	vector<int> mejor_solucion;
 	vector<vector<int>> vector_padres = selectionOperator(vector_solutions, vector_solutions.size());
 	vector<vector<int>> vector_hijos;
-	int mejor_padre = -1;
-	float mejor_f=999, f_actual;
+	int mejor_padre = -1, peor_hijo= -1;
+	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
 
-	for(unsigned int i=0; i<stop; i+=vector_padres.size()){
+	for(int i=0; i<stop; i+=vector_padres.size()){
 		//cout << "iteracion: " << i << endl;
 
 		//choose the type of cross and calculate the mutation
@@ -277,16 +313,23 @@ vector <int> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 		//choose the best parent
 		for(unsigned int i=0; i < vector_padres.size(); ++i){
 
-			f_actual = fitness(vector_padres[i]);
+			f_actualp = fitness(vector_padres[i]);
+			f_actualh = fitness(vector_hijos[i]);
 
-			if(f_actual < mejor_f){
+			if(f_actualp < mejor_f){
 				mejor_padre = i;
-				mejor_f = f_actual;
+				mejor_f = f_actualp;
 			}
+
+			if(f_actualh > peor_f){
+				peor_hijo = i;
+				peor_f = f_actualh;
+			}
+
 		}
 
 		//and that parent isn't replaced
-		vector_hijos[mejor_padre] = vector_padres[mejor_padre];
+		vector_hijos[peor_hijo] = vector_padres[mejor_padre];
 
 		//cout << "MEJOR PADRE: " << mejor_f << endl;
 
@@ -296,22 +339,12 @@ vector <int> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 		//reset
 		mejor_f = 999;
 		mejor_padre = -1;
+		peor_f = 999;
+		peor_hijo = -1;
 	}
-	mejor_f = 999;
-	//choose the best solution
-	for(unsigned int i=0; i < vector_hijos.size(); ++i){
-
-		f_actual = fitness(vector_hijos[i]);
-
-		if(f_actual < mejor_f){
-			mejor_f = f_actual;
-			mejor_solucion = vector_hijos[i];
-		}
-	}
-	//cout << "MEJOR HIJO: " << mejor_f << endl;
 
 	//and return it
-	return mejor_solucion;
+	return vector_padres;
 }
 //select the best new set of solutions
 vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney){
