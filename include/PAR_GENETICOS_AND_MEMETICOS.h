@@ -99,5 +99,8 @@ public:
 	//clear the clusters
 	void clearClusters(bool all=true);
 	void shuffleRSI();
+
+	//calculate the error distance
+	float ErrorDistance(vector<int> solution, string type_data_file);
 };
 #endif /* INCLUDE_PAR_H_ */

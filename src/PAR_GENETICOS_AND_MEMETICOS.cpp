@@ -253,9 +253,7 @@ vector<int> PAR_GM::GENETIC(TIPE_CROSS tipo, float probability, int stop){
 
 	//choose the tipe of crossover operator and genetic algorithm
 	if(tipo == AGG_UN || tipo == AGG_SF){
-		cout << "ENTRA" << endl;
 		mejores = AGG(tipo, probability, stop);
-		cout << "ENTRA, " << mejores.size() << endl;
 	}else
 		mejores = AGE(tipo, probability, stop);
 
@@ -277,11 +275,25 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 	vector<vector<int>> vector_poblacion = vector_solutions;
 	vector<vector<int>> vector_padres;
 	vector<vector<int>> vector_hijos;
-
+	vector<float> vector_fitness;
 	float f_actual, f_peor1=-999, f_peor2=-999;
-	int parent1=-1, parent2=-1;
+	int parent1=-1, parent2=-1, iterations = 0;
 
-	for(int i=0; i<stop; i+=vector_solutions.size()){
+	for(unsigned int i=0; i < vector_solutions.size(); ++i){
+		f_actual = fitness(vector_poblacion[i]);
+		vector_fitness.push_back(f_actual);
+		if(f_actual > f_peor1){
+			parent2 = parent1;
+			f_peor2 = f_peor1;
+			parent1 = i;
+			f_peor1 = f_actual;
+		}else if(f_actual > f_peor2){
+			parent2 = i;
+			f_peor2 = f_actual;
+		}
+	}
+
+	for(int i=0; i<stop; i+=2){
 
 		vector_padres = selectionOperator(vector_poblacion, 2);
 
@@ -290,13 +302,18 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 		else
 			vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
+		vector_poblacion[parent1] = vector_hijos[0];
+		vector_poblacion[parent2] = vector_hijos[1];
+
+		vector_fitness[parent1] = fitness(vector_poblacion[parent1]);
+		vector_fitness[parent2] = fitness(vector_poblacion[parent2]);
+
+		f_peor1 = f_peor2 = -999;
+
 		//choose the 2 worst parent
-		for(unsigned int i=0; i < vector_poblacion.size(); ++i){
+		for(unsigned int i=0; i < vector_fitness.size(); ++i){
 
-			//calculate fitness
-			f_actual = fitness(vector_poblacion[i]);
-
-			if(f_actual > f_peor1){
+			if(vector_fitness[i] > f_peor1){
 				parent2 = parent1;
 				f_peor2 = f_peor1;
 				parent1 = i;
@@ -306,9 +323,11 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 				f_peor2 = f_actual;
 			}
 		}
-		vector_poblacion[parent1] = vector_hijos[0];
-		vector_poblacion[parent2] = vector_hijos[1];
+		++iterations;
+		//cout << iterations << endl;
 	}
+
+	//cout << "NUMBER OF ITERATIONS: " << iterations << endl;
 
 	return vector_poblacion;
 }
@@ -1006,4 +1025,24 @@ float PAR_GM::createLanda(){
 	lan = lan/rest.size();
 
 	return lan;
+}
+
+//calculate the distance error
+float PAR_GM::ErrorDistance(vector<int> solution, string type_data_file){
+	float error_distance = 0, optimal_distance = 0;
+	//calculate the distance
+	error_distance = generalDeviation(solution);
+
+	//choose the optimal distance
+	if(type_data_file.compare("ZOO") == 0)
+		optimal_distance = 0.904799856;
+	else if(type_data_file.compare("GLASS") == 0)
+		optimal_distance = 0.364290282;
+	else
+		optimal_distance = 0.220423749;
+
+	//calculate the distance error
+	error_distance = abs(error_distance-optimal_distance);
+
+	return error_distance;
 }
