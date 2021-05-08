@@ -31,7 +31,6 @@ public:
 	int size_mat;//size of matriz
 	vector<pair<int,int>> CL;//save the par of nodes that it have CL constraints
 	vector<pair<int,int>> ML;//save the par of nodes that it have ML constraints
-	vector<int> S;//list of clusters assigned to each node
 	int size_sol;
 	float landa;
 
@@ -52,6 +51,7 @@ public:
 	vector<vector <int>> AGE(TIPE_CROSS cruce, float probability, int stop);
 	vector<int> GENETIC(TIPE_CROSS tipo, float probability, int stop);
 	vector<int> BL_SOFT(vector<int> chromosom, int max_fails);
+	vector <int> AM(float probability, int generations, int stop);
 
 	//use the binary tournament, to select the best
 	vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney);
@@ -66,18 +66,13 @@ public:
 	//replacement operator
 	vector<vector<int>> replaceOperator(vector<vector<int>> hijos);
 
-	//MINIMIZATION FUNCTIONS
-	//calculate the best fitness in each node
-	int betterFitness(vector<int> chromosom, int gen);
-
 	//MAXIMIZATION FUNCTION
 	//calculate Landa
 	float createLanda();
 	//calculate general deviation
 	float generalDeviation(vector<int> s_cop);
 
-	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL NUMERO DE RESTRICCIONES QUE INCUMPLE DEL CLUSTER QUE RECIBE
-	int infeasibility(int cluster, int actual);
+	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL NUMERO DE RESTRICCIONES QUE INCUMPLE
 	int infeasibility(vector<int> S_cop);//return the number of restrictions that the solution has
 
 	//CALCULO QUE NODO TIENE LA DISTANCIA EUCLIDEA MINIMA
@@ -85,6 +80,9 @@ public:
 
 	//check wich solution is better
 	int betterFitness(vector<vector<int>> padres, int indv1, int indv2);
+	//calculate the best fitness in each node
+	int betterFitness(vector<int> chromosom, int gen);
+
 	//calculate fitness
 	float fitness(vector<int> solution);
 
@@ -93,8 +91,7 @@ public:
 	vector<vector<float>> updateDistance(vector<int> nodes);
 	//find all elements of the cluster
 	vector<int> findInCluster(vector<int> s_cop, int clust);
-	//reset centroides
-	//void resetCentroides();
+
 	//random assignment
 	void randomAssign(int n);
 	//clear the clusters

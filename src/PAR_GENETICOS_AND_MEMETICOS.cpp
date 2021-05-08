@@ -291,10 +291,75 @@ vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails){
 		//if the cluster has changed, there is improvement
 		if(chromosom[i] != mejor_sol[i])
 			mejora = true;
+		//otherwise it increases the number of faults
+		else
+			++fails;
 
-
+		++i;
 	}
 	return mejor_sol;
+}
+
+vector<int> PAR_GM::AM(float probability, int generations, int stop){
+	vector<int> mejor_solucion;
+	vector<vector<int>> vector_poblacion = vector_solutions;
+	vector<vector<int>> vector_padres = selectionOperator(vector_poblacion, vector_solutions.size());
+	vector<vector<int>> vector_hijos;
+	int mejor_padre = -1, peor_hijo= -1, cont_gen=0;
+	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
+
+	stop = stop/vector_solutions.size();
+
+	for(int i=0; i<stop; ++i){
+
+		if(cont_gen == 10){
+			for(auto sol:vector_poblacion)
+				sol = BL_SOFT(sol,0.1*sol.size());
+			cont_gen = 0;
+			i += k;
+		}
+
+		//TENGO QUE ELEGIR EL CRUCE QUE DE MEJORES RESULTADOS
+		vector_hijos = uniformMutation(uniformCross(vector_padres, probability));//uniformMutation(uniformCross(vector_padres));
+		vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
+
+		//choose the best parent
+		for(unsigned int e=0; e < vector_poblacion.size(); ++e){
+
+			f_actualp = fitness(vector_poblacion[e]);
+			f_actualh = fitness(vector_hijos[e]);
+
+			if(f_actualp < mejor_f){
+				mejor_padre = e;
+				mejor_f = f_actualp;
+			}
+
+			if(f_actualh > peor_f){
+				peor_hijo = e;
+				peor_f = f_actualh;
+			}
+
+		}
+		//and that parent isn't replaced
+		vector_hijos[peor_hijo] = vector_poblacion[mejor_padre];
+
+		//update vector with new parents
+		vector_poblacion = vector_hijos;
+
+		//choose the new parents
+		vector_padres = selectionOperator(vector_poblacion, vector_solutions.size());
+
+		//reset
+		mejor_f = 999;
+		mejor_padre = -1;
+		peor_f = -999;
+		peor_hijo = -1;
+
+		//count number of generations
+		++cont_gen;
+	}
+
+	return mejor_solucion;
 }
 
 vector<int> PAR_GM::GENETIC(TIPE_CROSS tipo, float probability, int stop){
@@ -855,77 +920,6 @@ vector<vector<float>> PAR_GM::updateDistance(vector<int> nodes){
 	return centroides;
 }
 
-//calculate the closest and least restriction to cluster
-int PAR_GM::minRestrictionsDistance(int actual, bool first){
-	int cluster=-1;
-	/*float min_distance=999;//save the minimum distance and less restriction
-	int less_restriction=999;
-	float actual_distance=0;//save the actual distance
-	int actual_restriction=0;//save the actual number of restrictions
-
-	//go through all clusters
-	for(unsigned int i=0; i < centroides.size(); ++i){
-
-		//calculate the Euclidea distance with the current cluster
-		actual_distance = distanciaEuclidea(atributos[actual],centroides[i]);
-
-		//if it isn't the first node to enter
-		if(!first)
-			//calculates the number of constraints it violates
-			actual_restriction = infeasibility(i, actual);
-
-		//if the current cluster is less than the minimum saved, update the cluster and distance
-		if(actual_restriction <=less_restriction){
-
-			if((actual_restriction <less_restriction) || (actual_distance < min_distance && actual_restriction <=less_restriction)){
-
-				min_distance = actual_distance;
-				less_restriction = actual_restriction;
-				cluster = i;
-			}
-		}
-	}*/
-	return cluster;
-}
-
-//calculate infeasibility when assigning an atribute to each cluster and return the minimum
-int PAR_GM::infeasibility(int clust, int actual){
-	// number of restrictions, matrix column and row and not empty cluster indexes
-	int rest=0;
-	//walk through each constrain ML
-	for (unsigned int i = 0; i<ML.size(); ++i) {
-		if(i < ML.size()){
-			//if it find the current node in the constrain
-			if(ML[i].first == actual){
-				//and the second node has an assigned cluster and isn't in the same cluster
-				if(S[ML[i].second] != -1 && S[ML[i].second] != clust){
-					++rest;//increases the number of restrictions violated
-				}
-			}else if(ML[i].second == actual){
-				if(S[ML[i].first] != -1 && S[ML[i].first] != clust){
-					++rest;
-				}
-			}
-		}
-	}
-	//walk through each constrain CL
-	for (unsigned int i = 0; i<CL.size(); ++i) {
-		//if it find the current node in the constrain
-		if(CL[i].first == actual){
-			//and the second node has an assigned cluster and is in the same cluster
-			if(S[CL[i].second] != -1 && S[CL[i].second] == clust){
-				++rest;//increases the number of restrictions violated
-			}
-		}else if(CL[i].second == actual){
-			if(S[CL[i].first] != -1 && S[CL[i].first] == clust){
-				++rest;
-			}
-		}
-	}
-
-	return rest;// return the number of restrictions it violates
-}
-
 //same the infeasibility(int clust, int actual) except it receives the solution
 int PAR_GM::infeasibility(vector<int> S_cop){
 	int restrictions = 0;
@@ -970,6 +964,7 @@ void PAR_GM::randomAssign(int n){
 	//bool find = false;
 	stack<int> clusters_null;
 	vector<int> clusters_asign;
+	vector<int> S;
 
 	size_sol = n;
 	vector_solutions.resize(n);
