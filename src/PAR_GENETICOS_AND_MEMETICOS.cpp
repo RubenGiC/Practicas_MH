@@ -340,11 +340,12 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 	int mejor_padre = -1, peor_hijo= -1;
 	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
 
-	stop = 3;
+	stop = stop/vector_solutions.size();
+	//cout << stop << endl;
 
-	for(int i=0; i<stop; i+=vector_solutions.size()){
-		/*cout << "size: " << vector_padres.size() << endl;
-		cout << "iteracion: " << i << endl;*/
+	for(int i=0; i<stop; ++i){
+		//cout << "size: " << vector_padres.size() << endl;
+		//cout << "iteracion: " << i << endl;
 
 		//choose the type of cross and calculate the mutation
 		if(cruce == AGG_UN)
@@ -352,14 +353,30 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 		else
 			vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
-		/*cout << "iteracion despues: " << i << endl;
-		cout << "size: " << vector_padres.size() << endl;*/
+		//cout << "iteracion despues: " << i << endl;
+		//cout << "size: " << vector_padres.size() << endl;
+
+		/*for(auto p:vector_padres){
+			for(auto g:p){
+				cout << g << ", ";
+			}
+			cout << endl;
+		}*/
+		/*for(auto p:vector_hijos){
+			for(auto g:p){
+				cout << g << ", ";
+			}
+			cout << endl;
+		}*/
+
+		//cout << "poblacion: " << vector_poblacion.size() << endl;
+		//cout << "hjos: " << vector_hijos.size() << endl;
 
 		//choose the best parent
 		for(unsigned int e=0; e < vector_poblacion.size(); ++e){
 
-			/*cout << "antes fitness: size = " << vector_padres[e].size() << ", e = " << e << endl;
-			cout << "size hijos: " << vector_hijos[e].size() << endl;*/
+			//cout << "antes fitness: size = " << vector_padres[e].size() << ", e = " << e << endl;
+			//cout << "size hijos: " << vector_hijos[e].size() << endl;
 			/*for(int j = 0; j<vector_padres[e].size(); ++j){
 				cout << vector_hijos[e][j] << ", ";
 			}
@@ -380,7 +397,7 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 			}
 
 		}
-		//cout << "aqui?" << endl;
+		//cout << "aqui?, hijo: " << peor_hijo << ", padre: " << mejor_padre << endl;
 		//and that parent isn't replaced
 		vector_hijos[peor_hijo] = vector_poblacion[mejor_padre];
 
@@ -395,7 +412,7 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 		//reset
 		mejor_f = 999;
 		mejor_padre = -1;
-		peor_f = 999;
+		peor_f = -999;
 		peor_hijo = -1;
 	}
 
@@ -405,25 +422,30 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 //select the best new set of solutions
 vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney){
 	//choose 2 solutions
-	int indv1= -1, indv2= -1;
+	int indv1= -1, indv2= -1, indv11=-1, indv12=-1;
 	//save the best solution
 	vector<vector<int>> padres;
 	//create landa
 	landa = createLanda();
 
 	//generate n torney depend of tipe AGG or AGE
-	for(int i=0; i < tourney; ++i){
+	for(int i=0; i < tourney; i+=2){
 		//randomly select 2 diferents individuals
 		do{
 			indv1 = rand() % actual.size();
 			indv2 = rand() % actual.size();
 		}while(indv1 == indv2);
+		do{
+			indv11 = rand() % actual.size();
+			indv12 = rand() % actual.size();
+		}while(indv11 == indv12);
 
 		//cout << indv1 << " vs " << indv2 << endl;
 
 		//cout << "THE BEST: " << betterFitness(actual,indv1,indv2) << endl;
 		//and save the best of the 2
 		padres.push_back(actual[betterFitness(actual,indv1,indv2)]);
+		padres.push_back(actual[betterFitness(actual,indv11,indv12)]);
 	}
 
 	return padres;
@@ -458,20 +480,29 @@ vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres,float probab
 		//generates n/2 different random indices different from genes one parent and the rest of the other parent
 		random_shuffle(RSI_CROSS.begin(), RSI_CROSS.end());//barajo el vector
 
+		int size1 = RSI_CROSS.size()/2;
+		int size2 = RSI_CROSS.size() - size1;
+		int size_max = size1;
+
+		if(size2 > size1)
+			size_max = size2;
+
+		//cout << size1 << " vs " << size2 << " = " << size_max << endl;
+
 		//create the son
-		for(unsigned int e=0; e<RSI_CROSS.size(); ++e){
+		for(int e=0; e<size_max; ++e){
 
 			//n/2 genes first parent
-			if(e < (RSI_CROSS.size()/2)){
+			if(e < size1){
 				descendiente1[RSI_CROSS[e]] = descendientes[parent1][RSI_CROSS[e]];
 				descendiente2[RSI_CROSS[e]] = descendientes[parent2][RSI_CROSS[e]];
-			//and rest of the second parent
-			}else{
-				descendiente1[RSI_CROSS[e]] = descendientes[parent2][RSI_CROSS[e]];
-				descendiente2[RSI_CROSS[e]] = descendientes[parent1][RSI_CROSS[e]];
 			}
-		}
+			//and rest of the second parent
+			//cout << e+size1 << endl;
+			descendiente1[RSI_CROSS[e+size1]] = descendientes[parent2][RSI_CROSS[e+size1]];
+			descendiente2[RSI_CROSS[e+size1]] = descendientes[parent1][RSI_CROSS[e+size1]];
 
+		}
 		//add the children
 		descendientes[parent1] = descendiente1;
 		descendientes[parent2] = descendiente2;
@@ -501,7 +532,6 @@ vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres,float probab
 		descendiente1.resize(RSI.size(), -1);
 		descendiente2.resize(RSI.size(), -1);
 	}
-
 	return descendientes;
 }
 
@@ -707,8 +737,8 @@ vector<vector<int>> PAR_GM::uniformMutation(vector<vector<int>> padres){
 	//calculate the number of genes to mutate
 	int n_genes = RSI.size()*padres.size() * probability;
 
-	//cout << "genes: " << RSI.size() << ", cromosomas: " << padres.size() << endl;
-	//cout << probability << ", " << n_genes << endl;
+	/*cout << "genes: " << RSI.size() << ", cromosomas: " << padres.size() << endl;
+	cout << probability << ", " << n_genes << endl;*/
 
 	//mutates n_genes
 	for(int i = 0; i<n_genes; ++i){
