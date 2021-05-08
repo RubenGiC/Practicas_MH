@@ -27,29 +27,34 @@ int main(int argc, char** argv) {
 	vector<int> seeds;
 	vector<string> paths_data;
 	vector<string> paths_const;
+	vector<string> names;
 	int iterations = 100000;
 
 	string tipo;
 
 	if(argc>1){
 		if(argc > 2){
-			if(argc%2 == 0){
-				for(int i = 1; i <argc-1; i+=3){
+			if(argc%2 != 0){
+				for(int i = 1; i <argc-1; i+=4){
 					//seed
 					seeds.push_back(atoi(argv[i]));
+					//name
+					names.push_back(argv[i+1]);
 					//data
-					paths_data.push_back(argv[i+1]);
+					paths_data.push_back(argv[i+2]);
 					//constraints
-					paths_const.push_back(argv[i+2]);
+					paths_const.push_back(argv[i+3]);
 				}
 			}else{
-				for(int i = 1; i <argc-1; i+=3){
+				for(int i = 1; i <argc; i+=4){
 					//seed
 					seeds.push_back(atoi(argv[i]));
+					//name
+					names.push_back(argv[i+1]);
 					//data
-					paths_data.push_back(argv[i+1]);
+					paths_data.push_back(argv[i+2]);
 					//constraints
-					paths_const.push_back(argv[i+2]);
+					paths_const.push_back(argv[i+3]);
 				}
 			}
 		}
@@ -74,12 +79,8 @@ int main(int argc, char** argv) {
 
 	//string greedy_zoo_20 = "", greedy_zoo_10 = "", greedy_glass_10 = "", greedy_glass_20 = "", greedy_bupa_10 = "", greedy_bupa_20 = "";
 	//string bl_zoo_20 = "", bl_zoo_10 = "", bl_glass_10 = "", bl_glass_20 = "", bl_bupa_10 = "", bl_bupa_20 = "";
-	string agg_un_zoo10 = "", agg_sf_zoo10 = "", age_un_zoo10 = "", age_sf_zoo10 = "";
-	string agg_un_zoo20 = "", agg_sf_zoo20 = "", age_un_zoo20 = "", age_sf_zoo20 = "";
-	string agg_un_glass10 = "", agg_sf_glass10 = "", age_un_glass10 = "", age_sf_glass10 = "";
-	string agg_un_glass20 = "", agg_sf_glass20 = "", age_un_glass20 = "", age_sf_glass20 = "";
-	string agg_un_bupa10 = "", agg_sf_bupa10 = "", age_un_bupa10 = "", age_sf_bupa10 = "";
-	string agg_un_bupa20 = "", agg_sf_bupa20 = "", age_un_bupa20 = "", age_sf_bupa20 = "";
+	string agg_un = "", agg_sf = "", age_un = "", age_sf = "";
+
 	float elapsed;
 	clock_t start;
 	clock_t end;
@@ -442,71 +443,70 @@ int main(int argc, char** argv) {
 	cout << endl << bl_bupa_10 << endl;*/
 
 
-	PAR_GM *par_zoo10_gm = new PAR_GM(paths_data[0], paths_const[0], seeds[0]);
-	/*PAR_GM *par_zoo20_gm = new PAR_GM("datos/zoo_set.dat", "datos/zoo_set_const_20.const", seed);
-	PAR_GM *par_glass10_gm = new PAR_GM("datos/glass_set.dat", "datos/glass_set_const_10.const", seed);
-	PAR_GM *par_glass20_gm = new PAR_GM("datos/glass_set.dat", "datos/glass_set_const_20.const", seed);
-	PAR_GM *par_bupa10_gm = new PAR_GM("datos/bupa_set.dat", "datos/bupa_set_const_10.const", seed);
-	PAR_GM *par_bupa20_gm = new PAR_GM("datos/bupa_set.dat", "datos/bupa_set_const_20.const", seed);
-	vector<vector<int>> clusters_sol, clusters_sol_gred, clusters_sol_bl;
-	ResultAlgorithms *results = new ResultAlgorithms();
+	for(unsigned int e=0; e<seeds.size(); ++e){
+		PAR_GM *par_gm = new PAR_GM(paths_data[e], paths_const[e], seeds[e]);
 
-	string greedy_zoo_20 = "", greedy_zoo_10 = "", greedy_glass_10 = "", greedy_glass_20 = "", greedy_bupa_10 = "", greedy_bupa_20 = "";
-	string bl_zoo_20 = "", bl_zoo_10 = "", bl_glass_10 = "", bl_glass_20 = "", bl_bupa_10 = "", bl_bupa_20 = "";
-	float elapsed;
-	clock_t start;
-	clock_t end;
-	clock_t start_global;
-	clock_t end_global;*/
+		vector<int> solution;
 
-	vector<int> solution;
+		for(int i=0; i<5; ++i){
 
-	for(int i=0; i<1; ++i){
+			par_gm->randomAssign(50);
+			//par_zoo10_gm->printS();
 
-		par_zoo10_gm->randomAssign(50);
-		//par_zoo10_gm->printS();
+			start = clock();
+			solution = par_gm->GENETIC(AGG_UN, 0.7, iterations);
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
+			/*cout << "AGG-------------------------------------------------------------" << endl;
+			cout << " Elapsed Total (AGG UN): " << elapsed << "(seconds)\n" << endl;
+			cout << "Fitness: " << par_gm->fitness(solution) << endl;*/
+			//par_zoo10_gm->printSolution(solution);
+			agg_un += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
+			agg_un += "\tElapse: " + to_string(elapsed) + "\n";
+			agg_un += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
+			agg_un += "\tError Distance: " + to_string(par_gm->ErrorDistance(solution,"ZOO")) + "\n";
+			agg_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
 
-		start = clock();
-		solution = par_zoo10_gm->GENETIC(AGG_UN, 0.7, iterations);
-		end = clock();
-		elapsed = float(end - start)/CLOCKS_PER_SEC;
-		cout << "AGG-------------------------------------------------------------" << endl;
-		cout << " Elapsed Total (AGG UN): " << elapsed << "(seconds)\n" << endl;
-		cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;
-		//par_zoo10_gm->printSolution(solution);
-		agg_un_zoo10 += "\tElapse: " + to_string(elapsed) + "\n";
-		agg_un_zoo10 += "\tInfeas: " + to_string(par_zoo10_gm->infeasibility(solution)) + "\n";
-		agg_un_zoo10 += "\tError Distance: " + to_string(par_zoo10_gm->ErrorDistance(solution,"ZOO")) + "\n";
-		agg_un_zoo10 += "\tFitness: " + to_string(par_zoo10_gm->fitness(solution)) + "\n";
+			start = clock();
+			solution = par_gm->GENETIC(AGG_SF, 0.7, iterations);
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
 
-		start = clock();
-		solution = par_zoo10_gm->GENETIC(AGG_SF, 0.7, iterations);
-		end = clock();
-		elapsed = float(end - start)/CLOCKS_PER_SEC;
-		cout << " Elapsed Total (AGG SF): " << elapsed << "(seconds)\n" << endl;
-		cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;
-		//par_zoo10_gm->printSolution(solution);
+			agg_sf += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
+			agg_sf += "\tElapse: " + to_string(elapsed) + "\n";
+			agg_sf += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
+			agg_sf += "\tError Distance: " + to_string(par_gm->ErrorDistance(solution,"ZOO")) + "\n";
+			agg_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
+			//cout << " Elapsed Total (AGG SF): " << elapsed << "(seconds)\n" << endl;
+			//cout << "Fitness: " << par_gm->fitness(solution) << endl;
+			//par_zoo10_gm->printSolution(solution);
 
-		cout << "AGE-------------------------------------------------------------" << endl;
-		start = clock();
-		solution = par_zoo10_gm->GENETIC(AGE_SF, 1, iterations);
-		end = clock();
-		elapsed = float(end - start)/CLOCKS_PER_SEC;
-		cout << " Elapsed Total (AGE SF): " << elapsed << "(seconds)\n" << endl;
-		cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;
-		//par_zoo10_gm->printSolution(solution);
+			/*cout << "AGE-------------------------------------------------------------" << endl;
+			start = clock();
+			solution = par_zoo10_gm->GENETIC(AGE_SF, 1, iterations);
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
+			cout << " Elapsed Total (AGE SF): " << elapsed << "(seconds)\n" << endl;
+			cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;
+			//par_zoo10_gm->printSolution(solution);
 
-		start = clock();
-		solution = par_zoo10_gm->GENETIC(AGE_UN, 1, iterations);
-		end = clock();
-		elapsed = float(end - start)/CLOCKS_PER_SEC;
-		cout << " Elapsed Total (AGE UN): " << elapsed << "(seconds)\n" << endl;
-		cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;
-		//par_zoo10_gm->printSolution(solution);
+			start = clock();
+			solution = par_zoo10_gm->GENETIC(AGE_UN, 1, iterations);
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
+			cout << " Elapsed Total (AGE UN): " << elapsed << "(seconds)\n" << endl;
+			cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;*/
+			//par_zoo10_gm->printSolution(solution);
+		}
+
+		cout << "AGG UNIFORM CROSS WITH(" << names[e] << ")" << endl;
+		cout << agg_un << endl;
+		cout << "AGG FIXED SEGMENT CROSS WITH(" << names[e] << ")" << endl;
+		cout << agg_sf << endl;
+
+		agg_un = "";
+		agg_sf = "";
 	}
-
-	cout << "AGG UNIFORM CROSS" << endl;
-	cout << agg_un_zoo10 << endl;
 
 	return 0;
 }

@@ -1,11 +1,16 @@
 Para la compilación no necesita unos parametros especificos.
 Para la ejecución recibe minimo 4 parametros:
  - la semilla
+ - nombre (para distinguir en la visualización una muestra de otra)
  - la ruta de los datos
  - la ruta de las restricciones
  - numero de iteraciones (si no se indica nada por defecto es 100000)
+
 Puede recibir más por parametro siguiendo el orden semilla, datos y restricciones.
 Si queremos indicar el numero de iteraciones se pone al final
 
 Ejemplo: ./program 37 datos/d1.dat datos/c1.const 22 datos/d2.dat datos/c2.const...
 
+Para ejecutarlo completo:
+
+./Practicas_MH 37 ZOO10 datos/zoo_set.dat datos/zoo_set_const_10.const 38 ZOO20 datos/zoo_set.dat datos/zoo_set_const_20.const 50 GLASS10 datos/glass_set.dat datos/glass_set_const_10.const 20 GLASS20 datos/glass_set.dat datos/glass_set_const_20.const 10 BUPA10 datos/bupa_set.dat datos/bupa_set_const_10.const 1 BUPA20 datos/bupa_set.dat datos/bupa_set_const_20.const
