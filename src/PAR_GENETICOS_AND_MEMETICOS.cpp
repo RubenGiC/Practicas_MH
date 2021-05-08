@@ -389,6 +389,9 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 		//update vector with new parents
 		vector_poblacion = vector_hijos;
 
+		//choose the new parents
+		vector_padres = selectionOperator(vector_poblacion, vector_solutions.size());
+
 		//reset
 		mejor_f = 999;
 		mejor_padre = -1;
