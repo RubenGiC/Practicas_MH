@@ -51,6 +51,7 @@ public:
 	vector<vector <int>> AGG(TIPE_CROSS cruce, float probability, int stop);
 	vector<vector <int>> AGE(TIPE_CROSS cruce, float probability, int stop);
 	vector<int> GENETIC(TIPE_CROSS tipo, float probability, int stop);
+	vector<int> BL_SOFT(vector<int> chromosom, int max_fails);
 
 	//use the binary tournament, to select the best
 	vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney);
@@ -66,8 +67,8 @@ public:
 	vector<vector<int>> replaceOperator(vector<vector<int>> hijos);
 
 	//MINIMIZATION FUNCTIONS
-	//calculate the closest and least restriction cluster
-	int minRestrictionsDistance(int actual, bool first);
+	//calculate the best fitness in each node
+	int betterFitness(vector<int> chromosom, int gen);
 
 	//MAXIMIZATION FUNCTION
 	//calculate Landa

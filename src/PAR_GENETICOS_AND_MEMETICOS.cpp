@@ -245,6 +245,58 @@ void PAR_GM::printRSI(){
 	}
 }
 
+int PAR_GM::betterFitness(vector<int> chromosom, int gen){
+	int betterCluster = chromosom[gen], i=0;
+	float actual_f, better_f=fitness(chromosom);
+	vector<int> copy_chromosom = chromosom;
+
+	//if the value of gen is 0 increase i
+	if(i == chromosom[gen]) ++i;
+
+	while(i<k){
+
+		//change cluster
+		copy_chromosom[gen] = i;
+		//calculate fitness
+		actual_f = fitness(copy_chromosom);
+
+		//and save the cluster with the best fitness
+		if(actual_f < better_f){
+			better_f = actual_f;
+			betterCluster = i;
+		}
+		++i;
+		//if the cluster is equal to actual cluster increment
+		if(i == chromosom[gen])
+			++i;
+	}
+
+	return betterCluster;
+}
+
+vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails){
+	vector<int> mejor_sol=chromosom;
+	int fails = 0, i=0;
+	bool mejora = true;
+
+	//shuffle the inices
+	shuffleRSI();
+
+	//while the solution improve or not exceed the maximum nuber of failures and hasn't covered all solution
+	while((mejora or fails < max_fails) and i< RSI.size()){
+		mejora = false;
+
+		mejor_sol[i] = betterFitness(mejor_sol, i);
+
+		//if the cluster has changed, there is improvement
+		if(chromosom[i] != mejor_sol[i])
+			mejora = true;
+
+
+	}
+	return mejor_sol;
+}
+
 vector<int> PAR_GM::GENETIC(TIPE_CROSS tipo, float probability, int stop){
 
 	vector<vector<int>> mejores;
