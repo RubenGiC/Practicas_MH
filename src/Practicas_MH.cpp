@@ -450,8 +450,8 @@ int main(int argc, char** argv) {
 
 		for(int i=0; i<5; ++i){
 
-			par_gm->randomAssign(50);
-			//par_zoo10_gm->printS();
+			/*par_gm->randomAssign(50);
+			//par_gm->printS();
 
 			start = clock();
 			solution = par_gm->GENETIC(AGG_UN, 0.7, iterations);
@@ -461,12 +461,14 @@ int main(int argc, char** argv) {
 			cout << " Elapsed Total (AGG UN): " << elapsed << "(seconds)\n" << endl;
 			cout << "Fitness: " << par_gm->fitness(solution) << endl;*/
 			//par_zoo10_gm->printSolution(solution);
-			agg_un += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
+			/*agg_un += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
 			agg_un += "\tElapse: " + to_string(elapsed) + "\n";
 			agg_un += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
 			agg_un += "\tError Distance: " + to_string(par_gm->ErrorDistance(solution,"ZOO")) + "\n";
-			agg_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
+			agg_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
 
+
+			par_gm->randomAssign(50);
 			start = clock();
 			solution = par_gm->GENETIC(AGG_SF, 0.7, iterations);
 			end = clock();

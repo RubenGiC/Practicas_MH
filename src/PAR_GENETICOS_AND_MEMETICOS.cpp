@@ -967,6 +967,11 @@ void PAR_GM::randomAssign(int n){
 	vector<int> S;
 
 	size_sol = n;
+	if(vector_solutions.size()>0){
+		for(unsigned int i = 0; i < vector_solutions.size(); ++i)
+			vector_solutions[i].clear();
+		vector_solutions.clear();
+	}
 	vector_solutions.resize(n);
 
 	S.resize(RSI.size());
