@@ -245,7 +245,7 @@ void PAR_GM::printRSI(){
 	}
 }
 
-int PAR_GM::betterFitness(vector<int> chromosom, int gen){
+int PAR_GM::betterFitness(vector<int> chromosom, int gen, int &iterations){
 	int betterCluster = chromosom[gen], i=0;
 	float actual_f, better_f=fitness(chromosom);
 	vector<int> copy_chromosom = chromosom;
@@ -259,6 +259,8 @@ int PAR_GM::betterFitness(vector<int> chromosom, int gen){
 		copy_chromosom[gen] = i;
 		//calculate fitness
 		actual_f = fitness(copy_chromosom);
+
+		++iterations;
 
 		//and save the cluster with the best fitness
 		if(actual_f < better_f){
@@ -274,7 +276,7 @@ int PAR_GM::betterFitness(vector<int> chromosom, int gen){
 	return betterCluster;
 }
 
-vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails, int &iteraciones){
+vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails, int &iteraciones, int stop){
 	vector<int> mejor_sol=chromosom;
 	int fails = 0;
 	unsigned int i=0;
@@ -284,12 +286,10 @@ vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails, int &iteracion
 	shuffleRSI();
 
 	//while the solution improve or not exceed the maximum nuber of failures and hasn't covered all solution
-	while((mejora or fails < max_fails) and i< RSI.size()){
+	while((mejora or fails < max_fails) and i< RSI.size() and iteraciones < stop){
 		mejora = false;
 
-		mejor_sol[i] = betterFitness(mejor_sol, i);
-
-		++iteraciones;
+		mejor_sol[i] = betterFitness(mejor_sol, i, iteraciones);
 
 		//if the cluster has changed, there is improvement
 		if(chromosom[i] != mejor_sol[i])
@@ -315,7 +315,7 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 
 		if(cont_gen == 10){
 			for(auto sol:vector_poblacion)
-				sol = BL_SOFT(sol, 0.1*sol.size(), i);
+				sol = BL_SOFT(sol, 0.1*sol.size(), i, stop);
 			cont_gen = 0;
 			i += k;
 		}
@@ -453,15 +453,23 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 
 	vector<vector<int>> vector_poblacion = vector_solutions;
-	vector<vector<int>> vector_padres = selectionOperator(vector_poblacion, vector_solutions.size());
 	vector<vector<int>> vector_hijos;
-	int mejor_padre = -1, peor_hijo= -1;
+	vector<float> fitness_poblacion;
+	int mejor_padre = -1, peor_hijo= -1, i=0;
 	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
 
-	stop = stop/vector_solutions.size();
-	//cout << stop << endl;
+	fitness_poblacion.resize(vector_poblacion.size());
 
-	for(int i=0; i<stop; ++i){
+	//calculate the fitness of actual population
+	for(unsigned int e=0; e < vector_poblacion.size(); ++e){
+
+		fitness_poblacion[e] = fitness(vector_poblacion[e]);
+	}
+
+	// select the best parents of each tournament
+	vector<vector<int>> vector_padres = selectionOperator(vector_poblacion, vector_solutions.size(), fitness_poblacion);
+
+	while(i<stop){
 		//cout << "size: " << vector_padres.size() << endl;
 		//cout << "iteracion: " << i << endl;
 
@@ -490,7 +498,7 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 		//cout << "poblacion: " << vector_poblacion.size() << endl;
 		//cout << "hjos: " << vector_hijos.size() << endl;
 
-		//choose the best parent
+		//choose the best parent and worst descendent
 		for(unsigned int e=0; e < vector_poblacion.size(); ++e){
 
 			//cout << "antes fitness: size = " << vector_padres[e].size() << ", e = " << e << endl;
@@ -499,8 +507,12 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 				cout << vector_hijos[e][j] << ", ";
 			}
 			cout << endl;*/
-			f_actualp = fitness(vector_poblacion[e]);
+			//f_actualp = fitness(vector_poblacion[e]);
+
+			f_actualp = fitness_poblacion[e];
 			f_actualh = fitness(vector_hijos[e]);
+
+			fitness_poblacion[e] = f_actualh;
 
 			//cout << "despues fitness" << endl;
 
@@ -513,11 +525,13 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 				peor_hijo = e;
 				peor_f = f_actualh;
 			}
+			++i;
 
 		}
-		//cout << "aqui?, hijo: " << peor_hijo << ", padre: " << mejor_padre << endl;
+
 		//and that parent isn't replaced
 		vector_hijos[peor_hijo] = vector_poblacion[mejor_padre];
+		fitness_poblacion[peor_hijo] = mejor_f;
 
 		//cout << "MEJOR PADRE: " << mejor_f << endl;
 
@@ -525,7 +539,7 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 		vector_poblacion = vector_hijos;
 
 		//choose the new parents
-		vector_padres = selectionOperator(vector_poblacion, vector_solutions.size());
+		vector_padres = selectionOperator(vector_poblacion, vector_solutions.size(), fitness_poblacion);
 
 		//reset
 		mejor_f = 999;
@@ -537,6 +551,42 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 	//and return it
 	return vector_poblacion;
 }
+
+//select the best new set of solutions
+vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney, vector<float> fitness_p){
+	//choose 2 solutions
+	int indv1= -1, indv2= -1, indv11=-1, indv12=-1;
+	//save the best solution
+	vector<vector<int>> padres;
+	//create landa
+	landa = createLanda();
+
+	//generate n torney depend of tipe AGG or AGE
+	for(int i=0; i < tourney; i+=2){
+		//randomly select 2 diferents individuals
+		do{
+			indv1 = rand() % actual.size();
+			indv2 = rand() % actual.size();
+		}while(indv1 == indv2);
+		do{
+			indv11 = rand() % actual.size();
+			indv12 = rand() % actual.size();
+		}while(indv11 == indv12);
+
+		//and save the best of the 2
+		if(fitness_p[indv1] < fitness_p[indv2])
+			padres.push_back(actual[indv1]);
+		else
+			padres.push_back(actual[indv2]);
+		if(fitness_p[indv1] < fitness_p[indv2])
+			padres.push_back(actual[indv11]);
+		else
+			padres.push_back(actual[indv12]);
+	}
+
+	return padres;
+}
+
 //select the best new set of solutions
 vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney){
 	//choose 2 solutions

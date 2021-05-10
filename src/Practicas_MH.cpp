@@ -447,15 +447,15 @@ int main(int argc, char** argv) {
 	//PAR ALGORITMOS GENETICOS Y MEMETICOS
 
 	cout << "Información de los tiempos: " << endl;
-	cout << "AGG:\n\t - Con zoo tarda aproximadamente 2 minutos." << endl;
-	cout << "\t - Con glass tarda aproximadamente 2 minutos." << endl;
-	cout << "\t - Con bupa tarda aproximadamente 2 minutos." << endl;
+	cout << "AGG (uniforme y segmentación fija) (tiempos totales de las 5 ejecuciones):\n\t - Con zoo tarda aproximadamente 5 minutos (con cada restricción)." << endl;
+	cout << "\t - Con glass tarda aproximadamente 14 minutos (con cada restricción)." << endl;
+	cout << "\t - Con bupa tarda aproximadamente 24 minutos (con cada restricción)." << endl;
 	/*cout << "AGE:\n\t - Con zoo tarda aproximadamente 2 minutos." << endl;
-	cout << "\t - Con glass tarda aproximadamente 2 minutos." << endl;
-	cout << "\t - Con bupa tarda aproximadamente 2 minutos." << endl;
-	cout << "AM:\n\t - Con zoo tarda aproximadamente 2 minutos." << endl;
-	cout << "\t - Con glass tarda aproximadamente 2 minutos." << endl;
-	cout << "\t - Con bupa tarda aproximadamente 2 minutos." << endl;*/
+	cout << "\t - Con glass tarda aproximadamente 2 minutos (con cada restricción)." << endl;
+	cout << "\t - Con bupa tarda aproximadamente 2 minutos (con cada restricción)." << endl;
+	cout << "AM:\n\t - Con zoo tarda aproximadamente 2 minutos (con cada restricción)." << endl;
+	cout << "\t - Con glass tarda aproximadamente 2 minutos (con cada restricción)." << endl;
+	cout << "\t - Con bupa tarda aproximadamente 2 minutos (con cada restricción)." << endl;*/
 
 	for(unsigned int e=0; e<seeds.size(); ++e){
 		PAR_GM *par_gm = new PAR_GM(paths_data[e], paths_const[e], seeds[e]+e);

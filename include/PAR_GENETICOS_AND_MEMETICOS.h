@@ -50,10 +50,11 @@ public:
 	vector<vector <int>> AGG(TIPE_CROSS cruce, float probability, int stop);
 	vector<vector <int>> AGE(TIPE_CROSS cruce, float probability, int stop);
 	vector<int> GENETIC(TIPE_CROSS tipo, float probability, int stop);
-	vector<int> BL_SOFT(vector<int> chromosom, int max_fails, int &iteraciones);
+	vector<int> BL_SOFT(vector<int> chromosom, int max_fails, int &iteraciones, int stop);
 	vector <int> AM(float probability, int generations, int stop);
 
 	//use the binary tournament, to select the best
+	vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney, vector<float> fitness_p);
 	vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney);
 
 	//CROSSOVER OPERATORS
@@ -81,7 +82,7 @@ public:
 	//check wich solution is better
 	int betterFitness(vector<vector<int>> padres, int indv1, int indv2);
 	//calculate the best fitness in each node
-	int betterFitness(vector<int> chromosom, int gen);
+	int betterFitness(vector<int> chromosom, int gen, int &iterations);
 
 	//calculate fitness
 	float fitness(vector<int> solution);
