@@ -274,9 +274,10 @@ int PAR_GM::betterFitness(vector<int> chromosom, int gen){
 	return betterCluster;
 }
 
-vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails){
+vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails, int &iteraciones){
 	vector<int> mejor_sol=chromosom;
-	int fails = 0, i=0;
+	int fails = 0;
+	unsigned int i=0;
 	bool mejora = true;
 
 	//shuffle the inices
@@ -287,6 +288,8 @@ vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails){
 		mejora = false;
 
 		mejor_sol[i] = betterFitness(mejor_sol, i);
+
+		++iteraciones;
 
 		//if the cluster has changed, there is improvement
 		if(chromosom[i] != mejor_sol[i])
@@ -308,13 +311,11 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 	int mejor_padre = -1, peor_hijo= -1, cont_gen=0;
 	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
 
-	stop = stop/vector_solutions.size();
-
 	for(int i=0; i<stop; ++i){
 
 		if(cont_gen == 10){
 			for(auto sol:vector_poblacion)
-				sol = BL_SOFT(sol,0.1*sol.size());
+				sol = BL_SOFT(sol, 0.1*sol.size(), i);
 			cont_gen = 0;
 			i += k;
 		}
@@ -338,7 +339,7 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 				peor_hijo = e;
 				peor_f = f_actualh;
 			}
-
+			++i;
 		}
 		//and that parent isn't replaced
 		vector_hijos[peor_hijo] = vector_poblacion[mejor_padre];

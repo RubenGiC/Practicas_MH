@@ -68,25 +68,25 @@ int main(int argc, char** argv) {
 		cout << "PATH CONST: " << paths_const[i] << endl;
 	}*/
 
-	/*PAR *par_zoo10 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const", seed);
-	PAR *par_zoo20 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_20.const", seed);
-	PAR *par_glass10 = new PAR("datos/glass_set.dat", "datos/glass_set_const_10.const", seed);
-	PAR *par_glass20 = new PAR("datos/glass_set.dat", "datos/glass_set_const_20.const", seed);
-	PAR *par_bupa10 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_10.const", seed);
-	PAR *par_bupa20 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_20.const", seed);
-	vector<vector<int>> clusters_sol, clusters_sol_gred, clusters_sol_bl;*/
-	ResultAlgorithms *results = new ResultAlgorithms();
+	/*PAR *par_zoo10 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_10.const", seeds[0]);
+	PAR *par_zoo20 = new PAR("datos/zoo_set.dat", "datos/zoo_set_const_20.const", seeds[1]);
+	PAR *par_glass10 = new PAR("datos/glass_set.dat", "datos/glass_set_const_10.const", seeds[2]);
+	PAR *par_glass20 = new PAR("datos/glass_set.dat", "datos/glass_set_const_20.const", seeds[3]);
+	PAR *par_bupa10 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_10.const", seeds[4]);
+	PAR *par_bupa20 = new PAR("datos/bupa_set.dat", "datos/bupa_set_const_20.const", seeds[5]);
+	vector<vector<int>> clusters_sol;
+	ResultAlgorithms *results = new ResultAlgorithms();*/
 
-	//string greedy_zoo_20 = "", greedy_zoo_10 = "", greedy_glass_10 = "", greedy_glass_20 = "", greedy_bupa_10 = "", greedy_bupa_20 = "";
-	//string bl_zoo_20 = "", bl_zoo_10 = "", bl_glass_10 = "", bl_glass_20 = "", bl_bupa_10 = "", bl_bupa_20 = "";
+	/*string greedy_zoo_20 = "", greedy_zoo_10 = "", greedy_glass_10 = "", greedy_glass_20 = "", greedy_bupa_10 = "", greedy_bupa_20 = "";
+	string bl_zoo_20 = "", bl_zoo_10 = "", bl_glass_10 = "", bl_glass_20 = "", bl_bupa_10 = "", bl_bupa_20 = "";*/
 	string agg_un = "", agg_sf = "", age_un = "", age_sf = "";
 
 	float elapsed;
 	clock_t start;
 	clock_t end;
-	clock_t start_global;
+	/*clock_t start_global;
 	clock_t end_global;
-/*
+
 	cout << "Calculate Greedy (ZOO, GLASS, BUPA) Aproximate 1 minute" << endl;
 	start_global = clock();
 	for(int i = 0; i<5; ++i){
@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
 		greedy_zoo_10 += to_string(i+1) + " Elapsed (Greedy PAR ZOO 10): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_zoo_10 += "\tInfeas: " + to_string(results->Infeasable(par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
-		greedy_zoo_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides,"ZOO")) + "\n";
+		greedy_zoo_10 += "\tIntracluster Distance: " + to_string(par_zoo10->generalDeviation(clusters_sol)) + "\n";
 		greedy_zoo_10 += "\tFitness: " + to_string(results->Fitness(par_zoo10->atributos,par_zoo10->matriz, clusters_sol, par_zoo10->centroides, par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
 		//cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
 
@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 		greedy_glass_10 += to_string(i+1) + " Elapsed (Greedy PAR GLASS 10): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_glass_10 += "\tInfeas: " + to_string(results->Infeasable(par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
-		greedy_glass_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_glass10->atributos, par_glass10->centroides,"GLASS")) + "\n";
+		greedy_glass_10 += "\tIntracluster Distance: " + to_string(par_glass10->generalDeviation(clusters_sol)) + "\n";
 		greedy_glass_10 += "\tFitness: " + to_string(results->Fitness(par_glass10->atributos,par_glass10->matriz, clusters_sol, par_glass10->centroides, par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
 
 		//cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
 		greedy_bupa_10 += to_string(i+1) + " Elapsed (Greedy PAR BUPA 10): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_bupa_10 += "\tInfeas: " + to_string(results->Infeasable(par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
-		greedy_bupa_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa10->atributos, par_bupa10->centroides,"BUPA")) + "\n";
+		greedy_bupa_10 += "\tIntracluster Distance: " + to_string(par_bupa10->generalDeviation(clusters_sol)) + "\n";
 		greedy_bupa_10 += "\tFitness: " + to_string(results->Fitness(par_bupa10->atributos,par_bupa10->matriz, clusters_sol, par_bupa10->centroides, par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
 
 		par_bupa10->clearClusters(false);//clear the clusters
@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
 		greedy_zoo_20 += to_string(i+1) + " Elapsed (Greedy PAR zoo 20): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_zoo_20 += "\tInfeas: " + to_string(results->Infeasable(par_zoo20->ML, par_zoo20->CL, par_zoo20->createS())) + "\n";
-		greedy_zoo_20 += "\t Error Distance: " + to_string(results->ErrorDistance(clusters_sol, par_zoo20->atributos, par_zoo20->centroides,"ZOO")) + "\n";
+		greedy_zoo_20 += "\tIntracluster Distance: " + to_string(par_zoo20->generalDeviation(clusters_sol)) + "\n";
 		greedy_zoo_20 += "\t Fitness: " + to_string(results->Fitness(par_zoo20->atributos,par_zoo20->matriz, clusters_sol, par_zoo20->centroides, par_zoo20->ML, par_zoo20->CL, par_zoo20->createS())) + "\n";
 		//cout << "\tDistance: " << results->Distance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides) << endl;
 		par_zoo20->clearClusters(false);//clear the clusters
@@ -181,7 +181,7 @@ int main(int argc, char** argv) {
 		greedy_glass_20 += to_string(i+1) + " Elapsed (Greedy PAR GLASS 20): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_glass_20 += "\tInfeas: " + to_string(results->Infeasable(par_glass20->ML, par_glass20->CL, par_glass20->createS())) + "\n";
-		greedy_glass_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_glass20->atributos, par_glass20->centroides,"GLASS")) + "\n";
+		greedy_glass_20 += "\tIntracluster Distance: " + to_string(par_glass20->generalDeviation(clusters_sol)) + "\n";
 		greedy_glass_20 += "\tFitness: " + to_string(results->Fitness(par_glass20->atributos,par_glass20->matriz, clusters_sol, par_glass20->centroides, par_glass20->ML, par_glass20->CL, par_glass20->createS())) + "\n";
 
 		par_glass20->clearClusters(false);//clear the clusters
@@ -201,7 +201,7 @@ int main(int argc, char** argv) {
 		greedy_bupa_20 += to_string(i+1) + " Elapsed (Greedy PAR BUPA 20): " + to_string(elapsed) + "(seconds)\n";
 
 		greedy_bupa_20 += "\tInfeas: " + to_string(results->Infeasable(par_bupa20->ML, par_bupa20->CL, par_bupa20->createS())) + "\n";
-		greedy_bupa_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa20->atributos, par_bupa20->centroides,"BUPA")) + "\n";
+		greedy_bupa_20 += "\tIntracluster Distance: " + to_string(par_bupa20->generalDeviation(clusters_sol)) + "\n";
 		greedy_bupa_20 += "\tFitness: " + to_string(results->Fitness(par_bupa20->atributos,par_bupa20->matriz, clusters_sol, par_bupa20->centroides, par_bupa20->ML, par_bupa20->CL, par_bupa20->createS())) + "\n";
 
 		par_bupa20->clearClusters(false);//clear the clusters
@@ -233,7 +233,7 @@ int main(int argc, char** argv) {
 		bl_zoo_10 += to_string(i+1) + " Elapsed (BL PAR ZOO 10): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_zoo_10 += "\tInfeas: " + to_string(results->Infeasable(par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
-		bl_zoo_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_zoo10->atributos, par_zoo10->centroides,"ZOO")) + "\n";
+		bl_zoo_10 += "\tIntracluster Distance: " + to_string(par_zoo10->generalDeviation(clusters_sol)) + "\n";
 		bl_zoo_10 += "\tFitness: " + to_string(results->Fitness(par_zoo10->atributos,par_zoo10->matriz, clusters_sol, par_zoo10->centroides, par_zoo10->ML, par_zoo10->CL, par_zoo10->createS())) + "\n";
 
 		par_zoo10->clearClusters(false);//clear the clusters
@@ -255,7 +255,7 @@ int main(int argc, char** argv) {
 		bl_glass_10 += to_string(i+1) + " Elapsed (BL PAR GLASS 10): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_glass_10 += "\tInfeas: " + to_string(results->Infeasable(par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
-		bl_glass_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_glass10->atributos, par_glass10->centroides,"GLASS")) + "\n";
+		bl_glass_10 += "\tIntracluster Distance: " + to_string(par_glass10->generalDeviation(clusters_sol)) + "\n";
 		bl_glass_10 += "\tFitness: " + to_string(results->Fitness(par_glass10->atributos,par_glass10->matriz, clusters_sol, par_glass10->centroides, par_glass10->ML, par_glass10->CL, par_glass10->createS())) + "\n";
 
 		par_glass10->clearClusters(false);//clear the clusters
@@ -276,7 +276,7 @@ int main(int argc, char** argv) {
 		bl_bupa_10 += to_string(i+1) + " Elapsed (BL PAR BUPA 10): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_bupa_10 += "\tInfeas: " + to_string(results->Infeasable(par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
-		bl_bupa_10 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa10->atributos, par_bupa10->centroides,"BUPA")) + "\n";
+		bl_bupa_10 += "\tIntracluster Distance: " + to_string(par_bupa10->generalDeviation(clusters_sol)) + "\n";
 		bl_bupa_10 += "\tFitness: " + to_string(results->Fitness(par_bupa10->atributos,par_bupa10->matriz, clusters_sol, par_bupa10->centroides, par_bupa10->ML, par_bupa10->CL, par_bupa10->createS())) + "\n";
 
 		par_bupa10->clearClusters(false);//clear the clusters
@@ -298,7 +298,7 @@ int main(int argc, char** argv) {
 		bl_zoo_20 += to_string(i+1) + " Elapsed (BL PAR ZOO 20): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_zoo_20 += "\tInfeas: " + to_string(results->Infeasable(par_zoo20->ML, par_zoo20->CL, par_zoo20->createS())) + "\n";
-		bl_zoo_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_zoo20->atributos, par_zoo20->centroides,"ZOO")) + "\n";
+		bl_zoo_20 += "\tIntracluster Distance: " + to_string(par_zoo20->generalDeviation(clusters_sol)) + "\n";
 		bl_zoo_20 += "\tFitness: " + to_string(results->Fitness(par_zoo20->atributos,par_zoo20->matriz, clusters_sol, par_zoo20->centroides, par_zoo20->ML, par_zoo20->CL, par_zoo20->createS())) + "\n";
 
 		par_zoo20->clearClusters(false);//clear the clusters
@@ -320,7 +320,7 @@ int main(int argc, char** argv) {
 		bl_glass_20 += to_string(i+1) + " Elapsed (BL PAR GLASS 20): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_glass_20 += "\tInfeas: " + to_string(results->Infeasable(par_glass20->ML, par_glass20->CL, par_glass20->createS())) + "\n";
-		bl_glass_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_glass20->atributos, par_glass20->centroides,"GLASS")) + "\n";
+		bl_glass_20 += "\tIntracluster Distance: " + to_string(par_glass20->generalDeviation(clusters_sol)) + "\n";
 		bl_glass_20 += "\tFitness: " + to_string(results->Fitness(par_glass20->atributos,par_glass20->matriz, clusters_sol, par_glass20->centroides, par_glass20->ML, par_glass20->CL, par_glass20->createS())) + "\n";
 
 		par_glass20->clearClusters(false);//clear the clusters
@@ -341,7 +341,8 @@ int main(int argc, char** argv) {
 		bl_bupa_20 += to_string(i+1) + " Elapsed (BL PAR BUPA 20): " + to_string(elapsed) + "(seconds)\n";
 
 		bl_bupa_20 += "\tInfeas: " + to_string(results->Infeasable(par_bupa20->ML, par_bupa20->CL, par_bupa20->createS())) + "\n";
-		bl_bupa_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa20->atributos, par_bupa20->centroides,"BUPA")) + "\n";
+		//bl_bupa_20 += "\tError Distance: " + to_string(results->ErrorDistance(clusters_sol, par_bupa20->atributos, par_bupa20->centroides,"BUPA")) + "\n";
+		bl_bupa_20 += "\tIntracluster Distance: " + to_string(par_bupa20->generalDeviation(clusters_sol)) + "\n";
 		bl_bupa_20 += "\tFitness: " + to_string(results->Fitness(par_bupa20->atributos,par_bupa20->matriz, clusters_sol, par_bupa20->centroides, par_bupa20->ML, par_bupa20->CL, par_bupa20->createS())) + "\n";
 
 		par_bupa20->clearClusters(false);//clear the clusters
@@ -385,7 +386,8 @@ int main(int argc, char** argv) {
 	cout << "BUPA ********************************************* " << endl;
 
 	cout << endl << bl_bupa_10 << endl;
-	cout << endl << bl_bupa_20 << endl;*/
+	cout << endl << bl_bupa_20 << endl;
+	*/
 
 	/*greedy_bupa_10 = greedy_bupa_20 = bl_bupa_10 = bl_bupa_20 = "";
 
@@ -442,6 +444,11 @@ int main(int argc, char** argv) {
 
 	cout << endl << bl_bupa_10 << endl;*/
 
+	//PAR ALGORITMOS GENETICOS Y MEMETICOS
+
+	cout << "Información de los tiempos: " << endl;
+	cout << "AGG:\n\t - Con zoo tarda aproximadamente 2 minutos." << endl;
+	cout << "\t - Con glass tarda aproximadamente 2 minutos." << endl;
 
 	for(unsigned int e=0; e<seeds.size(); ++e){
 		PAR_GM *par_gm = new PAR_GM(paths_data[e], paths_const[e], seeds[e]+e);
@@ -450,7 +457,7 @@ int main(int argc, char** argv) {
 
 		for(int i=0; i<5; ++i){
 
-			/*par_gm->randomAssign(50);
+			par_gm->randomAssign(50);
 			//par_gm->printS();
 
 			start = clock();
@@ -461,11 +468,11 @@ int main(int argc, char** argv) {
 			cout << " Elapsed Total (AGG UN): " << elapsed << "(seconds)\n" << endl;
 			cout << "Fitness: " << par_gm->fitness(solution) << endl;*/
 			//par_zoo10_gm->printSolution(solution);
-			/*agg_un += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
+			agg_un += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
 			agg_un += "\tElapse: " + to_string(elapsed) + "\n";
 			agg_un += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
-			agg_un += "\tError Distance: " + to_string(par_gm->ErrorDistance(solution,"ZOO")) + "\n";
-			agg_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
+			agg_un += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
+			agg_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
 
 
 			par_gm->randomAssign(50);
@@ -477,7 +484,7 @@ int main(int argc, char** argv) {
 			agg_sf += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
 			agg_sf += "\tElapse: " + to_string(elapsed) + "\n";
 			agg_sf += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
-			agg_sf += "\tError Distance: " + to_string(par_gm->ErrorDistance(solution,"ZOO")) + "\n";
+			agg_sf += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
 			agg_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
 
 
