@@ -449,6 +449,13 @@ int main(int argc, char** argv) {
 	cout << "Información de los tiempos: " << endl;
 	cout << "AGG:\n\t - Con zoo tarda aproximadamente 2 minutos." << endl;
 	cout << "\t - Con glass tarda aproximadamente 2 minutos." << endl;
+	cout << "\t - Con bupa tarda aproximadamente 2 minutos." << endl;
+	/*cout << "AGE:\n\t - Con zoo tarda aproximadamente 2 minutos." << endl;
+	cout << "\t - Con glass tarda aproximadamente 2 minutos." << endl;
+	cout << "\t - Con bupa tarda aproximadamente 2 minutos." << endl;
+	cout << "AM:\n\t - Con zoo tarda aproximadamente 2 minutos." << endl;
+	cout << "\t - Con glass tarda aproximadamente 2 minutos." << endl;
+	cout << "\t - Con bupa tarda aproximadamente 2 minutos." << endl;*/
 
 	for(unsigned int e=0; e<seeds.size(); ++e){
 		PAR_GM *par_gm = new PAR_GM(paths_data[e], paths_const[e], seeds[e]+e);
