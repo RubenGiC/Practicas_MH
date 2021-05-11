@@ -513,6 +513,18 @@ int main(int argc, char** argv) {
 			age_sf += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
 			age_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
 
+			par_gm->randomAssign(50);
+			start = clock();
+			solution = par_gm->GENETIC(AGE_SF, 1, iterations);
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
+
+			age_sf += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
+			age_sf += "\tElapse: " + to_string(elapsed) + "\n";
+			age_sf += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
+			age_sf += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
+			age_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
+
 		}
 
 		cout << "AGG UNIFORM CROSS WITH(" << names[e] << ")" << endl;

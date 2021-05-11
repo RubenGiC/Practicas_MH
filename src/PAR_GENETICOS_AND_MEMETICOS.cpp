@@ -311,7 +311,7 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 	vector<vector<int>> vector_poblacion = vector_solutions;
 	vector<float> fitness_poblacion;
 	vector<vector<int>> vector_hijos;
-	int mejor_padre = -1, peor_hijo= -1, cont_gen=0;
+	int mejor_padre = -1, peor_hijo= -1, cont_gen=0, n=0;
 	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
 
 	fitness_poblacion.resize(vector_poblacion.size());
@@ -327,14 +327,16 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 	for(int i=0; i<stop; ++i){
 
 		if(cont_gen == 10){
-			for(auto sol:vector_poblacion)
-				sol = BL_SOFT(sol, 0.1*sol.size(), i, stop);
+
+			n = vector_poblacion.size()*probability;
+			for(int e=0; e<n; ++e)
+				vector_poblacion[e] = BL_SOFT(vector_poblacion[e], 0.1*vector_poblacion[e].size(), i, stop);
 			cont_gen = 0;
 			i += k;
 		}
 
 		//TENGO QUE ELEGIR EL CRUCE QUE DE MEJORES RESULTADOS
-		vector_hijos = uniformMutation(uniformCross(vector_padres, probability));
+		vector_hijos = uniformMutation(uniformCross(vector_padres, 0.7));
 		//vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
 		//choose the best parent
@@ -478,12 +480,10 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 	int mejor_padre = -1, peor_hijo= -1, i=0;
 	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
 
-	fitness_poblacion.resize(vector_poblacion.size());
-
 	//calculate the fitness of actual population
 	for(unsigned int e=0; e < vector_poblacion.size(); ++e){
 
-		fitness_poblacion[e] = fitness(vector_poblacion[e]);
+		fitness_poblacion.push_back(fitness(vector_poblacion[e]));
 	}
 
 	// select the best parents of each tournament
