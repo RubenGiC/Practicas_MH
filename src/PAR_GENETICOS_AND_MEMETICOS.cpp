@@ -306,10 +306,20 @@ vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails, int &iteracion
 vector<int> PAR_GM::AM(float probability, int generations, int stop){
 	vector<int> mejor_solucion;
 	vector<vector<int>> vector_poblacion = vector_solutions;
-	vector<vector<int>> vector_padres = selectionOperator(vector_poblacion, vector_solutions.size());
+	vector<float> fitness_poblacion;
 	vector<vector<int>> vector_hijos;
 	int mejor_padre = -1, peor_hijo= -1, cont_gen=0;
 	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
+
+	fitness_poblacion.resize(vector_poblacion.size());
+	//calculate the fitness of actual population
+	for(unsigned int e=0; e < vector_poblacion.size(); ++e){
+
+		fitness_poblacion[e] = fitness(vector_poblacion[e]);
+	}
+
+	vector<vector<int>> vector_padres = selectionOperator(vector_poblacion, vector_solutions.size(),fitness_poblacion);
+
 
 	for(int i=0; i<stop; ++i){
 
@@ -321,14 +331,16 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 		}
 
 		//TENGO QUE ELEGIR EL CRUCE QUE DE MEJORES RESULTADOS
-		vector_hijos = uniformMutation(uniformCross(vector_padres, probability));//uniformMutation(uniformCross(vector_padres));
-		vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
+		vector_hijos = uniformMutation(uniformCross(vector_padres, probability));
+		//vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
 		//choose the best parent
 		for(unsigned int e=0; e < vector_poblacion.size(); ++e){
 
-			f_actualp = fitness(vector_poblacion[e]);
+			f_actualp = fitness_poblacion[e]; //fitness(vector_poblacion[e]);
 			f_actualh = fitness(vector_hijos[e]);
+
+			fitness_poblacion[e] = f_actualh;
 
 			if(f_actualp < mejor_f){
 				mejor_padre = e;
@@ -343,12 +355,13 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 		}
 		//and that parent isn't replaced
 		vector_hijos[peor_hijo] = vector_poblacion[mejor_padre];
+		fitness_poblacion[peor_hijo] = mejor_f;
 
 		//update vector with new parents
 		vector_poblacion = vector_hijos;
 
 		//choose the new parents
-		vector_padres = selectionOperator(vector_poblacion, vector_solutions.size());
+		vector_padres = selectionOperator(vector_poblacion, vector_solutions.size(), fitness_poblacion);
 
 		//reset
 		mejor_f = 999;
@@ -395,7 +408,7 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 	vector<vector<int>> vector_hijos;
 	vector<float> vector_fitness;
 	float f_actual, f_peor1=-999, f_peor2=-999;
-	int parent1=-1, parent2=-1, iterations = 0;
+	int parent1=-1, parent2=-1, iterations = 0, i=0;
 
 	for(unsigned int i=0; i < vector_solutions.size(); ++i){
 		f_actual = fitness(vector_poblacion[i]);
@@ -409,11 +422,12 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 			parent2 = i;
 			f_peor2 = f_actual;
 		}
+		++i;
 	}
 
-	for(int i=0; i<stop; i+=2){
+	while(i<stop){
 
-		vector_padres = selectionOperator(vector_poblacion, 2);
+		vector_padres = selectionOperator(vector_poblacion, 2, vector_fitness);
 
 		if(cruce == AGE_UN)
 			vector_hijos = uniformMutation(uniformCross(vector_padres, probability));
@@ -425,6 +439,7 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 
 		vector_fitness[parent1] = fitness(vector_poblacion[parent1]);
 		vector_fitness[parent2] = fitness(vector_poblacion[parent2]);
+		i += 2;
 
 		f_peor1 = f_peor2 = -999;
 
@@ -445,7 +460,7 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 		//cout << iterations << endl;
 	}
 
-	//cout << "NUMBER OF ITERATIONS: " << iterations << endl;
+	cout << "NUMBER OF ITERATIONS: " << iterations << endl;
 
 	return vector_poblacion;
 }
@@ -578,7 +593,7 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 			padres.push_back(actual[indv1]);
 		else
 			padres.push_back(actual[indv2]);
-		if(fitness_p[indv1] < fitness_p[indv2])
+		if(fitness_p[indv11] < fitness_p[indv12])
 			padres.push_back(actual[indv11]);
 		else
 			padres.push_back(actual[indv12]);
