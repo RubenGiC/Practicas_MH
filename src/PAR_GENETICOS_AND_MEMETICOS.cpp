@@ -42,6 +42,9 @@ PAR_GM::PAR_GM(string fichero_set, string fichero_set_const, int semilla){
 	//despues barajo los indices de los atributos
 	srand(unsigned (semilla));//genero una semilla fija
 	random_shuffle(RSI.begin(), RSI.end());//barajo el vector
+
+	//create landa
+	landa = createLanda();
 }
 
 void PAR_GM::shuffleRSI(){
@@ -410,9 +413,12 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 	float f_actual, f_peor1=-999, f_peor2=-999;
 	int parent1=-1, parent2=-1, iterations = 0, i=0;
 
+	//calculate fitness and the worst 2 parents
 	for(unsigned int i=0; i < vector_solutions.size(); ++i){
+
 		f_actual = fitness(vector_poblacion[i]);
 		vector_fitness.push_back(f_actual);
+
 		if(f_actual > f_peor1){
 			parent2 = parent1;
 			f_peor2 = f_peor1;
@@ -485,8 +491,6 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 	vector<vector<int>> vector_padres = selectionOperator(vector_poblacion, vector_solutions.size(), fitness_poblacion);
 
 	while(i<stop){
-		//cout << "size: " << vector_padres.size() << endl;
-		//cout << "iteracion: " << i << endl;
 
 		//choose the type of cross and calculate the mutation
 		if(cruce == AGG_UN)
@@ -494,42 +498,13 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 		else
 			vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
-		//cout << "iteracion despues: " << i << endl;
-		//cout << "size: " << vector_padres.size() << endl;
-
-		/*for(auto p:vector_padres){
-			for(auto g:p){
-				cout << g << ", ";
-			}
-			cout << endl;
-		}*/
-		/*for(auto p:vector_hijos){
-			for(auto g:p){
-				cout << g << ", ";
-			}
-			cout << endl;
-		}*/
-
-		//cout << "poblacion: " << vector_poblacion.size() << endl;
-		//cout << "hjos: " << vector_hijos.size() << endl;
-
 		//choose the best parent and worst descendent
 		for(unsigned int e=0; e < vector_poblacion.size(); ++e){
-
-			//cout << "antes fitness: size = " << vector_padres[e].size() << ", e = " << e << endl;
-			//cout << "size hijos: " << vector_hijos[e].size() << endl;
-			/*for(int j = 0; j<vector_padres[e].size(); ++j){
-				cout << vector_hijos[e][j] << ", ";
-			}
-			cout << endl;*/
-			//f_actualp = fitness(vector_poblacion[e]);
 
 			f_actualp = fitness_poblacion[e];
 			f_actualh = fitness(vector_hijos[e]);
 
 			fitness_poblacion[e] = f_actualh;
-
-			//cout << "despues fitness" << endl;
 
 			if(f_actualp < mejor_f){
 				mejor_padre = e;
@@ -541,14 +516,11 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 				peor_f = f_actualh;
 			}
 			++i;
-
 		}
 
 		//and that parent isn't replaced
 		vector_hijos[peor_hijo] = vector_poblacion[mejor_padre];
 		fitness_poblacion[peor_hijo] = mejor_f;
-
-		//cout << "MEJOR PADRE: " << mejor_f << endl;
 
 		//update vector with new parents
 		vector_poblacion = vector_hijos;
@@ -573,8 +545,6 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 	int indv1= -1, indv2= -1, indv11=-1, indv12=-1;
 	//save the best solution
 	vector<vector<int>> padres;
-	//create landa
-	landa = createLanda();
 
 	//generate n torney depend of tipe AGG or AGE
 	for(int i=0; i < tourney; i+=2){
@@ -608,8 +578,6 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 	int indv1= -1, indv2= -1, indv11=-1, indv12=-1;
 	//save the best solution
 	vector<vector<int>> padres;
-	//create landa
-	landa = createLanda();
 
 	//generate n torney depend of tipe AGG or AGE
 	for(int i=0; i < tourney; i+=2){

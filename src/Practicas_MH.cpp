@@ -450,7 +450,7 @@ int main(int argc, char** argv) {
 	cout << "AGG (uniforme y segmentación fija) (tiempos totales de las 5 ejecuciones):\n\t - Con zoo tarda aproximadamente 5 minutos (con cada restricción)." << endl;
 	cout << "\t - Con glass tarda aproximadamente 14 minutos (con cada restricción)." << endl;
 	cout << "\t - Con bupa tarda aproximadamente 25 minutos (con cada restricción)." << endl;
-	cout << "AGE (uniforme y segmentación fija) (tiempos totales de las 5 ejecuciones):\n\t - Con zoo tarda aproximadamente 2 minutos (con cada restricción)." << endl;
+	cout << "AGE (uniforme y segmentación fija) (tiempos totales de las 5 ejecuciones):\n\t - Con zoo tarda aproximadamente 47 minutos (con cada restricción)." << endl;
 	cout << "\t - Con glass tarda aproximadamente 2 minutos (con cada restricción)." << endl;
 	cout << "\t - Con bupa tarda aproximadamente 2 minutos (con cada restricción)." << endl;
 	/*cout << "AM:\n\t - Con zoo tarda aproximadamente 2 minutos (con cada restricción)." << endl;
