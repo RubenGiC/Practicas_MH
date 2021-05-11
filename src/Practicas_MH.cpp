@@ -458,13 +458,13 @@ int main(int argc, char** argv) {
 	cout << "\t - Con bupa tarda aproximadamente 2 minutos (con cada restricción)." << endl;*/
 
 	for(unsigned int e=0; e<seeds.size(); ++e){
-		PAR_GM *par_gm = new PAR_GM(paths_data[e], paths_const[e], seeds[e]+e);
+		PAR_GM *par_gm = new PAR_GM(paths_data[e], paths_const[e], seeds[e]);
 
 		vector<int> solution;
 
 		for(int i=0; i<5; ++i){
 
-			par_gm->randomAssign(50);
+			/*par_gm->randomAssign(50);
 			start = clock();
 			solution = par_gm->GENETIC(AGG_UN, 0.7, iterations);
 			end = clock();
@@ -474,9 +474,9 @@ int main(int argc, char** argv) {
 			agg_un += "\tElapse: " + to_string(elapsed) + "\n";
 			agg_un += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
 			agg_un += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
-			agg_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
+			agg_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
 
-			par_gm->randomAssign(50);
+			/*par_gm->randomAssign(50);
 			start = clock();
 			solution = par_gm->GENETIC(AGG_SF, 0.7, iterations);
 			end = clock();
@@ -486,7 +486,7 @@ int main(int argc, char** argv) {
 			agg_sf += "\tElapse: " + to_string(elapsed) + "\n";
 			agg_sf += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
 			agg_sf += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
-			agg_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
+			agg_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
 
 
 			/*par_gm->randomAssign(50);
@@ -499,19 +499,7 @@ int main(int argc, char** argv) {
 			age_un += "\tElapse: " + to_string(elapsed) + "\n";
 			age_un += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
 			age_un += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
-			age_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
-
-			par_gm->randomAssign(50);
-			start = clock();
-			solution = par_gm->GENETIC(AGE_SF, 1, iterations);
-			end = clock();
-			elapsed = float(end - start)/CLOCKS_PER_SEC;
-
-			age_sf += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
-			age_sf += "\tElapse: " + to_string(elapsed) + "\n";
-			age_sf += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
-			age_sf += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
-			age_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
+			age_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
 
 			par_gm->randomAssign(50);
 			start = clock();
@@ -524,6 +512,18 @@ int main(int argc, char** argv) {
 			age_sf += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
 			age_sf += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
 			age_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
+
+			/*par_gm->randomAssign(50);
+			start = clock();
+			solution = par_gm->AM();
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
+
+			age_sf += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
+			age_sf += "\tElapse: " + to_string(elapsed) + "\n";
+			age_sf += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
+			age_sf += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
+			age_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
 
 		}
 
