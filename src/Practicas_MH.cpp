@@ -447,12 +447,12 @@ int main(int argc, char** argv) {
 	//PAR ALGORITMOS GENETICOS Y MEMETICOS
 
 	cout << "Información de los tiempos: " << endl;
-	cout << "AGG (uniforme y segmentación fija) (tiempos totales de las 5 ejecuciones):\n\t - Con zoo tarda aproximadamente 5 minutos (con cada restricción)." << endl;
+	cout << "AGG (uniforme y segmentación fija) (tiempos totales de las 5 ejecuciones):\n\t - Con zoo tarda aproximadamente 3 minutos (con cada restricción)." << endl;
 	cout << "\t - Con glass tarda aproximadamente 14 minutos (con cada restricción)." << endl;
 	cout << "\t - Con bupa tarda aproximadamente 25 minutos (con cada restricción)." << endl;
-	cout << "AGE (uniforme y segmentación fija) (tiempos totales de las 5 ejecuciones):\n\t - Con zoo tarda aproximadamente 47 minutos (con cada restricción)." << endl;
-	cout << "\t - Con glass tarda aproximadamente 2 minutos (con cada restricción)." << endl;
-	cout << "\t - Con bupa tarda aproximadamente 2 minutos (con cada restricción)." << endl;
+	cout << "AGE (uniforme y segmentación fija) (tiempos totales de las 5 ejecuciones):\n\t - Con zoo tarda aproximadamente 3 minutos (con cada restricción)." << endl;
+	cout << "\t - Con glass tarda aproximadamente 5 minutos (con cada restricción)." << endl;
+	cout << "\t - Con bupa tarda aproximadamente 9 minutos (con cada restricción)." << endl;
 	/*cout << "AM:\n\t - Con zoo tarda aproximadamente 2 minutos (con cada restricción)." << endl;
 	cout << "\t - Con glass tarda aproximadamente 2 minutos (con cada restricción)." << endl;
 	cout << "\t - Con bupa tarda aproximadamente 2 minutos (con cada restricción)." << endl;*/
@@ -464,7 +464,7 @@ int main(int argc, char** argv) {
 
 		for(int i=0; i<5; ++i){
 
-			/*par_gm->randomAssign(50);
+			par_gm->randomAssign(50);
 			start = clock();
 			solution = par_gm->GENETIC(AGG_UN, 0.7, iterations);
 			end = clock();
@@ -486,10 +486,10 @@ int main(int argc, char** argv) {
 			agg_sf += "\tElapse: " + to_string(elapsed) + "\n";
 			agg_sf += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
 			agg_sf += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
-			agg_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
+			agg_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
 
 
-			par_gm->randomAssign(50);
+			/*par_gm->randomAssign(50);
 			start = clock();
 			solution = par_gm->GENETIC(AGE_UN, 1, iterations);
 			end = clock();
@@ -501,13 +501,18 @@ int main(int argc, char** argv) {
 			age_un += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
 			age_un += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
 
-			/*start = clock();
-			solution = par_zoo10_gm->GENETIC(AGE_UN, 1, iterations);
+			par_gm->randomAssign(50);
+			start = clock();
+			solution = par_gm->GENETIC(AGE_SF, 1, iterations);
 			end = clock();
 			elapsed = float(end - start)/CLOCKS_PER_SEC;
-			cout << " Elapsed Total (AGE UN): " << elapsed << "(seconds)\n" << endl;
-			cout << "Fitness: " << par_zoo10_gm->fitness(solution) << endl;*/
-			//par_zoo10_gm->printSolution(solution);
+
+			age_sf += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
+			age_sf += "\tElapse: " + to_string(elapsed) + "\n";
+			age_sf += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
+			age_sf += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
+			age_sf += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
+
 		}
 
 		cout << "AGG UNIFORM CROSS WITH(" << names[e] << ")" << endl;

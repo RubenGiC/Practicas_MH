@@ -54,44 +54,42 @@ public:
 	vector <int> AM(float probability, int generations, int stop);
 
 	//use the binary tournament, to select the best
-	vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney, vector<float> fitness_p);
-	vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney);
+	vector<vector<int>> selectionOperator(const vector<vector<int>> &actual, int tourney, const vector<float> &fitness_p);
+	//vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney);
 
 	//CROSSOVER OPERATORS
 	//uniform crossover operator
-	vector<vector<int>> uniformCross(vector<vector<int>> padres, float probability);
+	vector<vector<int>> uniformCross(const vector<vector<int>> &padres, float probability);
 	//fixed segment crossover operator
-	vector<vector<int>> fixedSegmentCross(vector<vector<int>> padres, float probability);
+	vector<vector<int>> fixedSegmentCross(const vector<vector<int>> &padres, float probability);
 	//uniform mutation operator
-	vector<vector<int>> uniformMutation(vector<vector<int>> padres);
-	//replacement operator
-	vector<vector<int>> replaceOperator(vector<vector<int>> hijos);
+	vector<vector<int>> uniformMutation(const vector<vector<int>> &padres);
 
 	//MAXIMIZATION FUNCTION
 	//calculate Landa
 	float createLanda();
 	//calculate general deviation
-	float generalDeviation(vector<int> s_cop);
+	float generalDeviation(const vector<int> &s_cop);
 
 	//CALCULO DEL INFEASIBILITY Y DEVUELVO EL NUMERO DE RESTRICCIONES QUE INCUMPLE
-	int infeasibility(vector<int> S_cop);//return the number of restrictions that the solution has
+	int infeasibility(const vector<int> &S_cop);//return the number of restrictions that the solution has
 
 	//CALCULO QUE NODO TIENE LA DISTANCIA EUCLIDEA MINIMA
-	float distanciaEuclidea(vector<float> nod1, vector<float> nod2);//calcula la distancia de 2 puntos
+	float distanciaEuclidea(const vector<float> &nod1, const vector<float> &nod2);//calcula la distancia de 2 puntos
 
 	//check wich solution is better
-	int betterFitness(vector<vector<int>> padres, int indv1, int indv2);
+	int betterFitness(const vector<vector<int>> &padres, int indv1, int indv2);
 	//calculate the best fitness in each node
-	int betterFitness(vector<int> chromosom, int gen, int &iterations);
+	int betterFitness(const vector<int> &chromosom, int gen, int &iterations);
 
 	//calculate fitness
-	float fitness(vector<int> solution);
+	float fitness(const vector<int> &solution);
 
 	//OTHER FUNCTIONS
 	//update the distance for each cluster
-	vector<vector<float>> updateDistance(vector<int> nodes);
+	vector<vector<float>> updateDistance(const vector<int> &nodes);
 	//find all elements of the cluster
-	vector<int> findInCluster(vector<int> s_cop, int clust);
+	vector<int> findInCluster(const vector<int> &s_cop, int clust);
 
 	//random assignment
 	void randomAssign(int n);
@@ -100,6 +98,6 @@ public:
 	void shuffleRSI();
 
 	//calculate the error distance
-	float ErrorDistance(vector<int> solution, string type_data_file);
+	float ErrorDistance(const vector<int> &solution, string type_data_file);
 };
 #endif /* INCLUDE_PAR_H_ */

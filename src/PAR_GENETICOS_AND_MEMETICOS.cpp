@@ -248,7 +248,7 @@ void PAR_GM::printRSI(){
 	}
 }
 
-int PAR_GM::betterFitness(vector<int> chromosom, int gen, int &iterations){
+int PAR_GM::betterFitness(const vector<int> &chromosom, int gen, int &iterations){
 	int betterCluster = chromosom[gen], i=0;
 	float actual_f, better_f=fitness(chromosom);
 	vector<int> copy_chromosom = chromosom;
@@ -411,21 +411,21 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 	vector<vector<int>> vector_hijos;
 	vector<float> vector_fitness;
 	float f_actual, f_peor1=-999, f_peor2=-999;
-	int parent1=-1, parent2=-1, iterations = 0, i=0;
+	int parent1=-1, parent2=-1, i=0;
 
 	//calculate fitness and the worst 2 parents
-	for(unsigned int i=0; i < vector_solutions.size(); ++i){
+	for(unsigned int e=0; e < vector_solutions.size(); ++e){
 
-		f_actual = fitness(vector_poblacion[i]);
+		f_actual = fitness(vector_poblacion[e]);
 		vector_fitness.push_back(f_actual);
 
 		if(f_actual > f_peor1){
 			parent2 = parent1;
 			f_peor2 = f_peor1;
-			parent1 = i;
+			parent1 = e;
 			f_peor1 = f_actual;
 		}else if(f_actual > f_peor2){
-			parent2 = i;
+			parent2 = e;
 			f_peor2 = f_actual;
 		}
 		++i;
@@ -433,13 +433,16 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 
 	while(i<stop){
 
+		// select the best parents of each tournament
 		vector_padres = selectionOperator(vector_poblacion, 2, vector_fitness);
 
+		//choose the type of cross and calculate the mutation
 		if(cruce == AGE_UN)
 			vector_hijos = uniformMutation(uniformCross(vector_padres, probability));
 		else
 			vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
+		//change the worts parents by new descendents
 		vector_poblacion[parent1] = vector_hijos[0];
 		vector_poblacion[parent2] = vector_hijos[1];
 
@@ -450,23 +453,19 @@ vector<vector <int>> PAR_GM::AGE(TIPE_CROSS cruce, float probability, int stop){
 		f_peor1 = f_peor2 = -999;
 
 		//choose the 2 worst parent
-		for(unsigned int i=0; i < vector_fitness.size(); ++i){
+		for(unsigned int e=0; e < vector_fitness.size(); ++e){
 
-			if(vector_fitness[i] > f_peor1){
+			if(vector_fitness[e] > f_peor1){
 				parent2 = parent1;
 				f_peor2 = f_peor1;
-				parent1 = i;
-				f_peor1 = f_actual;
-			}else if(f_actual > f_peor2){
-				parent2 = i;
-				f_peor2 = f_actual;
+				parent1 = e;
+				f_peor1 = vector_fitness[e];
+			}else if(vector_fitness[e] > f_peor2){
+				parent2 = e;
+				f_peor2 = vector_fitness[e];
 			}
 		}
-		++iterations;
-		//cout << iterations << endl;
 	}
-
-	cout << "NUMBER OF ITERATIONS: " << iterations << endl;
 
 	return vector_poblacion;
 }
@@ -540,7 +539,7 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 }
 
 //select the best new set of solutions
-vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney, vector<float> fitness_p){
+vector<vector<int>> PAR_GM::selectionOperator(const vector<vector<int>> &actual, int tourney, const vector<float> &fitness_p){
 	//choose 2 solutions
 	int indv1= -1, indv2= -1, indv11=-1, indv12=-1;
 	//save the best solution
@@ -573,7 +572,7 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 }
 
 //select the best new set of solutions
-vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney){
+/*vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney){
 	//choose 2 solutions
 	int indv1= -1, indv2= -1, indv11=-1, indv12=-1;
 	//save the best solution
@@ -600,10 +599,10 @@ vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int to
 	}
 
 	return padres;
-}
+}*/
 
 //uniform crossover operator
-vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres,float probability){
+vector<vector<int>> PAR_GM::uniformCross(const vector<vector<int>> &padres,float probability){
 	vector<vector<int>> descendientes = padres;
 	vector<int> RSI_CROSS = RSI;
 	vector<int> descendiente1;
@@ -687,7 +686,7 @@ vector<vector<int>> PAR_GM::uniformCross(vector<vector<int>> padres,float probab
 }
 
 //fixed segment crossover operator
-vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres, float probability){
+vector<vector<int>> PAR_GM::fixedSegmentCross(const vector<vector<int>> &padres, float probability){
 	vector<vector<int>> descendientes = padres;
 	//random start segment and size of segment
 	unsigned int start_seg1 = 0, start_seg2 = 0, size_seg1 = 0, end_seg1=0, size_seg2 = 0, end_seg2=0;
@@ -878,7 +877,7 @@ vector<vector<int>> PAR_GM::fixedSegmentCross(vector<vector<int>> padres, float 
 }
 
 //uniform mutation operator
-vector<vector<int>> PAR_GM::uniformMutation(vector<vector<int>> padres){
+vector<vector<int>> PAR_GM::uniformMutation(const vector<vector<int>> &padres){
 	vector<vector<int>> descendientes = padres;
 	vector<int> clust;
 	int gen, new_value, crom=-1;
@@ -924,7 +923,7 @@ vector<vector<int>> PAR_GM::uniformMutation(vector<vector<int>> padres){
 }
 
 //Update the distance
-vector<vector<float>> PAR_GM::updateDistance(vector<int> nodes){
+vector<vector<float>> PAR_GM::updateDistance(const vector<int> &nodes){
 	//save the actual distance
 	vector<float> distance(atributos[nodes[0]].size(),0);
 	vector<vector<float>> centroides;
@@ -955,7 +954,7 @@ vector<vector<float>> PAR_GM::updateDistance(vector<int> nodes){
 }
 
 //same the infeasibility(int clust, int actual) except it receives the solution
-int PAR_GM::infeasibility(vector<int> S_cop){
+int PAR_GM::infeasibility(const vector<int> &S_cop){
 	int restrictions = 0;
 	//CALCULATE the max size
 	unsigned int max = CL.size();
@@ -980,7 +979,7 @@ int PAR_GM::infeasibility(vector<int> S_cop){
 }
 
 //calcula la distancia euclidea entre 2 nodos
-float PAR_GM::distanciaEuclidea(vector<float> nod1, vector<float> nod2){
+float PAR_GM::distanciaEuclidea(const vector<float> &nod1, const vector<float> &nod2){
 	//la formula es: sqrt(sumatoria((a_i - b_i)²))
 	float suma=0;
 
@@ -1065,13 +1064,34 @@ void PAR_GM::randomAssign(int n){
 	}
 }
 
-float PAR_GM::fitness(vector<int> solution){
-	float f = generalDeviation(solution) + infeasibility(solution) * landa;
+float PAR_GM::fitness(const vector<int> &solution){
+
+	float distance = 0, intra_cluster = 0;
+	vector<int> elements;
+	vector<vector<float>> centroides;
+	centroides = updateDistance(solution);
+
+	//walk through each cluster
+	for(int i = 0; i< k; ++i){
+
+		elements = findInCluster(solution,i);
+		//sumatorry(euclidean distance of all nodes in the cluster)
+		for(vector<int>::iterator it = elements.begin(); it != elements.end(); ++it){
+			distance += distanciaEuclidea(atributos[(*it)],centroides[i]);
+		}
+		//mean intra-cluster distance
+		distance = distance / elements.size();
+		intra_cluster += distance;
+		distance = 0;
+	}
+	float general_deviation = intra_cluster/k;
+
+	float f = general_deviation + infeasibility(solution) * landa;
 	return f;
 }
 
 //calculates wich of the 2 individuals is the best
-int PAR_GM::betterFitness(vector<vector<int>> padres, int indv1, int indv2){
+int PAR_GM::betterFitness(const vector<vector<int>> &padres, int indv1, int indv2){
 
 	float f1 = 0, f2 = 0;
 
@@ -1091,7 +1111,7 @@ int PAR_GM::betterFitness(vector<vector<int>> padres, int indv1, int indv2){
 }
 
 //calculate the general deviation
-float PAR_GM::generalDeviation(vector<int> s_cop){
+float PAR_GM::generalDeviation(const vector<int> &s_cop){
 	float distance = 0, intra_cluster = 0;
 	vector<int> elements;
 	vector<vector<float>> centroides;
@@ -1115,7 +1135,7 @@ float PAR_GM::generalDeviation(vector<int> s_cop){
 }
 
 //find all elements of the cluster
-vector<int> PAR_GM::findInCluster(vector<int> s_cop, int clust){
+vector<int> PAR_GM::findInCluster(const vector<int> &s_cop, int clust){
 	vector<int> elements;
 	for(unsigned int i=0; i<s_cop.size(); ++i)
 		if(clust == s_cop[i])
@@ -1147,7 +1167,7 @@ float PAR_GM::createLanda(){
 }
 
 //calculate the distance error
-float PAR_GM::ErrorDistance(vector<int> solution, string type_data_file){
+float PAR_GM::ErrorDistance(const vector<int> &solution, string type_data_file){
 	float error_distance = 0, optimal_distance = 0;
 	//calculate the distance
 	error_distance = generalDeviation(solution);

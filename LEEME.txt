@@ -1,4 +1,6 @@
-Para la compilación no necesita unos parametros especificos.
+Para la compilación he añadido unos parametros nuevos al make para que sea mas optimizado y rapido
+la ejecución (-c -Wall -O3).
+
 Para la ejecución recibe minimo 4 parametros:
  - la semilla
  - nombre (para distinguir en la visualización una muestra de otra)
