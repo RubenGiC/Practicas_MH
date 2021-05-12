@@ -311,33 +311,41 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 	vector<vector<int>> vector_poblacion = vector_solutions;
 	vector<float> fitness_poblacion;
 	vector<vector<int>> vector_hijos;
-	int mejor_padre = -1, peor_hijo= -1, cont_gen=0, n=0;
+	int mejor_padre = -1, peor_hijo= -1, cont_gen=0, n=0, i=0;
 	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
+	vector<int> indices_poblacion;
 
-	fitness_poblacion.resize(vector_poblacion.size());
 	//calculate the fitness of actual population
 	for(unsigned int e=0; e < vector_poblacion.size(); ++e){
 
-		fitness_poblacion[e] = fitness(vector_poblacion[e]);
+		fitness_poblacion.push_back(fitness(vector_poblacion[e]));
+		indices_poblacion.push_back(e);
 	}
 
-	vector<vector<int>> vector_padres = selectionOperator(vector_poblacion, vector_solutions.size(),fitness_poblacion);
+	vector<vector<int>> vector_padres = selectionOperator(vector_poblacion, vector_poblacion.size(),fitness_poblacion);
 
 
-	for(int i=0; i<stop; ++i){
+	while(i<stop){
+
+		//cout << "ERROR AQUI ANTES?" << endl;
+		//TENGO QUE ELEGIR EL CRUCE QUE DE MEJORES RESULTADOS
+		vector_hijos = uniformMutation(uniformCross(vector_padres, 0.7));
+		//vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
 		if(cont_gen == 10){
 
-			n = vector_poblacion.size()*probability;
-			for(int e=0; e<n; ++e)
-				vector_poblacion[e] = BL_SOFT(vector_poblacion[e], 0.1*vector_poblacion[e].size(), i, stop);
+			random_shuffle(indices_poblacion.begin(), indices_poblacion.end());//barajo el vector
+
+			n = vector_hijos.size()*probability;
+			for(int e=0; e<n; ++e){
+				vector_hijos[indices_poblacion[e]] = BL_SOFT(vector_hijos[indices_poblacion[e]], 0.1*vector_hijos[indices_poblacion[e]].size(), i, stop);
+				//fitness_poblacion[indices_poblacion[e]] = fitness(vector_poblacion[indices_poblacion[e]]);
+			}
 			cont_gen = 0;
 			i += k;
 		}
 
-		//TENGO QUE ELEGIR EL CRUCE QUE DE MEJORES RESULTADOS
-		vector_hijos = uniformMutation(uniformCross(vector_padres, 0.7));
-		//vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
+		//cout << "APLICADO CRUCE Y MUTACION" << endl;
 
 		//choose the best parent
 		for(unsigned int e=0; e < vector_poblacion.size(); ++e){
@@ -358,15 +366,24 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 			}
 			++i;
 		}
+
+		//cout << "ELEGIDO EL MEJOR PADRE Y PEOR HIJO" << endl;
+
 		//and that parent isn't replaced
 		vector_hijos[peor_hijo] = vector_poblacion[mejor_padre];
 		fitness_poblacion[peor_hijo] = mejor_f;
 
+		//cout << "sustituido el hijo por el padre" << endl;
+
 		//update vector with new parents
 		vector_poblacion = vector_hijos;
 
+		//cout << "REEMPLAZADO LA POBLACION ACTUAL POR LA NUEVA" << endl;
+
 		//choose the new parents
-		vector_padres = selectionOperator(vector_poblacion, vector_solutions.size(), fitness_poblacion);
+		vector_padres = selectionOperator(vector_poblacion, vector_poblacion.size(), fitness_poblacion);
+
+		//cout << "SELECCIONADO LOS PADRES" << endl;
 
 		//reset
 		mejor_f = 999;
@@ -376,8 +393,22 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 
 		//count number of generations
 		++cont_gen;
+		//cout << "RESETEO" << endl;
 	}
 
+	mejor_f = 999;
+	for(unsigned int e=0; e < vector_poblacion.size(); ++e){
+
+		if(fitness_poblacion[e] < mejor_f){
+			mejor_f = fitness_poblacion[e];
+			mejor_solucion = vector_poblacion[e];
+		}
+	}
+
+	/*cout << "FUERA DEL BUCLE " << mejor_solucion.size() << endl;
+	for(auto sol:mejor_solucion)
+		cout << sol << ", ";
+	cout << endl;*/
 	return mejor_solucion;
 }
 
@@ -571,36 +602,6 @@ vector<vector<int>> PAR_GM::selectionOperator(const vector<vector<int>> &actual,
 	return padres;
 }
 
-//select the best new set of solutions
-/*vector<vector<int>> PAR_GM::selectionOperator(vector<vector<int>> actual, int tourney){
-	//choose 2 solutions
-	int indv1= -1, indv2= -1, indv11=-1, indv12=-1;
-	//save the best solution
-	vector<vector<int>> padres;
-
-	//generate n torney depend of tipe AGG or AGE
-	for(int i=0; i < tourney; i+=2){
-		//randomly select 2 diferents individuals
-		do{
-			indv1 = rand() % actual.size();
-			indv2 = rand() % actual.size();
-		}while(indv1 == indv2);
-		do{
-			indv11 = rand() % actual.size();
-			indv12 = rand() % actual.size();
-		}while(indv11 == indv12);
-
-		//cout << indv1 << " vs " << indv2 << endl;
-
-		//cout << "THE BEST: " << betterFitness(actual,indv1,indv2) << endl;
-		//and save the best of the 2
-		padres.push_back(actual[betterFitness(actual,indv1,indv2)]);
-		padres.push_back(actual[betterFitness(actual,indv11,indv12)]);
-	}
-
-	return padres;
-}*/
-
 //uniform crossover operator
 vector<vector<int>> PAR_GM::uniformCross(const vector<vector<int>> &padres,float probability){
 	vector<vector<int>> descendientes = padres;
@@ -730,23 +731,6 @@ vector<vector<int>> PAR_GM::fixedSegmentCross(const vector<vector<int>> &padres,
 
 		n_parent21 = size_other2 /2;
 		n_parent22 = size_other2 - n_parent21;
-
-		/*cout << "hijo1 --------------" << endl;
-		cout << "START1: " << start_seg1 << endl;
-		cout << "END1: " << end_seg1 << endl;
-		cout << "SIZE1: " << size_seg1 << endl;
-		cout << "SIZE REST1: " << size_other1 << endl;
-		cout << "N PARENT11: " << n_parent11 << endl;
-		cout << "N PARENT12: " << n_parent12 << endl;
-		cout << "TOTAL: " << n_parent11+n_parent12+size_seg1 << endl;
-		cout << "hijo2 --------------" << endl;
-		cout << "START2: " << start_seg2 << endl;
-		cout << "END2: " << end_seg2 << endl;
-		cout << "SIZE2: " << size_seg2 << endl;
-		cout << "SIZE REST2: " << size_other2 << endl;
-		cout << "N PARENT21: " << n_parent21 << endl;
-		cout << "N PARENT22: " << n_parent22 << endl;
-		cout << "TOTAL: " << n_parent21+n_parent22+size_seg2 << endl;*/
 
 
 		//go through all elements

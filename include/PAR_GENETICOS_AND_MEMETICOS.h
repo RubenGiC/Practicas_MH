@@ -55,7 +55,6 @@ public:
 
 	//use the binary tournament, to select the best
 	vector<vector<int>> selectionOperator(const vector<vector<int>> &actual, int tourney, const vector<float> &fitness_p);
-	//vector<vector<int>> selectionOperator(vector<vector<int>> actual, int tourney);
 
 	//CROSSOVER OPERATORS
 	//uniform crossover operator
