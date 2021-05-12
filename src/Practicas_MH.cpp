@@ -525,7 +525,7 @@ int main(int argc, char** argv) {
 			am_100 += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
 			am_100 += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
 
-			par_gm->randomAssign(50);
+			/*par_gm->randomAssign(50);
 			start = clock();
 			solution = par_gm->AM(0.1,10,iterations);
 			end = clock();
@@ -535,7 +535,19 @@ int main(int argc, char** argv) {
 			am_10 += "\tElapse: " + to_string(elapsed) + "\n";
 			am_10 += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
 			am_10 += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
-			am_10 += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
+			am_10 += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";*/
+
+			par_gm->randomAssign(50);
+			start = clock();
+			solution = par_gm->AM(0.1,10,iterations, true);
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
+
+			am_10mej += "ITERACION: " + to_string(i+1) + " ---------------------------------------\n";
+			am_10mej += "\tElapse: " + to_string(elapsed) + "\n";
+			am_10mej += "\tInfeas: " + to_string(par_gm->infeasibility(solution)) + "\n";
+			am_10mej += "\tIntracluster Distance: " + to_string(par_gm->generalDeviation(solution)) + "\n";
+			am_10mej += "\tFitness: " + to_string(par_gm->fitness(solution)) + "\n";
 
 		}
 
@@ -548,9 +560,11 @@ int main(int argc, char** argv) {
 		cout << "AGE FIXED SEGMENT CROSS WITH(" << names[e] << ")" << endl;
 		cout << age_sf << endl;
 		cout << "AM 100% UNIFORM CROSS WITH(" << names[e] << ")" << endl;
-		cout << am_100 << endl;*/
+		cout << am_100 << endl;
 		cout << "AM 10% UNIFORM CROSS WITH(" << names[e] << ")" << endl;
-		cout << am_10 << endl;
+		cout << am_10 << endl;*/
+		cout << "AM 10% BETTER UNIFORM CROSS WITH(" << names[e] << ")" << endl;
+		cout << am_10mej << endl;
 
 		agg_un = "";
 		agg_sf = "";

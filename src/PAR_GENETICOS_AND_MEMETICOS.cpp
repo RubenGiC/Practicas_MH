@@ -311,10 +311,12 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop, bool mejore
 	vector<int> mejor_solucion;
 	vector<vector<int>> vector_poblacion = vector_solutions;
 	vector<float> fitness_poblacion;
+	vector<float> fitness_hijos;
 	vector<vector<int>> vector_hijos;
-	int mejor_padre = -1, peor_hijo= -1, cont_gen=0, n=0, i=0;//, iterations=0;
+	int mejor_padre = -1, peor_hijo= -1, cont_gen=0, n=0, i=0, mejor_hijo=-1;//, iterations=0;
 	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
 	vector<int> indices_poblacion;
+	vector<vector<int>> vector_mejores;
 
 	//calculate the fitness of actual population
 	for(unsigned int e=0; e < vector_poblacion.size(); ++e){
@@ -340,19 +342,48 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop, bool mejore
 		vector_hijos = uniformMutation(uniformCross(vector_padres, 0.7));
 		//vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
-		//if choose the 10% * n_better
-		if(mejores){
+		//if reach 10 generations calculate BL SOFT
+		if(cont_gen == 10 && mejores){
+
 			if(indices_poblacion.size()>0)
 				indices_poblacion.clear();
 
-			for(unsigned int e=0; e<vector_hijos.size(); ++e){
+			//calculate the number of chromosomes to calculate BL SOFT
+			n = vector_hijos.size()*probability;
 
+			for(int e = 0; e<n && i<stop; ++e){
+				for(unsigned int j = 0; j<vector_hijos.size(); ++j){
+					if(e>0){
+
+						if(fitness_hijos[j] < mejor_f && find(indices_poblacion.begin(), indices_poblacion.end(), j) == indices_poblacion.end()){
+							mejor_f = f_actualh;
+							mejor_hijo = j;
+						}
+					}else{
+
+						f_actualh = fitness(vector_hijos[j]);
+						fitness_hijos.push_back(f_actualh);
+						if(f_actualh < mejor_f){
+							mejor_f = f_actualh;
+							mejor_hijo = j;
+						}
+					}
+				}
+				//cout << "MEJOR HIJO: " << mejor_hijo << ", FITNESS: " << mejor_f << endl;
+				indices_poblacion.push_back(mejor_hijo);
+				mejor_hijo = -1;
+				mejor_f = 999;
 			}
-		}
 
-		//if reach 10 generations calculate BL SOFT
-		if(cont_gen == 10){
+			//cout << "SIZE: " << indices_poblacion.size() << endl;
 
+			//and calculate BL SOFT
+			for(unsigned int e=0; e<indices_poblacion.size() && i<stop; ++e)
+				vector_hijos[indices_poblacion[e]] = BL_SOFT(vector_hijos[indices_poblacion[e]], 0.1*vector_hijos[indices_poblacion[e]].size(), i, stop);
+
+			//reset the count of generations
+			cont_gen = 0;
+		}else if(cont_gen == 10){
 			//shuffle the new population
 			random_shuffle(indices_poblacion.begin(), indices_poblacion.end());//barajo el vector
 
