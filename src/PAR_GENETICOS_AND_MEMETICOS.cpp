@@ -279,7 +279,7 @@ int PAR_GM::betterFitness(const vector<int> &chromosom, int gen, int &iterations
 	return betterCluster;
 }
 
-vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails, int &iteraciones, int stop){
+vector<int> PAR_GM::BL_SOFT(const vector<int> &chromosom, int max_fails, int &iteraciones, int stop){
 	vector<int> mejor_sol=chromosom;
 	int fails = 0;
 	unsigned int i=0;
@@ -302,16 +302,17 @@ vector<int> PAR_GM::BL_SOFT(vector<int> chromosom, int max_fails, int &iteracion
 			++fails;
 
 		++i;
+		++iteraciones;
 	}
 	return mejor_sol;
 }
 
-vector<int> PAR_GM::AM(float probability, int generations, int stop){
+vector<int> PAR_GM::AM(float probability, int generations, int stop, bool mejores){
 	vector<int> mejor_solucion;
 	vector<vector<int>> vector_poblacion = vector_solutions;
 	vector<float> fitness_poblacion;
 	vector<vector<int>> vector_hijos;
-	int mejor_padre = -1, peor_hijo= -1, cont_gen=0, n=0, i=0;
+	int mejor_padre = -1, peor_hijo= -1, cont_gen=0, n=0, i=0;//, iterations=0;
 	float mejor_f=999, f_actualp, peor_f = -999, f_actualh;
 	vector<int> indices_poblacion;
 
@@ -319,40 +320,60 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 	for(unsigned int e=0; e < vector_poblacion.size(); ++e){
 
 		fitness_poblacion.push_back(fitness(vector_poblacion[e]));
-		indices_poblacion.push_back(e);
+
+		//and add indices of all chromosomas if not choose 10%*n_better
+		if(!mejores)
+			indices_poblacion.push_back(e);
+
+		++i;
 	}
 
+	//selec the parents
 	vector<vector<int>> vector_padres = selectionOperator(vector_poblacion, vector_poblacion.size(),fitness_poblacion);
 
 
+	//iterate 100.000 evaluations
 	while(i<stop){
 
-		//cout << "ERROR AQUI ANTES?" << endl;
-		//TENGO QUE ELEGIR EL CRUCE QUE DE MEJORES RESULTADOS
+		//++iterations;
+		//choose this cross, because have better results than fixed segment cross
 		vector_hijos = uniformMutation(uniformCross(vector_padres, 0.7));
 		//vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
-		if(cont_gen == 10){
+		//if choose the 10% * n_better
+		if(mejores){
+			if(indices_poblacion.size()>0)
+				indices_poblacion.clear();
 
-			random_shuffle(indices_poblacion.begin(), indices_poblacion.end());//barajo el vector
+			for(unsigned int e=0; e<vector_hijos.size(); ++e){
 
-			n = vector_hijos.size()*probability;
-			for(int e=0; e<n; ++e){
-				vector_hijos[indices_poblacion[e]] = BL_SOFT(vector_hijos[indices_poblacion[e]], 0.1*vector_hijos[indices_poblacion[e]].size(), i, stop);
-				//fitness_poblacion[indices_poblacion[e]] = fitness(vector_poblacion[indices_poblacion[e]]);
 			}
-			cont_gen = 0;
-			i += k;
 		}
 
-		//cout << "APLICADO CRUCE Y MUTACION" << endl;
+		//if reach 10 generations calculate BL SOFT
+		if(cont_gen == 10){
 
-		//choose the best parent
+			//shuffle the new population
+			random_shuffle(indices_poblacion.begin(), indices_poblacion.end());//barajo el vector
+
+			//calculate the number of chromosomes to calculate BL SOFT
+			n = indices_poblacion.size()*probability;
+
+			//and calculate BL SOFT
+			for(int e=0; e<n && i<stop; ++e)
+				vector_hijos[indices_poblacion[e]] = BL_SOFT(vector_hijos[indices_poblacion[e]], 0.1*vector_hijos[indices_poblacion[e]].size(), i, stop);
+
+			//reset the count of generations
+			cont_gen = 0;
+		}
+
+		//choose the best parent and worst descendent
 		for(unsigned int e=0; e < vector_poblacion.size(); ++e){
 
-			f_actualp = fitness_poblacion[e]; //fitness(vector_poblacion[e]);
+			f_actualp = fitness_poblacion[e];
 			f_actualh = fitness(vector_hijos[e]);
 
+			//update fitness of the new population
 			fitness_poblacion[e] = f_actualh;
 
 			if(f_actualp < mejor_f){
@@ -367,23 +388,15 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 			++i;
 		}
 
-		//cout << "ELEGIDO EL MEJOR PADRE Y PEOR HIJO" << endl;
-
-		//and that parent isn't replaced
+		//replace the worst descendent for the best parent
 		vector_hijos[peor_hijo] = vector_poblacion[mejor_padre];
 		fitness_poblacion[peor_hijo] = mejor_f;
-
-		//cout << "sustituido el hijo por el padre" << endl;
 
 		//update vector with new parents
 		vector_poblacion = vector_hijos;
 
-		//cout << "REEMPLAZADO LA POBLACION ACTUAL POR LA NUEVA" << endl;
-
 		//choose the new parents
 		vector_padres = selectionOperator(vector_poblacion, vector_poblacion.size(), fitness_poblacion);
-
-		//cout << "SELECCIONADO LOS PADRES" << endl;
 
 		//reset
 		mejor_f = 999;
@@ -393,10 +406,10 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 
 		//count number of generations
 		++cont_gen;
-		//cout << "RESETEO" << endl;
 	}
 
 	mejor_f = 999;
+	//choose the best solution
 	for(unsigned int e=0; e < vector_poblacion.size(); ++e){
 
 		if(fitness_poblacion[e] < mejor_f){
@@ -404,11 +417,8 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop){
 			mejor_solucion = vector_poblacion[e];
 		}
 	}
+	//cout << "Iteraciones: " << i << " vs " << iterations << endl;
 
-	/*cout << "FUERA DEL BUCLE " << mejor_solucion.size() << endl;
-	for(auto sol:mejor_solucion)
-		cout << sol << ", ";
-	cout << endl;*/
 	return mejor_solucion;
 }
 
@@ -515,6 +525,7 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 	for(unsigned int e=0; e < vector_poblacion.size(); ++e){
 
 		fitness_poblacion.push_back(fitness(vector_poblacion[e]));
+		++i;
 	}
 
 	// select the best parents of each tournament
@@ -902,6 +913,7 @@ vector<vector<int>> PAR_GM::uniformMutation(const vector<vector<int>> &padres){
 		descendientes[crom][gen] = new_value;
 		//cout << "(NEW) GEN: " << gen << ", Value: " << descendientes[crom][gen] << endl;
 	}
+
 	//return the new population
 	return descendientes;
 }

@@ -50,8 +50,8 @@ public:
 	vector<vector <int>> AGG(TIPE_CROSS cruce, float probability, int stop);
 	vector<vector <int>> AGE(TIPE_CROSS cruce, float probability, int stop);
 	vector<int> GENETIC(TIPE_CROSS tipo, float probability, int stop);
-	vector<int> BL_SOFT(vector<int> chromosom, int max_fails, int &iteraciones, int stop);
-	vector <int> AM(float probability, int generations, int stop);
+	vector<int> BL_SOFT(const vector<int> &chromosom, int max_fails, int &iteraciones, int stop);
+	vector <int> AM(float probability, int generations, int stop, bool mejores=false);
 
 	//use the binary tournament, to select the best
 	vector<vector<int>> selectionOperator(const vector<vector<int>> &actual, int tourney, const vector<float> &fitness_p);
