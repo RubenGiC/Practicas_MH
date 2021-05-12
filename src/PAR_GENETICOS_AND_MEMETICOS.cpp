@@ -143,16 +143,6 @@ void PAR_GM::lectura(string fichero_set, string fichero_set_const){
 	read.close();
 }
 
-//reset Centroides
-/*void PAR_GM::resetCentroides(){
-	//vuelvo a generar aleatoriamente los centroides inicialmente distintos de dimensión n
-	for(int i=0; i<k; ++i){
-		centroides[i].clear();
-		for(unsigned int e=0; e <atributos[0].size(); ++e)
-			centroides[i].push_back(Rand());
-	}
-}*/
-
 //print the elements of each cluster
 void PAR_GM::printS(int s){
 	vector<int> elements;
@@ -292,10 +282,10 @@ vector<int> PAR_GM::BL_SOFT(const vector<int> &chromosom, int max_fails, int &it
 	while((mejora or fails < max_fails) and i< RSI.size() and iteraciones < stop){
 		mejora = false;
 
-		mejor_sol[i] = betterFitness(mejor_sol, i, iteraciones);
+		mejor_sol[RSI[i]] = betterFitness(mejor_sol, RSI[i], iteraciones);
 
 		//if the cluster has changed, there is improvement
-		if(chromosom[i] != mejor_sol[i])
+		if(chromosom[RSI[i]] != mejor_sol[RSI[i]])
 			mejora = true;
 		//otherwise it increases the number of faults
 		else
@@ -369,13 +359,11 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop, bool mejore
 						}
 					}
 				}
-				//cout << "MEJOR HIJO: " << mejor_hijo << ", FITNESS: " << mejor_f << endl;
+
 				indices_poblacion.push_back(mejor_hijo);
 				mejor_hijo = -1;
 				mejor_f = 999;
 			}
-
-			//cout << "SIZE: " << indices_poblacion.size() << endl;
 
 			//and calculate BL SOFT
 			for(unsigned int e=0; e<indices_poblacion.size() && i<stop; ++e)
@@ -448,7 +436,6 @@ vector<int> PAR_GM::AM(float probability, int generations, int stop, bool mejore
 			mejor_solucion = vector_poblacion[e];
 		}
 	}
-	//cout << "Iteraciones: " << i << " vs " << iterations << endl;
 
 	return mejor_solucion;
 }
@@ -566,7 +553,7 @@ vector<vector <int>> PAR_GM::AGG(TIPE_CROSS cruce, float probability, int stop){
 
 		//choose the type of cross and calculate the mutation
 		if(cruce == AGG_UN)
-			vector_hijos = uniformMutation(uniformCross(vector_padres, probability));//uniformMutation(uniformCross(vector_padres));
+			vector_hijos = uniformMutation(uniformCross(vector_padres, probability));
 		else
 			vector_hijos = uniformMutation(fixedSegmentCross(vector_padres, probability));
 
@@ -699,26 +686,6 @@ vector<vector<int>> PAR_GM::uniformCross(const vector<vector<int>> &padres,float
 		//add the children
 		descendientes[parent1] = descendiente1;
 		descendientes[parent2] = descendiente2;
-
-
-		/*cout << "HIJO: " << i+1 << endl;
-		for(int j = 0; j<k; ++j){
-			vector<int> elements = findInCluster(descendiente1,j);
-			cout << j << ": [ ";
-			for(auto e : elements){
-				cout << e << ", ";
-			}
-			cout << " ] n = " << elements.size() << endl;
-		}
-		cout << "HIJO: " << i+2 << endl;
-		for(int j = 0; j<k; ++j){
-			vector<int> elements = findInCluster(descendiente2,j);
-			cout << j << ": [ ";
-			for(auto e : elements){
-				cout << e << ", ";
-			}
-			cout << " ] n = " << elements.size() << endl;
-		}*/
 
 		descendiente1.clear();
 		descendiente2.clear();
@@ -863,30 +830,6 @@ vector<vector<int>> PAR_GM::fixedSegmentCross(const vector<vector<int>> &padres,
 
 		}
 
-		/*int total = 0;
-		cout << "HIJO 1: " << i+1 << endl;
-		for(int j = 0; j<k; ++j){
-			vector<int> elements = findInCluster(descendiente1,j);
-			cout << j << ": [ ";
-			for(auto e : elements){
-				cout << e << ", ";
-			}
-			cout << " ] n = " << elements.size() << endl;
-			total += elements.size();
-		}
-		cout << "total = " << total << endl;
-		total = 0;
-		cout << "HIJO 2: " << i+2 << endl;
-		for(int j = 0; j<k; ++j){
-			vector<int> elements = findInCluster(descendiente2,j);
-			cout << j << ": [ ";
-			for(auto e : elements){
-				cout << e << ", ";
-			}
-			cout << " ] n = " << elements.size() << endl;
-			total += elements.size();
-		}
-		cout << "total = " << total << endl;*/
 		//replace the parents with their children
 		descendientes[parent1]=descendiente1;
 		descendientes[parent2]=descendiente2;
@@ -913,13 +856,8 @@ vector<vector<int>> PAR_GM::uniformMutation(const vector<vector<int>> &padres){
 	//calculate the number of genes to mutate
 	int n_genes = RSI.size()*padres.size() * probability;
 
-	/*cout << "genes: " << RSI.size() << ", cromosomas: " << padres.size() << endl;
-	cout << probability << ", " << n_genes << endl;*/
-
 	//mutates n_genes
 	for(int i = 0; i<n_genes; ++i){
-
-		//cout << "GEN: " << i << endl;
 
 		//choose random chromosome
 		crom = rand() % descendientes.size();
@@ -930,19 +868,14 @@ vector<vector<int>> PAR_GM::uniformMutation(const vector<vector<int>> &padres){
 			//create new value 0 to k-1
 			new_value = rand() % k;
 
-			//cout << "GEN: " << gen << ", Value: " << new_value << endl;
-
 			//calculates the gene vector of that cluster
 			clust = findInCluster(descendientes[crom],descendientes[crom][gen]);
 
 		//while the number of genes is less 2 or the new value is equal to the actual gene
 		}while(clust.size() < 2 || new_value == descendientes[crom][gen]);
 
-		//cout << "(ORIGINAL) GEN: " << gen << ", Value: " << descendientes[crom][gen] << endl;
-
 		//change to the new value
 		descendientes[crom][gen] = new_value;
-		//cout << "(NEW) GEN: " << gen << ", Value: " << descendientes[crom][gen] << endl;
 	}
 
 	//return the new population
@@ -1035,7 +968,6 @@ void PAR_GM::randomAssign(int n){
 	vector_solutions.resize(n);
 
 	S.resize(RSI.size());
-	//cout << S.size() << endl;
 
 	//initialize vector
 	for(int i = 0; i<n; ++i){
@@ -1050,16 +982,6 @@ void PAR_GM::randomAssign(int n){
 			if(i == RSI.size()/2){
 				//check that no cluster is empty
 				for(int e = 0; e < k; ++e){
-					/*for(unsigned int l=0; l<RSI.size()/2 && !find; ++l){
-						if(vector_solutions[j][(int)RSI[l]] == e)
-							find=true;
-					}*/
-					//if the cluster is empty
-					/*if(!find){//add the cluster to the stack
-						not_null = false;
-						clusters_null.push(e);
-					}else
-						find = false;*/
 
 					//find cluster empty
 					if(find(clusters_asign.begin(), clusters_asign.end(), e) == clusters_asign.end()){
@@ -1127,8 +1049,6 @@ int PAR_GM::betterFitness(const vector<vector<int>> &padres, int indv1, int indv
 
 	//calculate the fitness indv2
 	f2 = fitness(padres[indv2]);
-
-	//cout << "Fitness: " << f1 << " vs " << f2 << endl;
 
 	//if the new solution is better than current solution
 	if(f1 < f2)
