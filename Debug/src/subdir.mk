@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/PAR.cpp \
+../src/PAR_BT.cpp \
 ../src/PAR_GENETICOS_AND_MEMETICOS.cpp \
 ../src/Practicas_MH.cpp \
 ../src/random.cpp \
@@ -12,6 +13,7 @@ CPP_SRCS += \
 
 OBJS += \
 ./src/PAR.o \
+./src/PAR_BT.o \
 ./src/PAR_GENETICOS_AND_MEMETICOS.o \
 ./src/Practicas_MH.o \
 ./src/random.o \
@@ -19,6 +21,7 @@ OBJS += \
 
 CPP_DEPS += \
 ./src/PAR.d \
+./src/PAR_BT.d \
 ./src/PAR_GENETICOS_AND_MEMETICOS.d \
 ./src/Practicas_MH.d \
 ./src/random.d \

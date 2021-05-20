@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "../include/PAR.h"
+#include "../include/PAR_BT.h"
 #include "../include/PAR_GENETICOS_AND_MEMETICOS.h"
 #include "../include/result_algorithms.h"
 
@@ -446,7 +447,7 @@ int main(int argc, char** argv) {
 
 	//PAR ALGORITMOS GENETICOS Y MEMETICOS
 
-	cout << "Información de los tiempos: " << endl;
+	/*cout << "Información de los tiempos: " << endl;
 	cout << "AGG (uniforme y segmentación fija) (tiempos totales de las 5 ejecuciones):\n\t - Con zoo tarda aproximadamente 3 minutos (con cada restricción)." << endl;
 	cout << "\t - Con glass tarda aproximadamente 14 minutos (con cada restricción)." << endl;
 	cout << "\t - Con bupa tarda aproximadamente 25 minutos (con cada restricción)." << endl;
@@ -573,7 +574,10 @@ int main(int argc, char** argv) {
 		am_100 = "";
 		am_10 = "";
 		am_10mej = "";
-	}
+	}*/
+
+	PARBT *par_bt = new PARBT(paths_data[0], paths_const[0], seeds[0]);
+	par_bt->BMB(10000);
 
 	return 0;
 }
