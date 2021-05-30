@@ -40,7 +40,10 @@ public:
 	//ALGORITHMS
 	vector<int> algoritmoBL(vector<int> S_cop, int max_iter, int &iterations, float &f);//BL algorithm
 	vector<int> BMB(int max_iter, int n_solutions);//algoritmo de Busqueda Multiarranque Básica
-	vector<int> ILS(int max_iter, int n_solutions);//algoritmo de Busqueda Local Reiterada
+	vector<int> ILS(int max_iter, int n_iterations);//algoritmo de Busqueda Local Reiterada
+
+	//uniform mutation operator
+	vector<int> fixedSegmentMutation(const vector<int> &sol);
 
 	//MINIMIZATION FUNCTIONS
 	//calculate the closest and least restriction cluster
@@ -73,6 +76,8 @@ public:
 	void resetCentroides();
 	//random assignment solution
 	vector<vector<int>> randomAssign(int n);
+	//genearate random solution
+	vector<int> randomSolution();
 	//update the distance for each cluster
 	vector<vector<float>> updateDistance(const vector<int> &nodes);
 	//find all elements of the cluster

@@ -357,10 +357,54 @@ vector<vector<int>> PARBT::randomAssign(int n){
 	return solutions;
 }
 
-vector<int> PARBT::ILS(int max_iter, int n_solutions){
+//random assignment of each node with a cluster
+vector<int> PARBT::randomSolution(){
+	bool check = true;
+	vector<int> clusters_selected;
+	int cluster_null = -1;
+	clusters_selected.resize(k);
 
-	vector<vector<int>> soluciones = randomAssign(n_solutions);
-	vector<int> best_solution = soluciones[0];
+	vector<int> solution;
+	solution.resize(RSI.size());
+
+	for(unsigned int l=0; l <clusters_selected.size(); ++l)
+		clusters_selected[l] = 0;
+
+	//go through all nodes
+	for(unsigned int i = 0; i < RSI.size(); ++i){
+		//if it has traversed half the nodes
+		if(i > RSI.size()/2 && check){
+			//check that no cluster is empty
+			for(unsigned int e=0; e<clusters_selected.size(); ++e){
+				//if the cluster is empty
+				if(clusters_selected[i] == 0){//add the cluster to the stack
+					cluster_null = e;
+					break;
+				}
+			}
+			if(cluster_null != -1){
+				solution[RSI[i]] = cluster_null;
+				clusters_selected[cluster_null] = 1;
+				cluster_null = -1;
+			}else{
+				check = false;
+				solution[RSI[i]]=rand() % k + 0;//randomly assign a cluster
+			}
+		}else{
+			solution[RSI[i]] = rand() % k + 0;//randomly assign a cluster
+			if(clusters_selected[solution[RSI[i]]] == 0)
+				clusters_selected[solution[RSI[i]]] = 1;
+
+		}
+	}
+
+	return solution;
+}
+
+vector<int> PARBT::ILS(int max_iter, int n_iterations){
+
+	vector<int> best_solution = randomSolution();
+	vector<int> new_solution = best_solution;
 
 	//and calculate the fitness
 	float f_best = generalDeviation(best_solution) + (infeasibility(best_solution) * landa);
@@ -369,21 +413,57 @@ vector<int> PARBT::ILS(int max_iter, int n_solutions){
 	float f=0;
 
 	//while not evaluate the all solutions and the number of evaluatios is less than max number of evaluations
-	for(unsigned int i = 0; i < soluciones.size() && it < max_iter; ++i){
+	for(int i = 0; i < n_iterations && it < max_iter; ++i){
 
 		//Local Search
-		soluciones[i] = algoritmoBL(soluciones[i], max_iter, it, f);
+		new_solution = algoritmoBL(new_solution, max_iter, it, f);
 
 		//if the new o actual solution is better than the best solution find
 		if(f < f_best){
 			//update the best solution
-			best_solution = soluciones[i];
+			best_solution = new_solution;
 			f_best = f;
 		}
+
+		//new_solution =
 	}
 
 	//return the best solution
 	return best_solution;
+}
+
+vector<int> PARBT::fixedSegmentMutation(const vector<int> &sol){
+	vector<int> new_sol = sol;
+
+	//calculate the number of genes to mutate
+	int n_genes = sol.size() * 0.1;
+
+	int start_seg = rand() % sol.size();
+	int size_seg = 1 + rand() % (sol.size() - 1);
+	int end_seg = (start_seg + size_seg)%RSI.size() - 1;
+
+	for(int i = 0; i < (int) sol.size(); ++i){
+		//if the range is 0...k
+		if(start_seg < end_seg){
+			//if the index is inside the segment
+			if(i>= start_seg && i<=end_seg && countCluster(new_sol,new_sol[i])>1){
+
+				new_sol[i] = rand() % k;//randomly switch clusters
+			}
+
+		//if the range is k..n and 0..j
+		}else{
+			//if the index is inside the segment
+			if(i>= start_seg && countCluster(new_sol,new_sol[i])>1){
+				new_sol[i] = rand() % k;//randomly switch clusters
+			//if the index is inside the segment
+			}else if(i<=end_seg && countCluster(new_sol,new_sol[i])>1){
+				new_sol[i] = rand() % k;//randomly switch clusters
+			}
+		}
+	}
+
+	return new_sol;
 }
 
 vector<int> PARBT::BMB(int max_iter, int n_solutions){

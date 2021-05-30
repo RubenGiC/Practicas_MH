@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 	vector<string> paths_data;
 	vector<string> paths_const;
 	vector<string> names;
-	int iterations = 100000;
+	//int iterations = 100000;
 
 	string tipo;
 
@@ -59,8 +59,8 @@ int main(int argc, char** argv) {
 				}
 			}
 		}
-		if(argc%2 == 0)
-			iterations = atoi(argv[argc-1]);
+		/*if(argc%2 == 0)
+			iterations = atoi(argv[argc-1]);*/
 	}
 
 	/*for(unsigned int i = 0; i<paths_data.size(); ++i){
@@ -81,6 +81,7 @@ int main(int argc, char** argv) {
 	/*string greedy_zoo_20 = "", greedy_zoo_10 = "", greedy_glass_10 = "", greedy_glass_20 = "", greedy_bupa_10 = "", greedy_bupa_20 = "";
 	string bl_zoo_20 = "", bl_zoo_10 = "", bl_glass_10 = "", bl_glass_20 = "", bl_bupa_10 = "", bl_bupa_20 = "";*/
 	string agg_un = "", agg_sf = "", age_un = "", age_sf = "", am_100="", am_10 = "", am_10mej="";
+	string bmb = "", ils = "", es = "", ils_es = "";
 
 	float elapsed;
 	clock_t start;
@@ -578,16 +579,22 @@ int main(int argc, char** argv) {
 
 	for(unsigned int e=0; e<seeds.size(); ++e){
 		PARBT *par_bt = new PARBT(paths_data[e], paths_const[e], seeds[e]);
-		start = clock();
-		vector<int> sol = par_bt->BMB(10000, 10);
-		end = clock();
-		elapsed = float(end - start)/CLOCKS_PER_SEC;
 
-		/*cout << "BMB: " << names[e] << " ---------------------------------------\n";
-		cout << "\tElapse: " << elapsed << "\n";
-		cout << "\tInfeas: " << par_bt->infeasibility(sol) << "\n";
-		cout << "\tIntracluster Distance: " << par_bt->generalDeviation(sol) << "\n";
-		cout << "\tFitness: " << par_bt->fitness(sol) << "\n";*/
+		for(int i = 0; i<5; ++i){
+			start = clock();
+			vector<int> sol = par_bt->BMB(10000, 10);
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
+
+			bmb += "ITERATE: " + to_string(i+1) + " ---------------------------------------\n";
+			bmb += "\tElapse: " + to_string(elapsed) + "\n";
+			bmb += "\tInfeas: " + to_string(par_bt->infeasibility(sol)) + "\n";
+			bmb += "\tIntracluster Distance: " + to_string(par_bt->generalDeviation(sol)) + "\n";
+			bmb += "\tFitness: " + to_string(par_bt->fitness(sol)) + "\n";
+		}
+		cout << "BMB WITH " << names[e] << endl;
+		cout << bmb << endl;
+		bmb = "";
 
 
 	}
