@@ -576,8 +576,21 @@ int main(int argc, char** argv) {
 		am_10mej = "";
 	}*/
 
-	PARBT *par_bt = new PARBT(paths_data[0], paths_const[0], seeds[0]);
-	par_bt->BMB(10000);
+	for(unsigned int e=0; e<seeds.size(); ++e){
+		PARBT *par_bt = new PARBT(paths_data[e], paths_const[e], seeds[e]);
+		start = clock();
+		vector<int> sol = par_bt->BMB(10000, 10);
+		end = clock();
+		elapsed = float(end - start)/CLOCKS_PER_SEC;
+
+		/*cout << "BMB: " << names[e] << " ---------------------------------------\n";
+		cout << "\tElapse: " << elapsed << "\n";
+		cout << "\tInfeas: " << par_bt->infeasibility(sol) << "\n";
+		cout << "\tIntracluster Distance: " << par_bt->generalDeviation(sol) << "\n";
+		cout << "\tFitness: " << par_bt->fitness(sol) << "\n";*/
+
+
+	}
 
 	return 0;
 }

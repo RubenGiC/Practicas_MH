@@ -27,6 +27,7 @@ public:
 	vector<pair<int,int>> CL;//save the par of nodes that it have CL constraints
 	vector<pair<int,int>> ML;//save the par of nodes that it have ML constraints
 	vector<int> S;//list of clusters assigned to each node
+	float landa;
 
 	PARBT(string fichero_set, string fichero_set_const, int semilla);//constructor que inicializa los valores
 	void lectura(string fichero_set, string fichero_set_const);//lee los archivos
@@ -37,8 +38,9 @@ public:
 	void printRSI();
 
 	//ALGORITHMS
-	vector<int> algoritmoBL(vector<int> S_cop, int max_iter, int &iterations);//BL algorithm
-	vector<int> BMB(int max_iter);//algoritmo de Busqueda Multiarranque Básica
+	vector<int> algoritmoBL(vector<int> S_cop, int max_iter, int &iterations, float &f);//BL algorithm
+	vector<int> BMB(int max_iter, int n_solutions);//algoritmo de Busqueda Multiarranque Básica
+	vector<int> ILS(int max_iter, int n_solutions);//algoritmo de Busqueda Local Reiterada
 
 	//MINIMIZATION FUNCTIONS
 	//calculate the closest and least restriction cluster
@@ -62,6 +64,9 @@ public:
 
 	//calculate a better fitness
 	vector<int> betterFitness(const vector<int> &S_cop, const vector<pair<int,int>> &vecindario, float &f, float landa, int &it, int max);
+
+	//calculate the fitness
+	float fitness(const vector<int> &solution);
 
 	//OTHER FUNCTIONS
 	//reset centroides

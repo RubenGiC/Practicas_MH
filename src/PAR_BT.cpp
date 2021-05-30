@@ -51,6 +51,8 @@ PARBT::PARBT(string fichero_set, string fichero_set_const, int semilla){
 	//despues barajo los indices de los atributos
 	srand(unsigned (semilla));//genero una semilla fija
 	random_shuffle(RSI.begin(), RSI.end());//barajo el vector
+
+	landa = createLanda();//calculate landa
 }
 
 void PARBT::shuffleRSI(){
@@ -355,47 +357,102 @@ vector<vector<int>> PARBT::randomAssign(int n){
 	return solutions;
 }
 
-vector<int> PARBT::BMB(int max_iter){
-	vector<int> best_solution;
-	vector<vector<int>> soluciones = randomAssign(10);
-	int it=0;
+vector<int> PARBT::ILS(int max_iter, int n_solutions){
 
-	for(unsigned int i = 0; i < soluciones.size(); ++i){
-		soluciones[i] = algoritmoBL(soluciones[i], max_iter, it);
+	vector<vector<int>> soluciones = randomAssign(n_solutions);
+	vector<int> best_solution = soluciones[0];
+
+	//and calculate the fitness
+	float f_best = generalDeviation(best_solution) + (infeasibility(best_solution) * landa);
+
+	int it=1;
+	float f=0;
+
+	//while not evaluate the all solutions and the number of evaluatios is less than max number of evaluations
+	for(unsigned int i = 0; i < soluciones.size() && it < max_iter; ++i){
+
+		//Local Search
+		soluciones[i] = algoritmoBL(soluciones[i], max_iter, it, f);
+
+		//if the new o actual solution is better than the best solution find
+		if(f < f_best){
+			//update the best solution
+			best_solution = soluciones[i];
+			f_best = f;
+		}
 	}
 
+	//return the best solution
 	return best_solution;
 }
 
-vector<int> PARBT::algoritmoBL(vector<int> S_cop, int max_iter, int &iterations){
+vector<int> PARBT::BMB(int max_iter, int n_solutions){
+
+	vector<vector<int>> soluciones = randomAssign(n_solutions);
+	vector<int> best_solution = soluciones[0];
+
+	//and calculate the fitness
+	float f_best = generalDeviation(best_solution) + (infeasibility(best_solution) * landa);
+
+	int it=1;
+	float f=0;
+
+	//while not evaluate the all solutions and the number of evaluatios is less than max number of evaluations
+	for(unsigned int i = 0; i < soluciones.size() && it < max_iter; ++i){
+
+		//Local Search
+		soluciones[i] = algoritmoBL(soluciones[i], max_iter, it, f);
+
+		//if the new o actual solution is better than the best solution find
+		if(f < f_best){
+			//update the best solution
+			best_solution = soluciones[i];
+			f_best = f;
+		}
+	}
+
+	//return the best solution
+	return best_solution;
+}
+
+vector<int> PARBT::algoritmoBL(vector<int> S_cop, int max_iter, int &iterations, float &f){
 
 	vector<int> S_cop2 = S_cop;
+	vector<int> S_cop2_new;
 	int infease = infeasibility(S_cop);//calculate infeasibility
 	float gen_deviation = generalDeviation(S_cop); //calculate General Deviation
-	float landa = createLanda();//calculate landa
+
 	//and calculate the fitness
-	float f = gen_deviation + (infease * landa);
+	f = gen_deviation + (infease * landa);
+	++iterations;//increment the number of evaluations
+	float f_new = f;
 
 	vector<pair<int,int>> vecindario = generateNeig(S_cop);//create the neighborhood
 	random_shuffle(vecindario.begin(), vecindario.end());//shuffle vector
 
 	bool end = false;//algorithm completion
-	int iterate = 0;
 
 	do{
-		//if the number of iterate don't reach 100000
-		if(iterate < max_iter){//calculate the new solution
-			S_cop2 = betterFitness(S_cop, vecindario, f, landa, iterate, max_iter);
+		S_cop2_new = betterFitness(S_cop, vecindario, f_new, landa, iterations, max_iter);
+
+		//if change
+		if(f_new != f){
+			//update the new solution
+			S_cop2 = S_cop2_new;
+			f = f_new;
+
 			//update centroides
 			centroides = updateDistance(S_cop);
 
-			//calculate the new neighborhood
-			random_shuffle(vecindario.begin(), vecindario.end());//shuffle vector
-		}else
+			if(iterations < max_iter)
+				//calculate the new neighborhood
+				random_shuffle(vecindario.begin(), vecindario.end());//shuffle vector
+		}else{
 			end = true;//else the algorithm ends
+		}
+	//while change the fitness and the number of evaluations is less than max number of evaluations
+	}while(!end && iterations < max_iter);
 
-	}while(!end or iterations < max_iter);
-	//cout << iterate << endl;
 	return S_cop2;
 }
 
@@ -468,6 +525,9 @@ vector<int> PARBT::betterFitness(const vector<int> &S_cop, const vector<pair<int
 				infease = infeasibility(S_cop2);
 				new_f = gen_deviation + (infease * landa);
 
+				//increment the number of evaluations
+				++it;
+
 				//if the new fitness is better
 				if(new_f < f){
 					//update the current solution
@@ -478,12 +538,11 @@ vector<int> PARBT::betterFitness(const vector<int> &S_cop, const vector<pair<int
 				S_cop2 = S_cop3;
 
 				//if the iterate reaches 100000
-				if(it == max){
+				if(it >= max){
 					return S_cop3;//ends
 				}
 			}
 		}
-		++it;
 	}
 
 	//if it calculate all the possibilities, it ends
@@ -533,7 +592,9 @@ float PARBT::generalDeviation(const vector<int> &s_cop){
 		return intra_cluster/k;
 }
 
-
+float PARBT::fitness(const vector<int> &solution){
+	return (generalDeviation(solution) + infeasibility(solution) * landa);
+}
 
 //calculate Landa
 float PARBT::createLanda(){
