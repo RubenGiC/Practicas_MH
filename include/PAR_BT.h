@@ -41,6 +41,7 @@ public:
 	vector<int> algoritmoBL(vector<int> S_cop, int max_iter, int &iterations, float &f);//BL algorithm
 	vector<int> BMB(int max_iter, int n_solutions);//algoritmo de Busqueda Multiarranque Básica
 	vector<int> ILS(int max_iter, int n_iterations);//algoritmo de Busqueda Local Reiterada
+	vector<int> ES(int max_iter, float mu, float fi, float tf);//algoritmo de Enfriamiento Simulado
 
 	//uniform mutation operator
 	vector<int> fixedSegmentMutation(const vector<int> &sol);

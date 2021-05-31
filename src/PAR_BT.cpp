@@ -401,9 +401,105 @@ vector<int> PARBT::randomSolution(){
 	return solution;
 }
 
+vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
+	//the initial solution is the best solution and actual solution
+	vector<int> best_solution = randomSolution();
+	vector<int> solution = best_solution;
+	vector<int> new_solution = best_solution;
+
+	//calculate the fitness
+	float f = fitness(best_solution);
+	float new_f;
+
+	//calculate the initial temperature
+	float t = (mu*f)/(-log(fi));
+	//calculate the max number of neighbours
+	int max_neighbours = 10 * best_solution.size();
+	//calculate the max number of successes
+	int max_successes = 0.1 * max_neighbours;
+
+	//calculate the number of cooldowns
+	float M = max_iter/max_neighbours;
+	//calculate the constant beta
+	float beta = (t - tf)/(M*t*tf);
+
+	//number of evaluations
+	int iterations = 1;
+
+	//choose the random node
+	int node = rand() % best_solution.size();
+	//random value to change in the random node
+	int cluster = rand() % k;
+
+	//value random bettwen 0 and 1
+	float u = (float) rand()/RAND_MAX;
+
+	//diference bettwen fitness
+	float deltaf;
+
+	int n_neighbours = 0;
+	int n_successes=0;
+
+	//while the temperature is greater than 0 and the number of evaluations si less than max evaluations
+	while(t>0 && iterations <max_iter){
+
+		//as long as the number of neighbors generated is less than maximum number of neighbors
+		//and the number of successes is less than maximum number of successes
+		for(int i = 0; i < max_neighbours && n_successes < max_successes; ++i){
+
+			//generate the new neighbor
+			do{
+				//if the cluster has more than 1 node
+				if(countCluster(solution,solution[node])>1)
+					//change the cluster one random node
+					new_solution[node] = cluster;
+
+				//generates a new random node and cluster for the next iteration
+				node = rand() % best_solution.size();
+				cluster = rand() % k;
+
+			//as long as the new value the node is equal to actual node change
+			}while(new_solution[node] == solution[node]);
+
+			//calculate fitness difference
+			deltaf = new_f-f;
+
+			//if the fitness difference is less than 0 or the random value is less than e^(deltaf/t)
+			if(deltaf<0 or u < exp(deltaf/t)){
+				//save the new solution
+				solution = new_solution;
+
+				//calculate the fitness
+				new_f = fitness(solution);
+				++iterations;
+
+				//and compare the new solution with the best solution
+				//if the new solution si better than the best solution
+				if(new_f < f){
+					//update the solution
+					f = new_f;
+					best_solution = solution;
+
+					++n_successes;
+				}
+			}
+
+		}
+		//decrease the temperature
+		t = t/(1+(beta*t));
+
+
+	}
+
+	return best_solution;
+}
+
+//ILS Algorithm
 vector<int> PARBT::ILS(int max_iter, int n_iterations){
 
+	//save the initial solution as the best solution
 	vector<int> best_solution = randomSolution();
+	//too save in the new_solution
 	vector<int> new_solution = best_solution;
 
 	//and calculate the fitness
@@ -415,7 +511,7 @@ vector<int> PARBT::ILS(int max_iter, int n_iterations){
 	//while not evaluate the all solutions and the number of evaluatios is less than max number of evaluations
 	for(int i = 0; i < n_iterations && it < max_iter; ++i){
 
-		//Local Search
+		//Local Search (change the number of iterarions and the fitness of the new solution)
 		new_solution = algoritmoBL(new_solution, max_iter, it, f);
 
 		//if the new o actual solution is better than the best solution find
@@ -424,7 +520,7 @@ vector<int> PARBT::ILS(int max_iter, int n_iterations){
 			best_solution = new_solution;
 			f_best = f;
 		}
-
+		//apply the mutation with the best solution
 		new_solution = fixedSegmentMutation(best_solution);
 	}
 
@@ -433,12 +529,17 @@ vector<int> PARBT::ILS(int max_iter, int n_iterations){
 }
 
 vector<int> PARBT::fixedSegmentMutation(const vector<int> &sol){
+	//copy the solution
 	vector<int> new_sol = sol;
 
+	//create random index start
 	int start_seg = rand() % sol.size();
+	//calculate the size of segment
 	int size_seg = sol.size() * 0.1;
+	//and calculate the end of the segment
 	int end_seg = (start_seg + size_seg)%RSI.size() - 1;
 
+	//walk through the whole solution
 	for(int i = 0; i < (int) sol.size(); ++i){
 		//if the range is 0...k
 		if(start_seg < end_seg){
