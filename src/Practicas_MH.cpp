@@ -581,21 +581,37 @@ int main(int argc, char** argv) {
 		PARBT *par_bt = new PARBT(paths_data[e], paths_const[e], seeds[e]);
 
 		for(int i = 0; i<5; ++i){
+			//------------------------------------------BMB
 			start = clock();
 			vector<int> sol = par_bt->BMB(10000, 10);
 			end = clock();
 			elapsed = float(end - start)/CLOCKS_PER_SEC;
 
 			bmb += "ITERATE: " + to_string(i+1) + " ---------------------------------------\n";
-			bmb += "\tElapse: " + to_string(elapsed) + "\n";
 			bmb += "\tInfeas: " + to_string(par_bt->infeasibility(sol)) + "\n";
 			bmb += "\tIntracluster Distance: " + to_string(par_bt->generalDeviation(sol)) + "\n";
 			bmb += "\tFitness: " + to_string(par_bt->fitness(sol)) + "\n";
-		}
-		cout << "BMB WITH " << names[e] << endl;
-		cout << bmb << endl;
-		bmb = "";
+			bmb += "\tElapse: " + to_string(elapsed) + "\n";
 
+			//------------------------------------------ILS
+			start = clock();
+			sol = par_bt->ILS(10000, 10);
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
+
+			ils += "ITERATE: " + to_string(i+1) + " ---------------------------------------\n";
+			ils += "\tInfeas: " + to_string(par_bt->infeasibility(sol)) + "\n";
+			ils += "\tIntracluster Distance: " + to_string(par_bt->generalDeviation(sol)) + "\n";
+			ils += "\tFitness: " + to_string(par_bt->fitness(sol)) + "\n";
+			ils += "\tElapse: " + to_string(elapsed) + "\n";
+		}
+		/*cout << "BMB WITH " << names[e] << endl;
+		cout << bmb << endl;*/
+		cout << "ILS WITH " << names[e] << endl;
+		cout << ils << endl;
+
+		bmb = "";
+		ils= "";
 
 	}
 

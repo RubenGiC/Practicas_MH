@@ -425,7 +425,7 @@ vector<int> PARBT::ILS(int max_iter, int n_iterations){
 			f_best = f;
 		}
 
-		//new_solution =
+		new_solution = fixedSegmentMutation(best_solution);
 	}
 
 	//return the best solution
@@ -435,17 +435,14 @@ vector<int> PARBT::ILS(int max_iter, int n_iterations){
 vector<int> PARBT::fixedSegmentMutation(const vector<int> &sol){
 	vector<int> new_sol = sol;
 
-	//calculate the number of genes to mutate
-	int n_genes = sol.size() * 0.1;
-
 	int start_seg = rand() % sol.size();
-	int size_seg = 1 + rand() % (sol.size() - 1);
+	int size_seg = sol.size() * 0.1;
 	int end_seg = (start_seg + size_seg)%RSI.size() - 1;
 
 	for(int i = 0; i < (int) sol.size(); ++i){
 		//if the range is 0...k
 		if(start_seg < end_seg){
-			//if the index is inside the segment
+			//if the index is within the segment and the number of nodes in the cluster is greater than 1
 			if(i>= start_seg && i<=end_seg && countCluster(new_sol,new_sol[i])>1){
 
 				new_sol[i] = rand() % k;//randomly switch clusters
