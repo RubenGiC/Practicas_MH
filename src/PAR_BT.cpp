@@ -652,13 +652,13 @@ vector<int> PARBT::ILS_ES(int max_iter, int n_iterations, float mu, float fi, fl
 	//while not evaluate the all solutions and the number of evaluatios is less than max number of evaluations
 	for(int i = 0; i < n_iterations && it < max_iter; ++i){
 
-		cout << "antes: " << it << endl;
+		//cout << "antes: " << it << endl;
 
 		//Local Search (change the number of iterarions and the fitness of the new solution)
-		new_solution = ES(max_iter, 0.3, 0.3, 1e-3, new_solution, it, f);
+		new_solution = ES(max_iter/n_iterations, 0.3, 0.3, 1e-3, new_solution, it, f);
 
-		cout << "despues: " << it << ", " << f << endl;
-		cout << f << " vs " << f_best << endl;
+		/*cout << "despues: " << it << ", " << f << endl;
+		cout << f << " vs " << f_best << endl;*/
 
 		//if the new o actual solution is better than the best solution find
 		if(f < f_best){
@@ -692,7 +692,7 @@ vector<int> PARBT::ILS(int max_iter, int n_iterations){
 	for(int i = 0; i < n_iterations && it < max_iter; ++i){
 
 		//Local Search (change the number of iterarions and the fitness of the new solution)
-		new_solution = algoritmoBL(new_solution, max_iter, it, f);
+		new_solution = algoritmoBL(new_solution, max_iter/n_iterations, it, f);
 
 		//if the new o actual solution is better than the best solution find
 		if(f < f_best){
@@ -756,10 +756,10 @@ vector<int> PARBT::BMB(int max_iter, int n_solutions){
 	float f=0;
 
 	//while not evaluate the all solutions and the number of evaluatios is less than max number of evaluations
-	for(unsigned int i = 0; i < soluciones.size() && it < max_iter; ++i){
+	for(int i = 0; i < n_solutions && it < max_iter; ++i){
 
 		//Local Search
-		soluciones[i] = algoritmoBL(soluciones[i], max_iter, it, f);
+		soluciones[i] = algoritmoBL(soluciones[i], max_iter/n_solutions, it, f);
 
 		//if the new o actual solution is better than the best solution find
 		if(f < f_best){

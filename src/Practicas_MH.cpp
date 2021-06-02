@@ -583,7 +583,7 @@ int main(int argc, char** argv) {
 		for(int i = 0; i<5; ++i){
 			//------------------------------------------BMB
 			start = clock();
-			vector<int> sol = par_bt->BMB(10000, 10);
+			vector<int> sol = par_bt->BMB(100000, 10);
 			end = clock();
 			elapsed = float(end - start)/CLOCKS_PER_SEC;
 
@@ -595,7 +595,7 @@ int main(int argc, char** argv) {
 
 			//------------------------------------------ILS
 			start = clock();
-			sol = par_bt->ILS(10000, 10);
+			sol = par_bt->ILS(100000, 10);
 			end = clock();
 			elapsed = float(end - start)/CLOCKS_PER_SEC;
 
@@ -607,7 +607,7 @@ int main(int argc, char** argv) {
 
 			//------------------------------------------ES
 			start = clock();
-			sol = par_bt->algoritmoES(10000, 0.3, 0.3, 1e-3, par_bt->randomSolution());
+			sol = par_bt->algoritmoES(100000, 0.3, 0.3, 1e-3, par_bt->randomSolution());
 			end = clock();
 			elapsed = float(end - start)/CLOCKS_PER_SEC;
 
@@ -619,7 +619,7 @@ int main(int argc, char** argv) {
 
 			//------------------------------------------ES-ILS
 			start = clock();
-			sol = par_bt->ILS_ES(10000, 10, 0.3, 0.3, 1e-3);
+			sol = par_bt->ILS_ES(100000, 10, 0.3, 0.3, 1e-3);
 			end = clock();
 			elapsed = float(end - start)/CLOCKS_PER_SEC;
 
@@ -630,14 +630,14 @@ int main(int argc, char** argv) {
 			ils_es += "\tElapse: " + to_string(elapsed) + "\n";
 
 		}
-		/*cout << "BMB WITH " << names[e] << endl;
+		cout << "BMB WITH " << names[e] << endl;
 		cout << bmb << endl;
 		cout << "ILS WITH " << names[e] << endl;
 		cout << ils << endl;
 		cout << "ES WITH " << names[e] << endl;
-		cout << es << endl;*/
-		cout << "Hibridación ILS-ES WITH " << names[e] << endl;
 		cout << es << endl;
+		cout << "Hibridación ILS-ES WITH " << names[e] << endl;
+		cout << ils_es << endl;
 
 		bmb = "";
 		ils= "";
@@ -645,21 +645,6 @@ int main(int argc, char** argv) {
 		ils_es="";
 
 	}
-
-	/*PARBT *par_bt = new PARBT(paths_data[0], paths_const[0], seeds[0]);
-
-	start = clock();
-	vector<int> sol = par_bt->ES(100000, 0.3, 0.3, 1e-3);
-	end = clock();
-	elapsed = float(end - start)/CLOCKS_PER_SEC;
-
-	//es += "ITERATE: " + to_string(i+1) + " ---------------------------------------\n";
-	es += "\tInfeas: " + to_string(par_bt->infeasibility(sol)) + "\n";
-	es += "\tIntracluster Distance: " + to_string(par_bt->generalDeviation(sol)) + "\n";
-	es += "\tFitness: " + to_string(par_bt->fitness(sol)) + "\n";
-	es += "\tElapse: " + to_string(elapsed) + "\n";
-
-	cout << es << endl;*/
 
 	return 0;
 }
