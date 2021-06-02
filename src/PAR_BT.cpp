@@ -400,15 +400,15 @@ vector<int> PARBT::randomSolution(){
 
 	return solution;
 }
-
-vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
+//algorithm ES
+vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf, vector<int> sol_ini, int &it, float &f){
 	//the initial solution is the best solution and actual solution
-	vector<int> best_solution = randomSolution();
+	vector<int> best_solution = sol_ini;
 	vector<int> solution = best_solution;
 	vector<int> new_solution = best_solution;
 
 	//calculate the fitness
-	float f = fitness(best_solution);
+	f = fitness(best_solution);
 	float new_f;
 
 	//calculate the initial temperature
@@ -433,7 +433,7 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 	float beta = (t - tf)/(M*t*tf);
 
 	//number of evaluations
-	int iterations = 1;
+	++it;
 
 	//choose the random node
 	int node = rand() % best_solution.size();
@@ -454,7 +454,7 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 	cout << "numero maximo de exitos: " << max_successes << endl;*/
 
 	//while the temperature is greater than 0 and the number of evaluations si less than max evaluations
-	while(t>tf && iterations <max_iter){
+	while(t>tf && it <max_iter){
 
 		//as long as the number of neighbors generated is less than maximum number of neighbors
 		//and the number of successes is less than maximum number of successes
@@ -488,7 +488,10 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 
 				//calculate the fitness
 				new_f = fitness(solution);
-				++iterations;
+				++it;
+
+				//increment the number of successes
+				++n_successes;
 
 				//and compare the new solution with the best solution
 				//if the new solution si better than the best solution
@@ -496,8 +499,6 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 					//update the solution
 					f = new_f;
 					best_solution = solution;
-
-					++n_successes;
 				}
 			}
 
@@ -514,6 +515,162 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 
 	}
 
+	return best_solution;
+}
+
+//algorithm ES
+vector<int> PARBT::algoritmoES(int max_iter, float mu, float fi, float tf, vector<int> sol_ini){
+	//the initial solution is the best solution and actual solution
+	vector<int> best_solution = sol_ini;
+	vector<int> solution = best_solution;
+	vector<int> new_solution = best_solution;
+
+	//calculate the fitness
+	float f = fitness(best_solution);
+	float new_f;
+
+	//calculate the initial temperature
+	float t = (mu*f)/(-log(fi));
+
+	//if the final temperature is greater than initial temperature
+	if(tf > t){
+		//reduce the final temperature
+		do{
+			tf = 0.01 * tf;
+		}while(tf > t);
+	}
+
+	//calculate the max number of neighbours
+	int max_neighbours = 10 * best_solution.size();
+	//calculate the max number of successes
+	int max_successes = 0.1 * max_neighbours;
+
+	//calculate the number of cooldowns
+	float M = max_iter/max_neighbours;
+	//calculate the constant beta
+	float beta = (t - tf)/(M*t*tf);
+
+	//number of evaluations
+	int it=1;
+
+	//choose the random node
+	int node = rand() % best_solution.size();
+	//random value to change in the random node
+	int cluster = rand() % k;
+
+	//value random bettwen 0 and 1
+	float u = (float) rand()/RAND_MAX;
+
+	//diference bettwen fitness
+	float deltaf;
+
+	int n_neighbours = 0, n_successes=0, n_nodes;
+
+	/*cout << "Temperatura final: " << tf << endl;
+	cout << "Temperatura inicial: " << t << endl;
+	cout << "numero maximo de vecinos: " << max_neighbours << endl;
+	cout << "numero maximo de exitos: " << max_successes << endl;*/
+
+	//while the temperature is greater than 0 and the number of evaluations si less than max evaluations
+	while(t>tf && it <max_iter){
+
+		//as long as the number of neighbors generated is less than maximum number of neighbors
+		//and the number of successes is less than maximum number of successes
+		for(int i = 0; i < max_neighbours && n_successes < max_successes; ++i){
+
+			//generate the new neighbor
+			do{
+				n_nodes = countCluster(solution,solution[node]);
+				//if the cluster has more than 1 node
+				if(n_nodes>1)
+					//change the cluster one random node
+					new_solution[node] = cluster;
+
+				//generates a new random node and cluster for the next iteration
+				node = rand() % best_solution.size();
+				cluster = rand() % k;
+
+			//as long as the new value the node is equal to actual node change
+			}while(new_solution[node] == solution[node] || n_nodes==1);
+
+			++n_neighbours;
+
+			//calculate fitness difference
+			deltaf = new_f-f;
+
+			//if the fitness difference is less than 0 or the random value is less than e^(deltaf/t)
+			if(deltaf<0 or u < exp(deltaf/t)){
+
+				//save the new solution
+				solution = new_solution;
+
+				//calculate the fitness
+				new_f = fitness(solution);
+				++it;
+
+				//increment the number of successes
+				++n_successes;
+
+				//and compare the new solution with the best solution
+				//if the new solution si better than the best solution
+				if(new_f < f){
+					//update the solution
+					f = new_f;
+					best_solution = solution;
+				}
+			}
+
+		}
+		//change value of u
+		u = (float) rand()/RAND_MAX;
+
+		//decrease the temperature
+		t = t/(1+(beta*t));
+
+		//reset counters
+		n_successes = 0;
+		n_neighbours = 0;
+
+	}
+
+	return best_solution;
+}
+
+//Hybrid ILS-ES algorithm
+vector<int> PARBT::ILS_ES(int max_iter, int n_iterations, float mu, float fi, float tf){
+	//save the initial solution as the best solution
+	vector<int> best_solution = randomSolution();
+	//too save in the new_solution
+	vector<int> new_solution = best_solution;
+
+	//and calculate the fitness
+	float f_best = generalDeviation(best_solution) + (infeasibility(best_solution) * landa);
+
+	int it=1;
+	float f=0;
+
+	//while not evaluate the all solutions and the number of evaluatios is less than max number of evaluations
+	for(int i = 0; i < n_iterations && it < max_iter; ++i){
+
+		cout << "antes: " << it << endl;
+
+		//Local Search (change the number of iterarions and the fitness of the new solution)
+		new_solution = ES(max_iter, 0.3, 0.3, 1e-3, new_solution, it, f);
+
+		cout << "despues: " << it << ", " << f << endl;
+		cout << f << " vs " << f_best << endl;
+
+		//if the new o actual solution is better than the best solution find
+		if(f < f_best){
+			//update the best solution
+			best_solution = new_solution;
+			f_best = f;
+		}
+		//apply the mutation with the best solution
+		new_solution = fixedSegmentMutation(best_solution);
+	}
+
+	//return the best solution
 	return best_solution;
 }
 

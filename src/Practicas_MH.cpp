@@ -607,7 +607,7 @@ int main(int argc, char** argv) {
 
 			//------------------------------------------ES
 			start = clock();
-			sol = par_bt->ES(10000, 0.3, 0.3, 1e-3);
+			sol = par_bt->algoritmoES(10000, 0.3, 0.3, 1e-3, par_bt->randomSolution());
 			end = clock();
 			elapsed = float(end - start)/CLOCKS_PER_SEC;
 
@@ -619,7 +619,7 @@ int main(int argc, char** argv) {
 
 			//------------------------------------------ES-ILS
 			start = clock();
-			sol = par_bt->ILS_ES(10000, 0.3, 0.3, 1e-3);
+			sol = par_bt->ILS_ES(10000, 10, 0.3, 0.3, 1e-3);
 			end = clock();
 			elapsed = float(end - start)/CLOCKS_PER_SEC;
 
@@ -637,7 +637,7 @@ int main(int argc, char** argv) {
 		cout << "ES WITH " << names[e] << endl;
 		cout << es << endl;*/
 		cout << "Hibridación ILS-ES WITH " << names[e] << endl;
-		cout << ils_es << endl;
+		cout << es << endl;
 
 		bmb = "";
 		ils= "";
