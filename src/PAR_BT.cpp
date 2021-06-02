@@ -413,6 +413,15 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 
 	//calculate the initial temperature
 	float t = (mu*f)/(-log(fi));
+
+	//if the final temperature is greater than initial temperature
+	if(tf > t){
+		//reduce the final temperature
+		do{
+			tf = 0.01 * tf;
+		}while(tf > t);
+	}
+
 	//calculate the max number of neighbours
 	int max_neighbours = 10 * best_solution.size();
 	//calculate the max number of successes
@@ -437,11 +446,15 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 	//diference bettwen fitness
 	float deltaf;
 
-	int n_neighbours = 0;
-	int n_successes=0;
+	int n_neighbours = 0, n_successes=0, n_nodes;
+
+	/*cout << "Temperatura final: " << tf << endl;
+	cout << "Temperatura inicial: " << t << endl;
+	cout << "numero maximo de vecinos: " << max_neighbours << endl;
+	cout << "numero maximo de exitos: " << max_successes << endl;*/
 
 	//while the temperature is greater than 0 and the number of evaluations si less than max evaluations
-	while(t>0 && iterations <max_iter){
+	while(t>tf && iterations <max_iter){
 
 		//as long as the number of neighbors generated is less than maximum number of neighbors
 		//and the number of successes is less than maximum number of successes
@@ -449,8 +462,9 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 
 			//generate the new neighbor
 			do{
+				n_nodes = countCluster(solution,solution[node]);
 				//if the cluster has more than 1 node
-				if(countCluster(solution,solution[node])>1)
+				if(n_nodes>1)
 					//change the cluster one random node
 					new_solution[node] = cluster;
 
@@ -459,13 +473,16 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 				cluster = rand() % k;
 
 			//as long as the new value the node is equal to actual node change
-			}while(new_solution[node] == solution[node]);
+			}while(new_solution[node] == solution[node] || n_nodes==1);
+
+			++n_neighbours;
 
 			//calculate fitness difference
 			deltaf = new_f-f;
 
 			//if the fitness difference is less than 0 or the random value is less than e^(deltaf/t)
 			if(deltaf<0 or u < exp(deltaf/t)){
+
 				//save the new solution
 				solution = new_solution;
 
@@ -485,9 +502,15 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf){
 			}
 
 		}
+		//change value of u
+		u = (float) rand()/RAND_MAX;
+
 		//decrease the temperature
 		t = t/(1+(beta*t));
 
+		//reset counters
+		n_successes = 0;
+		n_neighbours = 0;
 
 	}
 

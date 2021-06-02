@@ -42,6 +42,7 @@ public:
 	vector<int> BMB(int max_iter, int n_solutions);//algoritmo de Busqueda Multiarranque Básica
 	vector<int> ILS(int max_iter, int n_iterations);//algoritmo de Busqueda Local Reiterada
 	vector<int> ES(int max_iter, float mu, float fi, float tf);//algoritmo de Enfriamiento Simulado
+	vector<int> ILS_ES(int max_iter, float mu, float fi, float tf);//algoritmo Hibrido entre el Enfriamiento Simulado y el de Busqueda Local Reiterada
 
 	//uniform mutation operator
 	vector<int> fixedSegmentMutation(const vector<int> &sol);

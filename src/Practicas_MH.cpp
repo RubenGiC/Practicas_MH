@@ -577,7 +577,7 @@ int main(int argc, char** argv) {
 		am_10mej = "";
 	}*/
 
-	/*for(unsigned int e=0; e<seeds.size(); ++e){
+	for(unsigned int e=0; e<seeds.size(); ++e){
 		PARBT *par_bt = new PARBT(paths_data[e], paths_const[e], seeds[e]);
 
 		for(int i = 0; i<5; ++i){
@@ -616,16 +616,50 @@ int main(int argc, char** argv) {
 			es += "\tIntracluster Distance: " + to_string(par_bt->generalDeviation(sol)) + "\n";
 			es += "\tFitness: " + to_string(par_bt->fitness(sol)) + "\n";
 			es += "\tElapse: " + to_string(elapsed) + "\n";
-		}*/
+
+			//------------------------------------------ES-ILS
+			start = clock();
+			sol = par_bt->ILS_ES(10000, 0.3, 0.3, 1e-3);
+			end = clock();
+			elapsed = float(end - start)/CLOCKS_PER_SEC;
+
+			ils_es += "ITERATE: " + to_string(i+1) + " ---------------------------------------\n";
+			ils_es += "\tInfeas: " + to_string(par_bt->infeasibility(sol)) + "\n";
+			ils_es += "\tIntracluster Distance: " + to_string(par_bt->generalDeviation(sol)) + "\n";
+			ils_es += "\tFitness: " + to_string(par_bt->fitness(sol)) + "\n";
+			ils_es += "\tElapse: " + to_string(elapsed) + "\n";
+
+		}
 		/*cout << "BMB WITH " << names[e] << endl;
-		cout << bmb << endl;*/
-		/*cout << "ILS WITH " << names[e] << endl;
+		cout << bmb << endl;
+		cout << "ILS WITH " << names[e] << endl;
 		cout << ils << endl;
+		cout << "ES WITH " << names[e] << endl;
+		cout << es << endl;*/
+		cout << "Hibridación ILS-ES WITH " << names[e] << endl;
+		cout << ils_es << endl;
 
 		bmb = "";
 		ils= "";
+		es="";
+		ils_es="";
 
-	}*/
+	}
+
+	/*PARBT *par_bt = new PARBT(paths_data[0], paths_const[0], seeds[0]);
+
+	start = clock();
+	vector<int> sol = par_bt->ES(100000, 0.3, 0.3, 1e-3);
+	end = clock();
+	elapsed = float(end - start)/CLOCKS_PER_SEC;
+
+	//es += "ITERATE: " + to_string(i+1) + " ---------------------------------------\n";
+	es += "\tInfeas: " + to_string(par_bt->infeasibility(sol)) + "\n";
+	es += "\tIntracluster Distance: " + to_string(par_bt->generalDeviation(sol)) + "\n";
+	es += "\tFitness: " + to_string(par_bt->fitness(sol)) + "\n";
+	es += "\tElapse: " + to_string(elapsed) + "\n";
+
+	cout << es << endl;*/
 
 	return 0;
 }
