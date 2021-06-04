@@ -652,7 +652,7 @@ vector<int> PARBT::ILS_ES(int max_iter, int n_iterations, float mu, float fi, fl
 		//cout << "antes: " << it << endl;
 
 		//Local Search (change the number of iterarions and the fitness of the new solution)
-		new_solution = ES(max_iter/n_iterations, 0.3, 0.3, 1e-3, new_solution, it, f);
+		new_solution = ES(max_iter/n_iterations, mu, fi, tf, new_solution, it, f);
 
 		/*cout << "despues: " << it << ", " << f << endl;
 		cout << f << " vs " << f_best << endl;*/
