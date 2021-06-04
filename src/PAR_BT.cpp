@@ -501,9 +501,9 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf, vector<int> so
 				}
 			}
 
+			//change value of u
+			u = (float) rand()/RAND_MAX;
 		}
-		//change value of u
-		u = (float) rand()/RAND_MAX;
 
 		//decrease the temperature
 		t = t/(1+(beta*t));
@@ -618,9 +618,9 @@ vector<int> PARBT::algoritmoES(int max_iter, float mu, float fi, float tf, vecto
 				}
 			}
 
+			//change value of u
+			u = (float) rand()/RAND_MAX;
 		}
-		//change value of u
-		u = (float) rand()/RAND_MAX;
 
 		//decrease the temperature
 		t = t/(1+(beta*t));
