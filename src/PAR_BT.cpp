@@ -892,8 +892,9 @@ vector<int> PARBT::betterFitness(const vector<int> &S_cop, const vector<pair<int
 					f = new_f;
 					S_cop3 = S_cop2;
 
-				}//else restore to the previous solution
-				S_cop2 = S_cop3;
+				}else{//else restore to the previous solution
+					S_cop2 = S_cop3;
+				}
 
 				//if the iterate reaches 100000
 				if(it >= max){
