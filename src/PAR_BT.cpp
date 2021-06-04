@@ -409,17 +409,15 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf, vector<int> so
 
 	//calculate the fitness
 	f = fitness(best_solution);
-	float new_f;
+	float new_f, f_best = f;
 
 	//calculate the initial temperature
 	float t = (mu*f)/(-log(fi));
 
 	//if the final temperature is greater than initial temperature
-	if(tf > t){
+	while(tf > t){
 		//reduce the final temperature
-		do{
-			tf = 0.01 * tf;
-		}while(tf > t);
+		tf = 0.01 * tf;
 	}
 
 	//calculate the max number of neighbours
@@ -477,6 +475,10 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf, vector<int> so
 
 			++n_neighbours;
 
+			//calculate the fitness
+			new_f = fitness(solution);
+			++it;
+
 			//calculate fitness difference
 			deltaf = new_f-f;
 
@@ -485,19 +487,16 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf, vector<int> so
 
 				//save the new solution
 				solution = new_solution;
-
-				//calculate the fitness
-				new_f = fitness(solution);
-				++it;
+				f = new_f;
 
 				//increment the number of successes
 				++n_successes;
 
 				//and compare the new solution with the best solution
 				//if the new solution si better than the best solution
-				if(new_f < f){
+				if(f < f_best){
 					//update the solution
-					f = new_f;
+					f_best = f;
 					best_solution = solution;
 				}
 			}
@@ -510,8 +509,7 @@ vector<int> PARBT::ES(int max_iter, float mu, float fi, float tf, vector<int> so
 		t = t/(1+(beta*t));
 
 		//reset counters
-		n_successes = 0;
-		n_neighbours = 0;
+		n_successes = n_neighbours = 0;
 
 	}
 
@@ -527,17 +525,16 @@ vector<int> PARBT::algoritmoES(int max_iter, float mu, float fi, float tf, vecto
 
 	//calculate the fitness
 	float f = fitness(best_solution);
+	float f_best = f;
 	float new_f;
 
 	//calculate the initial temperature
 	float t = (mu*f)/(-log(fi));
 
 	//if the final temperature is greater than initial temperature
-	if(tf > t){
+	while(tf > t){
 		//reduce the final temperature
-		do{
-			tf = 0.01 * tf;
-		}while(tf > t);
+		tf = 0.01 * tf;
 	}
 
 	//calculate the max number of neighbours
@@ -595,6 +592,10 @@ vector<int> PARBT::algoritmoES(int max_iter, float mu, float fi, float tf, vecto
 
 			++n_neighbours;
 
+			//calculate the fitness
+			new_f = fitness(solution);
+			++it;
+
 			//calculate fitness difference
 			deltaf = new_f-f;
 
@@ -603,19 +604,16 @@ vector<int> PARBT::algoritmoES(int max_iter, float mu, float fi, float tf, vecto
 
 				//save the new solution
 				solution = new_solution;
-
-				//calculate the fitness
-				new_f = fitness(solution);
-				++it;
+				f = new_f;
 
 				//increment the number of successes
 				++n_successes;
 
 				//and compare the new solution with the best solution
 				//if the new solution si better than the best solution
-				if(new_f < f){
+				if(f < f_best){
 					//update the solution
-					f = new_f;
+					f_best = f;
 					best_solution = solution;
 				}
 			}
@@ -628,8 +626,7 @@ vector<int> PARBT::algoritmoES(int max_iter, float mu, float fi, float tf, vecto
 		t = t/(1+(beta*t));
 
 		//reset counters
-		n_successes = 0;
-		n_neighbours = 0;
+		n_successes = n_neighbours = 0;
 
 	}
 
